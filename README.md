@@ -524,7 +524,7 @@ Test your app in the browser and click the "Add Post" button several times. New 
 
 ## Understanding functional data flow
 
-Hyperapp **data flow** is inspired by the **Elm Architecture**:
+Hyperapp **data flow** is inspired by the [Elm Architecture](https://guide.elm-lang.org/architecture/):
 * view **V** interaction (e.g. click) triggers some action **A** 
 * action **A** changes state **S**
 * state **S** change triggers re-render of the view **V**
@@ -541,7 +541,7 @@ Hyperapp connects the circles and takes care of:
 * dispatching actions
 * re-rendering the view
 
-This approach makes code very declarative as you never have to perform fine-grain view updates. 
+This approach makes your code very declarative as you never have to perform fine-grain view updates. 
 At any given time, your view is the HTML/DOM projection of your current state.
 And state is the ultimate source of truth. 
 In other words, state is not spread across many JS components or even worse, in the DOM itself.
@@ -561,16 +561,20 @@ Add the input field to change the text:
 <button onclick=${AddPost}>Add Post</button>
 ```
 
-When you start typing into the input text, your state and view will desynchronize. One of the tenets of our architecture is constant synchronization of state and view. View reacting to state changes, and state changes reacting to view actions. To make this work, you need some part of your state to model the contents of the input field. 
+When you start typing some text, your state and view will get out of sync. What you're typing is not
+reflected in the state change.
+One of the tenets of functional UI architecture is continuous synchronization of state and view. 
+View reacting to state changes, and state changes reacting to view actions. 
+To make this work, you need some part of your state to model the contents of the input field. 
 
-Create a new field named currentPostText:
+Create a new state property named ```currentPostText```:
 ```javascript
 const state = {
   currentPostText: "type your text",
   posts: [...]
 };
 ```
-Read the state in the view:
+Read the new property in your view:
 ```javascript
 <input type="text" value=${state.currentPostText} autofocus />
 ```
