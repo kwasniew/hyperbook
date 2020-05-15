@@ -1063,7 +1063,7 @@ Modify ```AddPost``` action and stop adding ```newPost``` until we receive a con
 <details>
     <summary id="avoiding_duplicate_posts">Solution</summary>
 
-Inside AddPost actions change this line:
+Inside ```AddPost``` action change this line:
 ```javascript
     const newState = {
       ...state,
@@ -1072,7 +1072,7 @@ Inside AddPost actions change this line:
     };
 ```
 To this:
-```
+```javascript
     const newState = {
       ...state,
       currentPostText: ""
@@ -1085,35 +1085,37 @@ To this:
 
 In this section you'll write your own subscription for [Server-Sent Events](https://www.smashingmagazine.com/2018/02/sse-websockets-data-flow-http2/).
 
-Server-Sent Events (SSE) is a lesser known, but much simpler HTTP-native alternative to WebSockets. SSE also handles network failures more gracefully than plain WebSockets.
+Server-Sent Events (SSE) is a lesser known, but much simpler HTTP-native alternative to WebSockets. 
+SSE also handles network failures more gracefully than plain WebSockets.
 
-In the [Writing your own effects](#writing-your-own-effects) section you used the following signature for effect definition:
-```
+In [Writing your own effects](#writing-your-own-effects) section you defined effects as follows:
+```javascript
 const httpEffect = (dispatch, data) => {};
 ```
+
 Start with the same signature for the subscription definition:
 ```javascript
-const eventSourceSubscription = (dispatch, data) => {
-
-};
+const eventSourceSubscription = (dispatch, data) => {};
 ```
-The Web API to connect to SSE looks looks like this:
+
+The Web API for SSE is called the ```EventSource```:
 ```javascript
 const es = new EventSource("https://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
 ```
-The browser API for SSE is called EventSource and it is a regular event emitter similar e.g. to a button with click handlers.
+```EventSource``` is a regular event emitter similar e.g. to a clickable button.
 
-Wrap the API into our subscription definition:
+Wrap the API into your subscription definition:
 ```javascript
 const eventSourceSubscription = (dispatch, data) => {
-    const es = new EventSource(data.url);
-    es.addEventListener("message", event => dispatch(data.action, event));
+  const es = new EventSource(data.url);
+  es.addEventListener("message", (event) => dispatch(data.action, event));
 };
 ```
-```data``` parameter will hold two configuration options: url and action. It is the same convention that was used in the WebSockets implementation. When the event arrives dispatch action and pass the server event.
+```data``` parameter will hold two configuration options: ```url``` and ```action```. 
+We follow the same convention that was used in WebSockets implementation. When SSE notification arrives, dispatch an ```action``` and pass the server ```event```.
 
-In the [Writing your own effects](#writing-your-own-effects) section you used the actual effect signature:
+In [Writing your own effects](#writing-your-own-effects) section you used the following effect signature:
 ```javascript
 const Http = data => [httpEffect, data];
 ```
@@ -1123,24 +1125,43 @@ Following the same convention create your own subscription:
 const EventSourceListen = data => [eventSourceSubscription, data];
 ```
 
-
-Start using the subscription in your application:
+Plug the subscription into your application:
 ```javascript
 app({
-  subscriptions: state => [EventSourceListen({action: SetPost, url: 'https://hyperapp-api.herokuapp.com/api/event/post', event: 'post'})]
+  init: [state, LoadLatestPosts],
+  view,
+  subscriptions: (state) => [
+    EventSourceListen({
+      action: SetPost,
+      url: "https://hyperapp-api.herokuapp.com/api/event/post",
+      event: "post",
+    }),
+  ],
+  node: document.getElementById("app"),
 });
 ```
-Because you followed the same nameing convention for action and url it should be just a matter of switching WebSocketListen to EventSourceListen.
+Because you followed the same naming convention for ```action``` and ```url``` it should be just a matter of switching ```WebSocketListen``` to ```EventSourceListen```.
 
 Test your application. It should work the same as the WebSocket version, but without a need for a different protocol. 
 
-Diagnosing problems with WebSockets:
-* make sure the eventsource type was sent over HTTP
-![Eventsource Type](https://i.imgur.com/ehHPEG3.png)
-* click on the eventsource raw and find the actual message
-![Sending Messages](https://i.imgur.com/hR5esEk.png)
+Diagnosing problems with SSE:
+* make sure the ```eventsource``` connection-type was established
 
-Note: if your browser doesn't support SSE use a polyfill:
+<figure>
+    <img src="images/sse.png" width="650" alt="Establishing SSE connection" align="center">
+    <figcaption><em>Figure: Establishing SSE connection</em></figcaption>
+    <br><br>
+</figure>
+
+* check SSE messages
+
+<figure>
+    <img src="images/sse-messages.png" width="650" alt="Checking SSE messages" align="center">
+    <figcaption><em>Figure: Checking SSE messages</em></figcaption>
+    <br><br>
+</figure>
+
+If your browser [doesn't support SSE](https://caniuse.com/#search=eventsource) use a polyfill:
 ```html
 <script src="https://polyfill.io/v3/polyfill.min.js?features=fetch%2CEventSource%2Cdefault" defer></script>
 ```
