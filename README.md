@@ -791,14 +791,10 @@ It's something you must return to the framework, so it can handle the impure par
 
 ## Implementing "effects as data"
 
-In this section we'll use an open source library [hyperapp-fx](https://github.com/okwolf/hyperapp-fx) that implements the most common effect definitions. In the next section we'll peek under the hood to see that writing effect definition is not some rocket-science.
+In this section you'll use an open source library [hyperapp-fx](https://github.com/okwolf/hyperapp-fx) that implements the most common effects. 
+In the next section we'll peek under the hood to see how to build your own effects.
 
-Install the library and translate it to the browser friendly format:
-```
-npm i hyperapp-fx@next && npm run snowpack
-```
-
-Add this snippet:
+In **App.js** add ```LoadLatestPosts``` effect that invoked ```SetPost``` action on successful response:
 ```javascript
 import { Http } from "./web_modules/hyperapp-fx.js";
 
@@ -812,7 +808,20 @@ const LoadLatestPosts = Http({
   action: SetPosts
 });
 ```
-Http function takes your effect data and builds a two argument array with ```[httpEffectDefinition, effectData]```.
+```Http``` function takes your effect data and builds a two argument array with ```[httpEffectDefinition, effectData]```.
+
+Add ```hyperapp-fx``` and let Snowpack bundle it for the browser:
+```
+{
+  "dependencies": {
+    "htm": "3.0.4",
+    "hyperapp": "2.0.4",
+    "hyperapp-fx": "2.0.0-beta.1"
+  }
+}
+```
+
+```npm i```
 
 ## Triggering effects on the application startup
 
