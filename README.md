@@ -510,7 +510,7 @@ The following figure shows the same action in a visual format:
 Test your app in the browser and click the "Add Post" button several times. New items should be added to the list.
 
 <figure>
-    <img src="images/add_post_action.png.jpg" width="650" alt="Action" align="center">
+    <img src="images/add_post_action.png" width="650" alt="Action" align="center">
     <figcaption><em>Figure: AddPost action adding new items to the list</em></figcaption>
     <br><br>
 </figure>
