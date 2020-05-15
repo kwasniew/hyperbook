@@ -989,7 +989,7 @@ Import subscription definition:
 ```javascript
 import { Http, WebSocketListen } from "./web_modules/hyperapp-fx.js";
 ```
-```hyperapp-fx``` uses a convention ```*Listen``` to name the functions for creating subscriptions.
+```hyperapp-fx``` uses a convention ```*Listen``` to name subscription creating functions.
 
 Write an action for handling incoming WebSocket events:
 ```javascript
@@ -1040,9 +1040,20 @@ For now, test your WebSocket connection in two different browser windows. See if
 
 Diagnosing problems with WebSockets:
 * make sure the HTTP protocol was switched to WebSockets
-![Switching Protocols](https://i.imgur.com/ykeYaPv.png)
+
+<figure>
+    <img src="images/switching-protocols.png" width="650" alt="Switching protocols" align="center">
+    <figcaption><em>Figure: Switching protocols</em></figcaption>
+    <br><br>
+</figure>
+
 * click on the switching protocols raw and find the actual message
-![Sending Messages](https://i.imgur.com/XC1V2n1.png)
+
+<figure>
+    <img src="images/ws-messages.png" width="650" alt="Inspecting WebSocket messages" align="center">
+    <figcaption><em>Figure: Inspecting WebSocket messages</em></figcaption>
+    <br><br>
+</figure>
 
 ## Exercise: avoiding duplicate posts
 
