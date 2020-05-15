@@ -110,11 +110,11 @@ The following two figures show 2 screens you'll be building:
 ## Getting started
 
 When learning a new framework it's important to understand every single step you take and every single line of code you write. 
-Instead of generating boilerplate code, you'll setup everything line by line. 
+Instead of generating boilerplate code, you'll setup everything yourself. 
 Once you get more experience with Hyperapp, you may want to formalize the setup into your starter kit. 
-However, you may also realize that with simplified approach to development boilerplate is no longer necessary.
+However, you may also realize that with simplified approach to development, boilerplate is no longer necessary.
 
-Create empty ```src``` directory with ```index.html``` and ```App.js```. I decided to name JS files with first uppercase letter. 
+Create empty ```src``` directory with ```index.html``` and ```App.js```. You will name JS files with first uppercase letter. 
 
 ```index.html```
 ```html
@@ -132,8 +132,8 @@ Create empty ```src``` directory with ```index.html``` and ```App.js```. I decid
 </body>
 </html>
 ```
-HTML links to ```App.js``` as ES6 module, therefore you can use ES6 imports in your JS code. 
-Inside the HTML body you have an element **<main id="app"></main>** where Hyperapp will render its content.
+HTML links to ```App.js``` as ES6 module (```type="module```), so you can use ES6 imports in JS code. 
+Hyperapp will render its content into ```<main id="app"></main>```.
 
 
 ```App.js```
