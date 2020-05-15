@@ -683,7 +683,9 @@ According to [modern reaserch](https://en.wikipedia.org/wiki/Desirable_difficult
 If you want to get the most out of this tutorial please do the exercises. They are not optional.
 
 Your application doesn't clear the input text after adding a new post.
-Modify the ```AddPost``` action to reset ```currentPostText```. When you're done compare with the solution below.
+Modify the ```AddPost``` action to reset ```currentPostText```. 
+Also make sure the initial text is empty.
+When you're done compare with the solution below.
 But first, try to do it on your own. 
 
 <details>
