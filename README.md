@@ -1201,47 +1201,68 @@ const eventSourceSubscription = (dispatch, data) => {
 
   return () => {
     es.removeEventListener("message", listener);
+    es.close();
   };
 };
 ```
-The unsubscribe function removes a listener from the ```EventSource```. 
+The unsubscribe function removes a listener from the ```EventSource``` and closes the connection. 
 ```addEventListener``` and ```removeEventListener``` need a reference to the same listener instance. Therefore, put the listener in a shared variable.
 
 ## Controlling subscription status
 
 You will add a capability to enable/disable live updates through the UI.
 
-Introduce intial state field for liveUpdate control set to true:
+<figure>
+    <img src="images/liveupdate.png" width="650" alt="Live Update control" align="center">
+    <figcaption><em>Figure: Live Update control</em></figcaption>
+    <br><br>
+</figure>
+
+Introduce intial state field ```liveUpdate```:
 ```javascript
 const state = {
-  ...
+  currentPostText: "",
+  posts: [],
   liveUpdate: true
 };
 ```
-By default we'll be listening to SSE notifications.
+By default you'll be listening to SSE notifications.
 
-Add actions to toggle live update settings:
+Add an action to toggle live update:
 ```javascript
 const ToggleLiveUpdate = state => ({...state, liveUpdate: !state.liveUpdate});
 ```
 
-Add those two lines just below the Add Post button.
+Add UI control for live update just below the **Add Post** button.
 ```javascript
- <input type="checkbox" id="liveUpdate" onchange=${ToggleLiveUpdate} checked=${state.liveUpdate}/>
- <label for="liveUpdate">Live Update</label>
+    <input
+      type="checkbox"
+      id="liveUpdate"
+      onchange=${ToggleLiveUpdate}
+      checked=${state.liveUpdate}
+    />
+    <label for="liveUpdate">Live Update</label>
 ```
-The checkbox reflects the liveUpdate state. Every time the checkbox changes we toggle the live update setting.
-Label for the input field conveniently allows to click on the "Live Update" text to change the setting.
+The checkbox reflects ```liveUpdate``` status. Every time the checkbox changes it toggles the status.
+Label for the input field conveniently allows to click on the **Live Update** text to change the settings.
 
-React to liveUpdate setting:
+Control your subscription based on the ```liveUpdate``` status.
 ```javascript
 app({
-    ...
-    subscriptions: state => [state.liveUpdate && EventSourceListen({action: SetPost, url: 'https://hyperapp-api.herokuapp.com/api/event/post'})],
-    ...
+  init: [state, LoadLatestPosts],
+  view,
+  subscriptions: (state) => [
+    state.liveUpdate &&
+      EventSourceListen({
+        action: SetPost,
+        url: "https://hyperapp-api.herokuapp.com/api/event/post",
+        event: "post",
+      }),
+  ],
+  node: document.getElementById("app")
 });
 ```
-```app.subscription``` function allows to control the subscription status based on the current state. When ```state.liveUpdate``` is true we create a new subscription. When ```state.liveUpdate``` is false we usubscribe from the subscription.
+When ```state.liveUpdate``` is ```true``` a new subscription gets created. When ```state.liveUpdate``` is ```false```  you unsubscribe and close the connection.
 
 ## Handling slow API
 
