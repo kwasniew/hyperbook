@@ -890,11 +890,11 @@ const SetPosts = (state, posts) => ({
   posts
 });
 ```
-```dispatch``` call will replace the second parameter with the actual JSON data from the API. 
+```dispatch``` call will replace the second parameter with JSON data from the API. 
 The first parameter will be a regular state object that we used before.
 
 Test your own implementation of the Http effect. 
-If everything works uncomment the original ```Http``` effect from the library and delete your implementation.
+If everything works, uncomment the original ```Http``` effect from the library and delete your implementation.
 
 ```javascript
 import { Http } from "./web_modules/hyperapp-fx.js";
@@ -902,34 +902,37 @@ import { Http } from "./web_modules/hyperapp-fx.js";
 
 ## Understanding effectful actions
 
-LoadLatestPosts Http effect is invoked on application startup. What if we wanted to trigger the effects from regular actions?
+```LoadLatestPosts``` effect alias is invoked on application startup. What if we wanted to trigger ```Http``` effects from regular actions?
 
-Create SavePost effect:
+Create ```SavePost``` effect:
 ```javascript
 const SavePost = (post) =>
-    Http({
-      url: "https://hyperapp-api.herokuapp.com/api/post",
-      options: {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(post)
+  Http({
+    url: "https://hyperapp-api.herokuapp.com/api/post",
+    options: {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
       },
-      action: (state, data) => state
-    });
+      body: JSON.stringify(post),
+    },
+    action: (state, data) => state,
+  });
 ```
-This effect wraps HTTP POST to the API. The action to be triggered on successful response is not doing anything.
+This effect wraps HTTP POST. The action to be triggered on successful response is not doing anything.
 
-The signature of effectful actions looks like this:
+To use this effect in an action use the following signature: 
 ```javascript
 const EffectfulActions = oldState => [newState, Effect];
 ```
+This is how you create **effecftul actions**.
+
 If you have more than one effect wrap them in an array:
 ```javascript
 const EffectfulActions = oldState => [newState, [Effect1, Effect2]];
 ```
-Hyperapp applies the new state and schedules the effect almost instantly. The action inside the effect will trigger eventually e.g. when the HTTP response arrives.
+Hyperapp applies the new state and schedules the effect almost instantly. 
+The return action inside the effect will trigger eventually e.g. when the HTTP response arrives.
 
 ## Exercise: making effectful action
 
