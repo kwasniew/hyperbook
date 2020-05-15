@@ -856,18 +856,18 @@ The initial content flip should be gone.
 ## Writing your own effects
 
 Most of the time you don't need to write your own effects. However, to better understand the underlying concepts implement
-Http effect yourself.
+```Http``` effect yourself.
 
 Comment out this line of code:
 ```javascript
 // import { Http } from "./web_modules/hyperapp-fx.js";
 ```
 
-Our own implementation of the effect should build an array with the effect definition and data.
+Your own implementation of the effect should build an array with the effect definition and effect data.
 ```javascript
 const Http = data => [httpEffect, data];
 ```
-Hyperapp expects 2 parameter signature in the effect definition:
+Hyperapp expects two-parameter signature in the effect definition:
 ```javascript
 const httpEffect = (dispatch, data) => {};
 ```
@@ -880,7 +880,8 @@ const httpEffect = (dispatch, data) => {
       .then(json => dispatch(data.action, json));
 };
 ```
-As an effect library author you translate the side-effectful API call (e.g. fetch) into the dispatch call. Since you never call this function yourself you don't need to care about the internals of the dispatch function. Hyperapp will pass it for you when it handles the effect. 
+As an effect library author you translate the side-effectful API call (e.g. ```fetch```) into a ```dispatch``` call.  
+Hyperapp will invoke this effect and inject a ```dispatch``` function. You will never call it directly in the application code.
 
 Our original post-fetch action definition looked like this:
 ```javascript
@@ -889,9 +890,11 @@ const SetPosts = (state, posts) => ({
   posts
 });
 ```
-Dispatch call will replace the second parameter with the actual JSON data from the API. The first parameter will be a regular state object that we used before.
+```dispatch``` call will replace the second parameter with the actual JSON data from the API. 
+The first parameter will be a regular state object that we used before.
 
-Test your own implementation of the Http effect. If everything works uncomment the original Http effect from the library:
+Test your own implementation of the Http effect. 
+If everything works uncomment the original ```Http``` effect from the library and delete your implementation.
 
 ```javascript
 import { Http } from "./web_modules/hyperapp-fx.js";
