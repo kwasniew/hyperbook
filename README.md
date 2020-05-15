@@ -792,9 +792,9 @@ It's something you must return to the framework, so it can handle the impure par
 ## Implementing "effects as data"
 
 In this section you'll use an open source library [hyperapp-fx](https://github.com/okwolf/hyperapp-fx) that implements the most common effects. 
-In the next section we'll peek under the hood to see how to build your own effects.
+In the next section we'll peek under the hood and build your own effects.
 
-In **App.js** add ```LoadLatestPosts``` effect that invoked ```SetPost``` action on successful response:
+In **App.js** add ```LoadLatestPosts``` effect that invokes ```SetPost``` action on successful response:
 ```javascript
 import { Http } from "./web_modules/hyperapp-fx.js";
 
@@ -823,19 +823,27 @@ Add ```hyperapp-fx``` and let Snowpack bundle it for the browser:
 
 ```npm i```
 
-## Triggering effects on the application startup
+## Triggering effects on application startup
 
-With HTTP effect defined you must decide when to invoke it. For now, we can do it on the application startup.
+With HTTP effect defined you must decide when to invoke it. For now, you'll do it on application startup to start fetching posts early.
 
+Modify ```init``` to invoke ```LoadLatestPosts```:
 ```javascript
 app({
   init: [state, LoadLatestPosts],
   ...  
 });
 ```
-You can add init actions after the initial state. 
+```init``` has overloaded signature. In addition to the initial state you can pass one or more actions to invoke on startup.
 
-With those changes in place test your application. A list of posts from the server should arrive and replace the hardcoded posts.
+With those changes in place test your application. A list of posts from the server should arrive and replace the hardcoded posts. 
+You may observe a content flip as Hyperapp replaces initial state with server posts.
+
+<figure>
+    <img src="images/initial_posts.png" width="650" alt="Loading initial posts" align="center">
+    <figcaption><em>Figure: Loading initial posts</em></figcaption>
+    <br><br>
+</figure>
 
 If everything works fine, replace the initial posts with an empty array:
 ```javascript
@@ -843,6 +851,7 @@ const state = {
   posts: []
 };
 ```
+The initial content flip should be gone.
 
 ## Writing your own effects
 
