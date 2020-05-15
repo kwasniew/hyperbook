@@ -607,7 +607,7 @@ With a second attribute provided, Hyperapp will inject both sources of informati
 The ```event``` is a regular DOM event, therefore we can access ```event.target.value``` from DOM Event API. 
 As mentioned before, it's all about transferable skills. 
 
-The following figure updates conceptual model of Hyperapp actions with an extra event parameter:
+The following figure shows updated conceptual model of Hyperapp actions with an extra event parameter:
 <figure>
     <img src="images/action_with_event.jpg" width="650" alt="Action is a pure function of state and event" align="center">
     <figcaption><em>Figure: Action is a pure function of state and event</em></figcaption>
@@ -703,7 +703,7 @@ const AddPost = (state) => {
 ## Exercise: checking empty input
 
 After we clean the input, users may be tempted to submit empty text. Your task is to prevent them from doing so.
-Application should ignore 'Add Post' clicks when the text is empty.
+Application should ignore **Add Post** clicks when the text is empty.
 
 <details>
     <summary id="checking_empty_input">Solution</summary>
@@ -723,7 +723,9 @@ const AddPost = (state) => {
 
 ## Understanding "effects as data"
 
-All actions we used so far were simple state transitions from one data structure to the other. However in real-world situations your application will probably have to deal with side effect e.g. making HTTP calls to the API. A common functional approach to side-effects is to move them to the edges of the system. 
+All actions you've seen so far were simple state transitions from one data structure to the other. 
+However in real-world scenarios your application will probably have to deal with side effect e.g. making HTTP calls to some API. 
+A common functional approach to side-effects is to move them to the edges of the system. 
 
 Imagine the following hypothetical code you could write:
 ```javascript
@@ -733,7 +735,10 @@ const SetPosts = (state, posts) => ({
 });
 const LoadLatestPosts = (state) => fetch("https://hyperapp-api.herokuapp.com/api/post").then(SetPosts);
 ```
-```LoadLatestPosts``` uses fetch API to get data from the server. When data arrives it invokes simple state transition function to set the posts in a local state. Since fetch causes side effects (going over the wire with HTTP) it makes your entire program side-effectful. It only takes one innocent fetch call to make the code impure.
+```LoadLatestPosts``` uses browser fetch API to get data from the server. 
+When data arrives it invokes simple state transition function to set the posts in a local state. 
+Since ```fetch``` causes side effects (going over the wire with HTTP) it makes your entire program side-effectful. 
+It only takes one innocent ```fetch``` call to make the code impure.
 
 Another thought experiment is to represent the effect as a data structure:
 ```javascript
@@ -746,9 +751,14 @@ const LoadLatestPosts = {
   action: SetPosts
 };
 ```
-```LoadLatesPosts``` is an object with the API url and follow-up action to invoke after the fetch completes. Ideally we'd like to pass this object to Hyperapp so that it gets posts from the API on our behalf. We don't want to fetch the data ourselves in the userland code. This is the essence of moving impure code to the edges of the system. Framework does the impure part, while your code stays very declarative. 
+```LoadLatesPosts``` is an object with API ```url``` and follow-up ```action``` to invoke after the fetch completes. 
+Ideally we'd like to pass this object to Hyperapp and let it get the posts from the API on our behalf. 
+We don't want to fetch the data ourselves in the userland code. 
+This is the essence of moving impure code to the edges of the system. Framework does the impure part, while your code stays very declarative. 
 
-But how should Hyperapp know how to interpret this object? There's no way it can possibly translate JS objects to every single side-effect with a 400 lines core. That's why it doesn't even try. Instead, you must pass side-effect definition and the effect data as a 2 argument array.
+But how should Hyperapp know how to interpret this object? 
+There's no way it can possibly translate arbitrary JS objects to every single side-effect you can imagine. 
+That's why it doesn't even try. Instead, you must pass side-effect definition and the effect data as a two-argument array.
 
 ```javascript
 const LoadLatestPosts = [effectDefinition, {
@@ -757,13 +767,13 @@ const LoadLatestPosts = [effectDefinition, {
 }];
 ```
 
-Side-effects in Hyperapp look like this:
+Side-effects in Hyperapp are made of effect definition and effect data:
 ```javascript
 [effectDefinition, data]
 ```
 
-The effect definition will hide fetch call or some other impure action, but you will never invoke it in the userland code.
-It's something you must return to the framework so that it can handle the impure parts.
+The effect definition will hide the ```fetch``` call or some other impure call, but you will never invoke it in the userland code.
+It's something you must return to the framework, so it can handle the impure parts.
 
 ## Implementing "effects as data"
 
