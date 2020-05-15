@@ -626,26 +626,29 @@ With this change, you can start adding custom messages to the list.
 
 ## Extracting repetitive event data
 
-All actions dependent on state will follow the same pattern:
+All event based actions will follow similar pattern:
 ```javascript
 (oldState, event) => {
     const userData = event.target.value;
     ....
 }
 ```
-Create selector function to extract part of the event we care about:
+Action code would be cleaner if it didn't know about DOM Event API.
+
+Create a **selector function** to extract part of the event you care about:
 ```javascript
 const targetValue = event => event.target.value;
 ```
+Eventually, you'll move this code to a library but for now put it somewhere above your view declarations.
 
-Switch UpdatePostTest to use the new function:
+Switch ```UpdatePostTest``` to use the new function:
 ```javascript
 const UpdatePostText = (state, event) => ({
     ...state,
     currentPostText: targetValue(event)
 });
 ```
-The code is still dependent on the targetValue function.
+The code is still dependent on the ```targetValue``` function.
 
 Ideally, you'd like the action to accept only the data it needs:
 ```javascript
@@ -654,15 +657,18 @@ const UpdatePostText = (state, currentPostText) => ({
     currentPostText
 });
 ```
-You shape the second argument of your action inside the input handler. A tuple with an action and a selector applies the selector to the event before the action code is called. In our case targetValue is applied to event before calling UpdatePostText.
+Shape the second argument of your action inside the input handler. 
+A two argument array with an action and a selector applies the event selector before the action is invoked. 
+In our case ```targetValue``` is applied to DOM event before invoking ```UpdatePostText```.
 ```javascript
 <input type="text" oninput=${[UpdatePostText, targetValue]} value=${state.currentPostText} autofocus />
 ```
 
-If you keep using the action/selector tuple repeateadly, consider creating an alias:
+If you keep using the ```[action, selector]``` array over and over, consider creating an alias:
 ```javascript
 const UpdatePostTestAction = [UpdatePostText, targetValue];
 ```
+As you don't have a second usage of this pattern yet, withhold this decision for now. 
 
 ## Exercise: cleaning text input
 
