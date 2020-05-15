@@ -110,9 +110,10 @@ The following two figures show 2 screens you'll be building:
 ## Getting started
 
 When learning a new framework it's important to understand every single step you take and every single line of code you write. 
-Instead of generating boilerplate code, you'll setup everything yourself. 
-Once you get more experience with Hyperapp, you may want to formalize the setup into your starter kit. 
-However, you may also realize that with simplified approach to development, boilerplate is no longer necessary.
+Instead of generating boilerplate, you'll write everything yourself. 
+
+With more Hyperapp experience, you may formalize the setup into your own starter kit. 
+However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
 
 Create empty ```src``` directory with ```index.html``` and ```App.js```. You will name JS files with first uppercase letter. 
 
