@@ -19,6 +19,7 @@ You will need about 6 hours.
     * higher-order functions
     * currying
     * immutability
+* Some familiarity with browser development tooling (HTML elements tab, network tab, performance tab)  will be beneficial   
 * Some familiarity with other JS frameworks will be beneficial    
 
 No prior experience with Hyperapp is needed.
@@ -115,9 +116,9 @@ Instead of generating boilerplate, you'll write everything yourself.
 With more Hyperapp experience, you may formalize the setup into your own starter kit. 
 However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
 
-Create empty ```src``` directory with ```index.html``` and ```App.js```. You will name JS files with first uppercase letter. 
+Create empty ```src``` directory with **index.html** and **App.js**. You will name JS files with first uppercase letter. 
 
-```index.html```
+**index.html**
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -137,7 +138,7 @@ HTML links to ```App.js``` as ES6 module (```type="module"```), therefore you ca
 Hyperapp will render its content into ```<main id="app"></main>```.
 
 
-```App.js```
+**App.js**
 ```javascript
 import {h, app} from "https://unpkg.com/hyperapp?module";
 
@@ -173,7 +174,7 @@ Check if you browser renders same HTML as in the following figure:
     <br><br>
 </figure>
 
-## Analyzing view rendering options
+## Understanding view function
 
 <figure>
     <img src="images/view.jpg" width="650" alt="View as a function of state" align="center">
@@ -182,23 +183,33 @@ Check if you browser renders same HTML as in the following figure:
 </figure>
 
 In the functional approach to UI development, view is a pure function of state. 
-Hyperapp ```view``` function takes ```state``` parameter as an input and returns a data structure describing future DOM tree to build. 
-The returned data structure is known as the Virtual DOM. The framework turns it into very efficient low-level DOM updates. 
-The important point is that you never work directly with DOM updates in your application code. 
+Hyperapp ```view``` function takes ```state``` object as an input and returns a data structure describing future DOM tree to build. 
+The returned data structure is known as the Virtual DOM. The framework can turn it into very efficient low-level DOM updates. 
+The important point is that you never work directly with DOM API in your application code. 
+Instead of making imperative calls such as ```document.createElement```, ```element.insertBefore``` or ```element.removeChild``` you declare
+what the view should look like and call it a day.  
+
+## Analyzing view rendering options
+
+View function needs to build a Virtual DOM data structure. You have at least 3 options to choose from:
+* ```h```
+* ```JSX``` translating to ```h``` at build time
+* ```htm``` translating to ```h``` at runtime or build time
+
 
 ### h
 
-The view function uses **h** function to build Virtual DOM nodes.
+Currently your application uses built-in **h** function to build Virtual DOM nodes.
 Change your view function to wrap the text in a span element:
 ```javascript
-state => h("h1", {id: "my-header"}, [h("span", {}, state.text)]),
+state => h("h1", {id: "my-header"}, [h("span", {}, state.text)])
 ```
 Check the generated HTML:
 ```html
 <h1 id="my-header"><span>Welcome to Hyperapp!</span></h1>
 ```
 
-What about something more complicated? How much effort would it take you to translate the following snippet into h function calls?
+What about something more complicated? How much effort would it take to translate the following snippet into ```h``` function calls?
 ```html
 <div>
     <h1>Recent Posts</h1>
@@ -214,21 +225,25 @@ What about something more complicated? How much effort would it take you to tran
     </ul>
 </div>
 ```
-Translating between HTML and h function calls can be tiresome. Even if you automate the process, you still have to mentally switch between function representation and HTML representation.
+Translating between HTML and ```h``` function calls can get tiresome for more complex HTML. 
+Even if you automate the process, you still have to mentally switch between function representation and HTML representation you inspect in DevTools.
+On the other hand if you write everything from scratch and prefer JS first templating using ```h``` function directly is a solid option. 
 
 ### JSX (http://facebook.github.io/jsx/)
 
-**JSX** is a language extension that originated in the React circles. It allows to write code that looks like HTML in JS:
-```javascript
+**JSX** is a language extension that originated in the React circles. It allows to write JS code that looks like HTML:
+```jsx
 view: state => <h1 id="my-header"><span>{state.text}</span></h1>
 ```
-To make JSX work, you need to run a transpiler from JSX to h function calls. If adding a build step to your development process is not your thing, we have one more option.
+
+To make JSX work, you need to run a transpiler from JSX to ```h``` function calls. 
+If adding a build step to your development process is not your thing, we have one more option.
 
 ### htm (https://github.com/developit/htm)
 
 **htm** is a tiny library with HTML-like syntax and no build tool requirement. 
 
-Change you app.js code to use htm:
+Change you **app.js** code to use ```htm```:
 ```javascript
 import {h, app} from "https://unpkg.com/hyperapp?module";
 import htm from 'https://unpkg.com/htm?module';
@@ -243,15 +258,13 @@ app({
     node: document.getElementById("app")
 });
 ```
-htm connects to Hyperapp using the ```bind``` function. Write your HTML inside html tagged template. Under the hood it translates to the low-level h function calls.
+```htm``` connects to Hyperapp via ```bind``` function. Write your HTML inside ```html``` tagged template. Under the hood ```htm``` translates everything to the low-level ```h``` function calls.
 
-htm works with any Virtual DOM framework with the signature:
+```htm``` works with any Virtual DOM framework matching the signature:
 ```javascript
-function builder(type, props, ...children) {
-  return { type, props, children };
-}
+function buildVirtualNode(type, props, ...children) {}
 ```
-Hyperapp h function happens to match the signature.
+```h``` function happens to match the signature.
 
 ## Using Hyperapp from npm
 
