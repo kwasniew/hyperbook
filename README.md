@@ -116,7 +116,7 @@ Instead of generating boilerplate, you'll write everything yourself.
 With more Hyperapp experience, you may formalize the setup into your own starter kit. 
 However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
 
-Create empty ```src``` directory with **index.html** and **App.js**. You will name JS files with first uppercase letter. 
+Create empty **src** directory with **index.html** and **App.js**. You will name JS files with first uppercase letter. 
 
 **index.html**
 ```html
@@ -134,7 +134,7 @@ Create empty ```src``` directory with **index.html** and **App.js**. You will na
 </body>
 </html>
 ```
-HTML links to ```App.js``` as ES6 module (```type="module"```), therefore you can use ES6 imports in JS code. 
+HTML links to **App.js** as ES6 module (```type="module"```), therefore you can use ES6 imports in JS code. 
 Hyperapp will render its content into ```<main id="app"></main>```.
 
 
@@ -184,7 +184,7 @@ Check if you browser renders same HTML as in the following figure:
 
 In the functional approach to UI development, view is a pure function of state. 
 Hyperapp ```view``` function takes ```state``` object as an input and returns a data structure describing future DOM tree to build. 
-The returned data structure is known as the Virtual DOM. The framework can turn it into very efficient low-level DOM updates. 
+The returned data structure is known as the Virtual DOM. The framework can translate it into very efficient low-level DOM updates. 
 The important point is that you never work directly with DOM API in your application code. 
 Instead of making imperative calls such as ```document.createElement```, ```element.insertBefore``` or ```element.removeChild``` you declare
 what the view should look like and call it a day.  
@@ -199,8 +199,8 @@ View function needs to build a Virtual DOM data structure. You have at least 3 o
 
 ### h
 
-Currently your application uses built-in **h** function to build Virtual DOM nodes.
-Change your view function to wrap the text in a span element:
+Currently your application uses built-in **h** function to make Virtual DOM nodes.
+Change your view function to wrap the text in a ```span``` element:
 ```javascript
 state => h("h1", {id: "my-header"}, [h("span", {}, state.text)])
 ```
@@ -225,9 +225,9 @@ What about something more complicated? How much effort would it take to translat
     </ul>
 </div>
 ```
-Translating between HTML and ```h``` function calls can get tiresome for more complex HTML. 
+Translating between HTML and ```h``` function calls can get tiresome for nested HTML. 
 Even if you automate the process, you still have to mentally switch between function representation and HTML representation you inspect in DevTools.
-On the other hand if you write everything from scratch and prefer JS first templating using ```h``` function directly is a solid option. 
+On the other hand if you write everything from scratch and prefer JS first templating, calling ```h``` function directly is a solid option. 
 
 ### JSX (http://facebook.github.io/jsx/)
 
@@ -268,41 +268,47 @@ function buildVirtualNode(type, props, ...children) {}
 
 ## Using Hyperapp from npm
 
-Using modules directly from CDN is convenient for simple experiments. However, for the regular development you want to have local version of all dependencies. Why? Because sometimes CDNs go down, are slow to respond, have breaches or just go out of business. Also, having your dependencies locally allows to work offline.
+Using modules directly from CDN is convenient for simple experiments. 
+However, for the regular development you want to have local version of all dependencies. 
+Why? Because sometimes CDNs:
+* go down
+* are slow to respond
+* have security breaches
+* go out of business
 
-Create package.json:
-```json
-{}
-```
+Also having your local dependencies allows to work offline.
 
-Install dependencies:
-```
-npm i hyperapp htm
-```
-
-Check if your package.json was updated:
+Create **package.json** in your root directory:
 ```json
 {
   "dependencies": {
-    "htm": "3.0.3",
+    "htm": "3.0.4",
     "hyperapp": "2.0.4"
   }
 }
 ```
+Put the same versions of dependencies as this tutorial to make sure everything works.
 
-You can try to reference npm dependencies from app.js:
+Install dependencies:
+```
+npm i
+```
+On quick inspection of **node_modules** you'll find no transitive dependencies. Both ```htm``` and ```hyperapp``` bring no extra guests
+to the party.
+
+You can try to reference npm dependencies from **app.js**:
 ```javascript
 import {h, app} from "hyperapp";
 import htm from "htm";
 ```
 But unfortunately browsers can't resolve those dependencies.
 
-Since both Hyperapp and htm are zero-dependency libraries you can load them from node_modules:
+Since both ```hyperapp``` and ```htm``` are zero-dependency libraries you can load them from **node_modules**:
 ```javascript
-import {h, app} from "./node_modules/hyperapp/src/index.js";
-import htm from "./node_modules/htm/dist/htm.mjs";
+import {h, app} from "../node_modules/hyperapp/src/index.js";
+import htm from "../node_modules/htm/dist/htm.mjs";
 ```
-It works, but I had to manually inspect the contents of both libraries to provide correct paths.
+It certainly works, but I had to inspect the contents of both libraries to provide correct paths.
 
 ## Integrating Hyperapp with Snowpack (https://www.snowpack.dev/)
 
