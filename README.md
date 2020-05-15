@@ -757,6 +757,14 @@ We don't want to fetch the data ourselves in the userland code.
 This is the essence of moving impure code to the edges of the system. Framework does the impure part, while your code stays very declarative. 
 
 But how should Hyperapp know how to interpret this object? 
+
+<figure>
+    <img src="images/arbitrary_effect.jpg" width="650" alt="Hyperapp can't interpret arbitrary data" align="center">
+    <figcaption><em>Figure: Hyperapp can't interpret arbitrary data</em></figcaption>
+    <br><br>
+</figure>
+
+
 There's no way it can possibly translate arbitrary JS objects to every single side-effect you can imagine. 
 That's why it doesn't even try. Instead, you must pass side-effect definition and the effect data as a two-argument array.
 
@@ -774,6 +782,12 @@ Side-effects in Hyperapp are made of effect definition and effect data:
 
 The effect definition will hide the ```fetch``` call or some other impure call, but you will never invoke it in the userland code.
 It's something you must return to the framework, so it can handle the impure parts.
+
+<figure>
+    <img src="images/effect_definition.jpg" width="650" alt="Hyperapp can handle effect definitions from the userland" align="center">
+    <figcaption><em>Figure: Hyperapp can handle effect definitions from the userland</em></figcaption>
+    <br><br>
+</figure>
 
 ## Implementing "effects as data"
 
