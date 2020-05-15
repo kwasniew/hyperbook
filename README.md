@@ -554,7 +554,7 @@ Therefore, cognitive overhead from unnecessary language features is minimal.
 
 You already implemented a button click action. It always adds a post with the same text. 
 
-Add the input field to change the text:
+Add an input field to change the text:
 ```javascript
 <h1>Recent Posts</h1>
 <input type="text" autofocus />
@@ -582,22 +582,23 @@ DOM attribute called ```value``` sets the text of the input field to the ```curr
 
 ## Accessing DOM events
 
-Input text reflects currentPostText from the state object. You want to close the circle with DOM events changing the state.
+Input text reflects ```currentPostText``` from the state object. You want to close the circle with DOM events changing the state.
 
-Add DOM oninput attribute to trigger UpdatePostText action on input changes:
+Add DOM ```oninput``` attribute to trigger ```UpdatePostText``` action on input changes:
 ```javascript
-<input oninput=${UpdatePostText} type="text" autofocus />
+<input type="text" oninput=${UpdatePostText} value=${state.currentPostText} autofocus />
 ```
 
+Add a new action next to the ```AddPost``` action:
 ```javascript
 const UpdatePostText = (state, event) => ({
     ...state,
     currentPostText: event.target.value
 });
 ```
-Compare UpdatePostText signature with AddPost signature.
+Compare ```UpdatePostText``` signature with ```AddPost``` signature.
 
-```
+```javascript
 (oldState) => newState
 (oldState, event) => newState
 ```
