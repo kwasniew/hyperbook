@@ -34,6 +34,16 @@ No prior experience with Hyperapp is needed.
 
 > We have lost our ability of achieving more with less. We do more with more. Or, in certain cases, we do less with more.
 
+Modern frontend development is too complex:
+* frameworks with 10000k+ LOC, impenetrable to non-core developers
+* tools with huge API surface area
+* more and more JS "the bad parts" to learn
+* complex tooling to make everything work
+* layers upon layers of abstraction on top of the browser
+* elaborate performance tricks to improve performance
+* unpredictable mix of side-effects and application logic 
+* testing techniques encouraging monkey patching the language
+
 ## What is your elevator pitch?
 
 <figure>
