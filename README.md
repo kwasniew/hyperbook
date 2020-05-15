@@ -169,13 +169,22 @@ By default ```http-server``` starts on http://127.0.0.1:8080
 Check if you browser renders same HTML as in the following figure:
 <figure>
     <img src="images/getting_started.png" width="650" alt="Getting started result" align="center">
-    <figcaption><em>Figure: Getting started result</em></figcaption>
+    <figcaption><em>Figure: Getting started HTML</em></figcaption>
     <br><br>
 </figure>
 
 ## Analyzing view rendering options
 
-In the functional world of Hyperapp, view is a pure function of state. This function takes state parameter as input and returns data structure representing your view. The returned data structure is known as the Virtual DOM. The framework turns it into very efficient DOM updates. The important point is that you never work directly with DOM updates in your application code. 
+<figure>
+    <img src="images/view.jpg" width="650" alt="View as a function of state" align="center">
+    <figcaption><em>Figure: View as a function of state</em></figcaption>
+    <br><br>
+</figure>
+
+In the functional approach to UI development, view is a pure function of state. 
+Hyperapp ```view``` function takes ```state``` parameter as an input and returns a data structure describing future DOM tree to build. 
+The returned data structure is known as the Virtual DOM. The framework turns it into very efficient low-level DOM updates. 
+The important point is that you never work directly with DOM updates in your application code. 
 
 ### h
 
