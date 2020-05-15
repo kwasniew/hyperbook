@@ -71,7 +71,7 @@ By the end of this tutorial you will learn to:
 * render views as simple functions, not stateful components
 * model application state to make impossible states impossible
 * change application state with pure functions
-* talk to HTTP APIs and stream server events without callbacks, Promises, async/await, Observables in the user space
+* talk to HTTP APIs and stream server events without callbacks, promises, async/await, observables in the user space
 * describe all side effects (e.g. random number generation) as data structures
 * optimize load time and runtime performance 
 * test your application at the unit and integration level
@@ -83,10 +83,12 @@ By the end of this tutorial you will learn to:
 
 ## Introducing the problem
 
-You will be building a messaging/chat application. I decided to choose a boring and familiar domain purposefully. 
+You will be building a messaging/chat application called **HyperPosts**. I decided to choose a boring and familiar domain purposefully. 
 To ease the learning process you will only focus on the framework concepts instead of learning new and unfamiliar domain.
 
-You will find a deployed version here: https://hyperposts.netlify.app/
+You will find a deployed version on netlify: https://hyperposts.netlify.app/
+
+You will find source code on github: https://github.com/kwasniew/hyperbook-tutorial
 
 The following two figures show 2 screens you'll be building:
 * main screen with a post submit form and a list of posts streamed from the server
@@ -107,29 +109,34 @@ The following two figures show 2 screens you'll be building:
 
 ## Getting started
 
-When learning a new framework it's important to understand every single step you take and every single line of code you write. Instead of generating boilerplate starter code, you'll learn how to setup everything line by line. Once you get more experience with Hyperapp, you may want to formalize the setup into your starter kit. 
+When learning a new framework it's important to understand every single step you take and every single line of code you write. 
+Instead of generating boilerplate code, you'll setup everything line by line. 
+Once you get more experience with Hyperapp, you may want to formalize the setup into your starter kit. 
+However, you may also realize that with simplified approach to development boilerplate is no longer necessary.
 
-Create empty directory with index.html and app.js:
+Create empty ```src``` directory with ```index.html``` and ```App.js```. I decided to name JS files with first uppercase letter. 
 
-index.html
+```index.html```
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HyperPosts</title>
     <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
-    <script type="module" src="app.js"></script>
+    <script type="module" src="App.js"></script>
 </head>
 <body>
     <main id="app"></main>
 </body>
 </html>
 ```
-HTML links to app.js as ES6 module, so you can use ES6 imports in your JS code. 
-Inside the HTML body you have an element (main#app) where Hyperapp will render its content.
+HTML links to ```App.js``` as ES6 module, therefore you can use ES6 imports in your JS code. 
+Inside the HTML body you have an element **<main id="app"></main>** where Hyperapp will render its content.
 
 
-app.js
+```App.js```
 ```javascript
 import {h, app} from "https://unpkg.com/hyperapp?module";
 
