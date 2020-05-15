@@ -41,7 +41,7 @@ Modern frontend development is too complex:
 * complex tooling to make everything work
 * layers upon layers of abstraction on top of the browser
 * elaborate performance tricks to improve performance
-* unpredictable mix of side-effects and application logic 
+* code mixing side-effects and application logic 
 * testing techniques encouraging monkey patching the language
 
 ## What is your elevator pitch?
@@ -80,28 +80,30 @@ By the end of this tutorial you will learn to:
 * route between different pages
 * integrate with 3rd party libraries
 * appreciate the benefits of minimalist approach to software development
-* (extend Hyperapp ecosystem with new capabilities through middleware)
-* (organize your code in a bigger project)
-* ...
 
 ## Introducing the problem
 
 You will be building a messaging/chat application. I decided to choose a boring and familiar domain purposefully. 
-To ease the learning process you will only focus on the framework concepts instead of learning a new and unfamiliar domain.
+To ease the learning process you will only focus on the framework concepts instead of learning new and unfamiliar domain.
 
-(Show the website to see the end result of this tutorial.)
+You will find a deployed version here: https://hyperposts.netlify.app/
 
-(Choose familiar problem as you don't want to teach new domain and a frameworks at the same time.)
+The following two figures show 2 screens you'll be building:
+* main screen with a post submit form and a list of posts streamed from the server
+* login screen to set your username
 
-(Simulate pair-programming session working with a person who knows Hyperapp.)
+<figure>
+    <img src="images/main.png" width="650" alt="Hyperposts main screen" align="center">
+    <figcaption><em>Figure: Hyperposts main screen</em></figcaption>
+    <br><br>
+</figure>
 
-(Learn how to build a new app from scratch, step-by-step. Disclose information progressively. Explain every single line we write.)
+<figure>
+    <img src="images/login.png" width="650" alt="Hyperposts login screen" align="center">
+    <figcaption><em>Figure: Hyperposts login screen</em></figcaption>
+    <br><br>
+</figure>
 
-(Add mini exercices with hidden solutions.)
-
-(Introduce concepts as they are needed. Don't tell me about effects as data/subscriptions etc. before I need them. Problem - Solution - Problem - Solution.)
-
-(Provide Github repo with commit for each significant step.)
 
 ## Getting started
 
