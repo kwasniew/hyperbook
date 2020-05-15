@@ -469,12 +469,12 @@ app({
 ```
 View is extracted into a separate function.
 Inside the ```view``` you map over a list of ```posts``` and render each of them using ```listItem``` view fragment. 
-As a rule of thumb, if your view gets too big, split it into smaller view fragments. 
+As a rule of thumb, if your view gets too big, split it into **smaller view fragments**. 
 Pass as much state as needed. For example: ```listItem``` only needs a single ```post``` parameter.
 
 At the end of this section your view should look like this:
 <figure>
-    <img src="images/splitting_view.png" width="650" alt="Action" align="center">
+    <img src="images/splitting_view.png" width="650" alt="Displaying a list of posts" align="center">
     <figcaption><em>Figure: Displaying a list of posts</em></figcaption>
     <br><br>
 </figure>
@@ -508,7 +508,7 @@ Our current state has no other properties, but the code is future proofed.
 
 The following figure shows the same action in a visual format:
 <figure>
-    <img src="images/action.jpg" width="650" alt="Action" align="center">
+    <img src="images/action.jpg" width="650" alt="Action is a pure function of state" align="center">
     <figcaption><em>Figure: Action is a pure function of state</em></figcaption>
     <br><br>
 </figure>
@@ -517,23 +517,38 @@ The following figure shows the same action in a visual format:
 Test your app in the browser and click the "Add Post" button several times. New items should be added to the list.
 
 <figure>
-    <img src="images/add_post_action.png" width="650" alt="Action" align="center">
+    <img src="images/add_post_action.png" width="650" alt="AddPost action adding new items to the list" align="center">
     <figcaption><em>Figure: AddPost action adding new items to the list</em></figcaption>
     <br><br>
 </figure>
 
-## Understanding Hyperapp data flow
+## Understanding functional data flow
 
-Hyperapp data flow is inspired by the **Elm Architecture**:
-* view (V) interaction (e.g. click) triggers some action (A) 
-* action (A) changes state (S)
-* state (S) change triggers re-render of the view (V)
+Hyperapp **data flow** is inspired by the **Elm Architecture**:
+* view **V** interaction (e.g. click) triggers some action **A** 
+* action **A** changes state **S**
+* state **S** change triggers re-render of the view **V**
 
-![Architecture](https://d82.intsig.net/sync/download_resize_jpg?user_id=1609921833&_t=1586951223&sid=F110BA6504284C09E67Yy6aL&folder_name=CamScanner_Page&file_name=SgUMbWgRUKU2464e834yKVV2.jpg&pixel=600)
+<figure>
+    <img src="images/data-flow.jpg" width="650" alt="Functional data flow" align="center">
+    <figcaption><em>Figure: Functional data flow</em></figcaption>
+    <br><br>
+</figure>
 
-You declare all the views, actions and the initial state. Hyperapp connects the circles and takes care of handling events, dispatching actions and re-rendering the view. This approach makes code very declarative as you never have to perform fine-grain view updates. At any given time, your view is the HTML projection of your current state, which is the ultimate source of truth. In other words, state is not spread across many JS objects and DOM elements.
+As a Hyperapp user you declare all the views, actions and the initial state. 
+Hyperapp connects the circles and takes care of:
+* handling events
+* dispatching actions
+* re-rendering the view
 
-Note: with Hyperapp there's no need to use classes extending from a framework superclass or decorate your code with framework specific annotations. View and actions are pure functions and state is a plain JS object. Therefore, cognitive overhead from unnecessary language features is minimal.
+This approach makes code very declarative as you never have to perform fine-grain view updates. 
+At any given time, your view is the HTML/DOM projection of your current state.
+And state is the ultimate source of truth. 
+In other words, state is not spread across many JS components or even worse, in the DOM itself.
+
+Note: with Hyperapp there's no need to use classes extending from a framework superclass or to decorate your code with framework specific annotations. 
+View and actions are pure functions and state is a plain JS object. 
+Therefore, cognitive overhead from unnecessary language features is minimal.
 
 ## Modelling state
 
