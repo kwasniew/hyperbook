@@ -970,7 +970,7 @@ It doesn't fit the the short-lived HTTP request-response model.
 
 In Hyperapp you use **subscriptions** to handle those **long-lived** effects. 
 
-To build intuition about subscriptions look at different even sources that fit the model:
+To build intuition about subscriptions look at the different even sources that fit the model:
 * WebSockets
 * setInterval
 * mouse moves
@@ -987,38 +987,56 @@ In this section you will subscribe to the WebSocket stream with post updates.
 
 Import subscription definition:
 ```javascript
-import { WebSocketListen } from "./web_modules/hyperapp-fx.js";
+import { Http, WebSocketListen } from "./web_modules/hyperapp-fx.js";
 ```
-hyperapp-fx uses a convention ```*Listen``` to name the functions for creating subscriptions.
+```hyperapp-fx``` uses a convention ```*Listen``` to name the functions for creating subscriptions.
 
-Write the action for handling WebSocket events:
+Write an action for handling incoming WebSocket events:
 ```javascript
 const SetPost = (state, event) => {
-    try {
-        const post = JSON.parse(event.data);
-        return {
-            ...state,
-            posts: [post, ...state.posts]
-        }
-    } catch(e) {
-        return state;
-    }
+  try {
+    const post = JSON.parse(event.data);
+    return {
+      ...state,
+      posts: [post, ...state.posts],
+    };
+  } catch (e) {
+    return state;
+  }
 };
 ```
-The event is the underlying ```MessageEvent``` from the WebSocket API. You parse the ```data``` property of the event. If the data is valid JSON you add the post to the beginning of the post list. In case of a parsing error you don't change the state of the application.
+The event is the underlying ```MessageEvent``` from the WebSocket API. You parse the ```data``` property of the event. 
+If the data is a valid JSON post, you add it to the beginning of the post list. In case of a parsing error you don't change the state of the application.
 
 Plug the subscription and the action into the application:
 ```javascript
 app({
-  ...
-  subscriptions: state => [WebSocketListen({action: SetPost, url: 'ws://hyperapp-api.herokuapp.com'})],
-  ...
+  init: [state, LoadLatestPosts],
+  view,
+  subscriptions: (state) => [
+    WebSocketListen({
+      action: SetPost,
+      url: "ws://hyperapp-api.herokuapp.com",
+    }),
+  ],
+  node: document.getElementById("app"),
 });
 ```
 ```WebSocketListen``` function expects an object with ```action``` and ```url```.
-Since WebSockets is a protocol other than HTTP we changed the URL scheme to ```ws://```.
+Since WebSockets is a different protocol from HTTP, the URL scheme is ```ws://``` not ```http://```.
 
-Test your application. Add a new post. The post should be added to the list twice. Directly from the local state update and from the WebSocket. You'll fix this behavior in the next exercise. For now, test your WebSocket connection in two different browser windows. See if the messages are propagated correctly.
+Test your application. Add a new post. 
+
+<figure>
+    <img src="images/websockets.png" width="650" alt="Adding post twice" align="center">
+    <figcaption><em>Figure: Adding post twice</em></figcaption>
+    <br><br>
+</figure>
+
+The post should be added to the list twice. 
+Directly from the local state update and a few milliseconds later from a WebSocket. 
+You'll fix this behavior in the next exercise. 
+For now, test your WebSocket connection in two different browser windows. See if the messages are propagated correctly.
 
 Diagnosing problems with WebSockets:
 * make sure the HTTP protocol was switched to WebSockets
