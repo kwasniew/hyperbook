@@ -35,7 +35,7 @@ No prior experience with Hyperapp is needed.
 
 > We have lost our ability of achieving more with less. We do more with more. Or, in certain cases, we do less with more.
 
-Modern frontend development is too complex:
+Modern frontend development is too complicated:
 * frameworks with 10000k+ LOC, impenetrable to non-core developers
 * tools with huge API surface area
 * more and more JS "the bad parts" to learn
@@ -229,9 +229,9 @@ Translating between HTML and ```h``` function calls can get tiresome for nested 
 Even if you automate the process, you still have to mentally switch between function representation and HTML representation you inspect in DevTools.
 On the other hand if you write everything from scratch and prefer JS first templating, calling ```h``` function directly is a solid option. 
 
-### JSX (http://facebook.github.io/jsx/)
+### JSX 
 
-**JSX** is a language extension that originated in the React circles. It allows to write JS code that looks like HTML:
+[JSX](http://facebook.github.io/jsx/) is a language extension that originated in the React circles. It allows to write JS code that looks like HTML:
 ```jsx
 view: state => <h1 id="my-header"><span>{state.text}</span></h1>
 ```
@@ -239,11 +239,11 @@ view: state => <h1 id="my-header"><span>{state.text}</span></h1>
 To make JSX work, you need to run a transpiler from JSX to ```h``` function calls. 
 If adding a build step to your development process is not your thing, we have one more option.
 
-### htm (https://github.com/developit/htm)
+### htm
 
-**htm** is a tiny library with HTML-like syntax and no build tool requirement. 
+[htm](https://github.com/developit/htm) is a tiny library with HTML-like syntax and no build tool requirement. 
 
-Change you **app.js** code to use ```htm```:
+Change you **App.js** code to use ```htm```:
 ```javascript
 import {h, app} from "https://unpkg.com/hyperapp?module";
 import htm from 'https://unpkg.com/htm?module';
@@ -296,7 +296,7 @@ npm i
 On quick inspection of **node_modules** you'll find no transitive dependencies. Both ```htm``` and ```hyperapp``` bring no extra guests
 to the party.
 
-You can try to reference npm dependencies from **app.js**:
+You can try to reference npm dependencies from **App.js**:
 ```javascript
 import {h, app} from "hyperapp";
 import htm from "htm";
@@ -310,65 +310,72 @@ import htm from "../node_modules/htm/dist/htm.mjs";
 ```
 It certainly works, but I had to inspect the contents of both libraries to provide correct paths.
 
-## Integrating Hyperapp with Snowpack (https://www.snowpack.dev/)
+## Integrating Hyperapp with Snowpack 
 
-Snowpack is a tool that translates node_modules into browser friendly bundles at dependency installation time.
+[Snowpack](https://www.snowpack.dev/) is a tool to translate selected ```node_modules``` into browser friendly bundles at dependency installation time.
+In essence it makes bundling JS optional at development time.
 
+Update **package.json** with a ```snowpack``` setup:
+```json
+{
+  "scripts": {
+    "snowpack": "snowpack install --dest=src/web_modules",
+    "postinstall": "npm run snowpack"
+  },
+  "dependencies": {
+    "htm": "3.0.4",
+    "hyperapp": "2.0.4"
+  },
+  "devDependencies": {
+    "snowpack": "2.0.0-beta.20"
+  }
+}
 ```
-npm i snowpack -D
-```
+Snowpack is our development dependency. It provides ```snowpack install``` command that you will run after ```npm i```. 
+You tell snowpack to put the browser friendly bundles in ```src/web_modules```. By default it would put everything in the root-level
+```web_modules```.
 
-Rewrite your imports to:
+Rewrite your imports to use ```web_module```:
 ```
 import {h, app} from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
 ```
+ 
+Run the installation command:
+```npm i```
 
-Configure Snowpack in package.json
+At this point Snowpack will inspect your code and translate required modules from ```node_modules``` to ```web_modules```.
+
+If you track your code in git add **src/web_modules** to **.gitignore**.
+
+## Formatting code with prettier 
+
+[Prettier](https://prettier.io/) is an opinionated code formatter saving your code review time for things that really matter. 
+The days of spaces vs tabs wars are over.
+
+Add ```format``` command and ```prettier``` ```devDependency``` to **package.json**:
 ```json
 {
   "scripts": {
-    "snowpack": "snowpack",
-    "postinstall": "npm run snowpack"
+    "snowpack": "snowpack install --dest=src/web_modules",
+    "postinstall": "npm run snowpack",
+    "format": "prettier --write '**/!(web_modules)/*.js'"
   },
   "dependencies": {
-    "htm": "3.0.3",
+    "htm": "3.0.4",
     "hyperapp": "2.0.4"
   },
   "devDependencies": {
-    "snowpack": "1.6.0"
+    "prettier": "2.0.5",
+    "snowpack": "2.0.0-beta.20"
   }
 }
 ```
-
-Run Snowpack
-```
-npm run snowpack
-```
-
-By default, Snowpack translates all production dependencies in package.json into self-sufficient one file bundles living inside web_modules (default snowpack directory). For covenience of future maintainers, include snowpack in the ```postinstall``` script. Therefore, Snowpack will run after a new person gets your code and installs dependencies.
+```format``` command find format your JS files except from the ```web_modules``` and ```node_modules``` (excluded by default).
+```--write``` option will re-write the formatted files in place.
 
 
-## Formatting code with prettier (https://prettier.io/)
-
-Prettier is an opinionated code formatter saving your code review time for things that really matter. The days of spaces vs tabs wars are over.
-
-```
-npm i prettier -D
-```
-
-Add prettier to your scripts:
-```json
-{
-  "scripts": {
-    ...
-    "format": "prettier --write '*.js'"
-  }
-}
-```
-This configuration will find all JS files in the root directory and with the ```--write``` option it will fix formatting issues replacing the current code.
-
-Copy this malformed code to app.js:
+Copy this malformed code to **App.js**:
 ```javascript
 import { h, app } from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
@@ -397,21 +404,22 @@ app({
   node: document.getElementById("app"),
 });
 ```
-The opening div is not aligned properly.
+The opening ```div``` is not aligned properly.
 
+After running:
 ```
 npm run format
 ```
-The view code should get nicely aligned.
+The ```view``` code should get nicely aligned.
 
 You can connect prettier to your IDE/text editor but it's beyond the scope of this tutorial.
 
-We took a detour to learn about some tools that play nicely with Hyperapp:
-* htm for HTML-like syntactic sugar
-* Snowpack for browser friendly dependencies
-* Prettier for consistent code formatting
+You took a detour to learn about some tools that play nicely with Hyperapp:
+* ```htm``` for HTML-like syntactic sugar
+* ```snowpack``` for browser friendly dependencies
+* ```prettier``` for consistent code formatting
 
-In the next section we're back to our app.
+In the next section we're back to your app.
 
 ## Splitting view into smaller functions
 
@@ -1816,6 +1824,7 @@ http-server dist
 Here's a deployed version of our application: TODO
 
 TODO: Hyperapp + application is smaller than most framework code. No matter how much code splitting you do in React.
+TODO: remove htm
 
 ## Rendering view and state into a string
 
