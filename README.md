@@ -965,19 +965,21 @@ const AddPost = state => {
 ## Understanding long running effects (subscriptions)
 
 The HTTP effect you've been using so far was **short-lived**. A request is sent, a response arrives and the effect is over.
-Not all effects fit this pattern. E.g. if you open a connection to a WebSocket it will be running for a long time, unlike the short-lived HTTP request-response model. 
+Not all effects follow this pattern. E.g. if you open a connection to a WebSocket it will be running for a long time.
+It doesn't fit the the short-lived HTTP request-response model. 
 
-In Hyperapp you use so-called **subscriptions** to handle those **long-lived** effects. 
+In Hyperapp you use **subscriptions** to handle those **long-lived** effects. 
 
-To build intuition about subscription take a look at some other even sources that fit the model:
+To build intuition about subscriptions look at different even sources that fit the model:
+* WebSockets
 * setInterval
 * mouse moves
-* keybord key presses
+* keyboard key presses
 * history/URL changes 
 
 What they have in common is a long-lived nature of the underlying event source. 
 
-Note: From now one, we'll refer to short-live effects as just effects and to long-lived effects as subscriptions.
+Note: I'll refer to short-live effects as just effects and to long-lived effects as subscriptions.
 
 ## Implementing subscriptions
 
