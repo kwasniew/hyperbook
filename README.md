@@ -607,6 +607,13 @@ With a second attribute provided, Hyperapp will inject both sources of informati
 The ```event``` is a regular DOM event, therefore we can access ```event.target.value``` from DOM Event API. 
 As mentioned before, it's all about transferable skills. 
 
+The following figure updates conceptual model of Hyperapp actions with an extra event parameter:
+<figure>
+    <img src="images/action_with_event.jpg" width="650" alt="Action is a pure function of state and event" align="center">
+    <figcaption><em>Figure: Action is a pure function of state and event</em></figcaption>
+    <br><br>
+</figure>
+
 Try to add a new post with some text. It should still not work. You need to copy the ```currentPostText``` to the newly added post.
 
 ```javascript
@@ -672,9 +679,10 @@ As you don't have a second usage of this pattern yet, withhold this decision for
 
 ## Exercise: cleaning text input
 
-According to modern reaserch, testing your knowledge is essential for learning. If you want to get the most out of this tutorial please do the exercises.
+According to [modern reaserch](https://en.wikipedia.org/wiki/Desirable_difficulty), testing your knowledge is essential for learning. 
+If you want to get the most out of this tutorial please do the exercises. They are not optional.
 
-Our current application doesn't clear the input text after adding a new post.
+Your application doesn't clear the input text after adding a new post.
 Modify the ```AddPost``` action to reset ```currentPostText```. When you're done compare with the solution below.
 But first, try to do it on your own. 
 
