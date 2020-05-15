@@ -1121,7 +1121,7 @@ const Http = data => [httpEffect, data];
 ```
 
 Following the same convention create your own subscription:
-```
+```javascript
 const EventSourceListen = data => [eventSourceSubscription, data];
 ```
 
@@ -1140,9 +1140,9 @@ app({
   node: document.getElementById("app"),
 });
 ```
-Because you followed the same naming convention for ```action``` and ```url``` it should be just a matter of switching ```WebSocketListen``` to ```EventSourceListen```.
+Because you followed the same naming convention for ```action``` and ```url``` it should be just a matter of switching ```url``` and ```WebSocketListen``` to ```EventSourceListen```.
 
-Test your application. It should work the same as the WebSocket version, but without a need for a different protocol. 
+Test your application. It should work the same way as the WebSocket version, but without switching to a different protocol. 
 
 Diagnosing problems with SSE:
 * make sure the ```eventsource``` connection-type was established
@@ -1169,21 +1169,21 @@ If your browser [doesn't support SSE](https://caniuse.com/#search=eventsource) u
 ## Understanding differences between init effect and subscription
 
 Looking at our subscription signature it's not much different from any short-live effect. 
-You could event plug the subscription into the application:
+You could event plug the subscription into the init:
 ```javascript
 app({
     init: [state, LoadLatestPosts, EventSourceListen({action: SetPost, url: 'https://hyperapp-api.herokuapp.com/api/event/post'})],
     ...
 });
 ```
-Both the short-lived ```LoadLatestPosts``` action and long-lived ```EventSourceListen``` subscription are invoked on the application init.
+Both the short-lived ```LoadLatestPosts``` action and long-lived ```EventSourceListen``` subscription are invoked on startup.
 
 If you never need to stop listening to the long-running event source, the subscription is effectively the same as the init action.
 The moment you need to stop listening to the event source they start to differ.
 
 ## Unsubscribing from subscriptions
 
-Subscriptions are long-lived effects you can unsubscribe from. The code to unsubscribe lives in the return function of the subscription definition.
+Subscriptions are long-lived effects you can unsubscribe from. Return the code to unsubscribe from the subscription definition.
 ```javascript
 const eventSourceSubscription = (dispatch, data) => {
    return () => {
@@ -1192,19 +1192,20 @@ const eventSourceSubscription = (dispatch, data) => {
 };
 ```
 
-Fill in this template with your EventSource implementation:
+Fill in this template with your ```EventSource``` implementation:
 ```javascript
 const eventSourceSubscription = (dispatch, data) => {
-    const es = new EventSource(data.url);
-    const listener = event => dispatch(data.action, event);
-    es.addEventListener("message", listener);
+  const es = new EventSource(data.url);
+  const listener = (event) => dispatch(data.action, event);
+  es.addEventListener("message", listener);
 
-    return () => {
-        es.removeEventListener("message", listener);
-    };
+  return () => {
+    es.removeEventListener("message", listener);
+  };
 };
 ```
-The unsubscribe function removes a listener from the event source. ```addEventListener``` and ```removeEventListener``` need a reference to the same listener. Therefore, put the listener in a shared variable.
+The unsubscribe function removes a listener from the ```EventSource```. 
+```addEventListener``` and ```removeEventListener``` need a reference to the same listener instance. Therefore, put the listener in a shared variable.
 
 ## Controlling subscription status
 
