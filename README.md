@@ -87,7 +87,7 @@ By the end of this tutorial you will learn to:
 You will be building a messaging/chat application called **HyperPosts**. I decided to choose a boring and familiar domain purposefully. 
 To ease the learning process you will only focus on the framework concepts instead of learning new and unfamiliar domain.
 
-You will find a deployed version on netlify: https://hyperposts.netlify.app/
+You will find a deployed version of this app on netlify: https://hyperposts.netlify.app/
 
 You will find source code on github: https://github.com/kwasniew/hyperbook-tutorial
 
@@ -130,12 +130,14 @@ Create empty **src** directory with **index.html** and **App.js**. You will name
     <script type="module" src="App.js"></script>
 </head>
 <body>
-    <main id="app"></main>
+    <main>
+        <div id="app"></div>
+    </main>
 </body>
 </html>
 ```
 HTML links to **App.js** as ES6 module (```type="module"```), therefore you can use ES6 imports in JS code. 
-Hyperapp will render its content into ```<main id="app"></main>```.
+Hyperapp will render its content into ```<div id="app"></main>```.
 
 
 **App.js**
@@ -226,8 +228,8 @@ What about something more complicated? How much effort would it take to translat
 </div>
 ```
 Translating between HTML and ```h``` function calls can get tiresome for nested HTML. 
-Even if you automate the process, you still have to mentally switch between function representation and HTML representation you inspect in DevTools.
-On the other hand if you write everything from scratch and prefer JS first templating, calling ```h``` function directly is a solid option. 
+Even if you automate the process, you still have to mentally switch between JS representation and HTML representation you inspect in DevTools.
+On the other hand if you write everything from scratch and prefer JS-driven templating, calling ```h``` function directly is a solid option. 
 
 ### JSX 
 
@@ -287,7 +289,7 @@ Create **package.json** in your root directory:
   }
 }
 ```
-Put the same versions of dependencies as this tutorial to make sure everything works.
+Put the same versions of dependencies as this tutorial to avoid surprises.
 
 Install dependencies:
 ```
@@ -315,7 +317,7 @@ It certainly works, but I had to inspect the contents of both libraries to provi
 [Snowpack](https://www.snowpack.dev/) is a tool to translate selected ```node_modules``` into browser friendly bundles at dependency installation time.
 In essence it makes bundling JS optional at development time.
 
-Update **package.json** with a ```snowpack``` setup:
+Update **package.json** with this ```snowpack``` setup:
 ```json
 {
   "scripts": {
@@ -371,8 +373,8 @@ Add ```format``` command and ```prettier``` ```devDependency``` to **package.jso
   }
 }
 ```
-```format``` command find format your JS files except from the ```web_modules``` and ```node_modules``` (excluded by default).
-```--write``` option will re-write the formatted files in place.
+```format``` command willl format your JS files except from the ```web_modules``` and ```node_modules``` (excluded by default).
+And ```--write``` option will re-write the formatted files in place.
 
 
 Copy this malformed code to **App.js**:
@@ -474,24 +476,44 @@ Pass as much state as needed. For example: ```listItem``` only needs a single ``
 
 **Actions** bring interactivity to your application. As users click buttons or type some text, you want to react to those events.
 
-First, add a button just below the h1 element:
+First, add a button just below the ```h1``` element:
 ```javascript
 <h1>Recent Posts</h1>
 <button onclick=${AddPost}>Add Post</button>
 ```
-The ```click``` event is the same event you may know from the DOM API. More precisely, Hyperapp translates the ```onclick``` into the ```button.addEventListener('click')```. It works with all DOM events. Everything you know about the DOM API is still relevant and transferable. There's no extra events to learn.
+The ```onclick``` translates to DOM API click event. 
+More precisely, Hyperapp translates the ```onclick``` into ```button.addEventListener('click')```. 
+Everything you know about DOM API is still relevant and transferable. 
+There's no extra framework-specific events to learn.
 
-Add the action itself:
+Add the action itself. Put it between the state and view declarations:
 ```javascript
 const AddPost = (state) => {
   const newPost = { username: "fixed user", body: "fixed text" };
   return { ...state, posts: [newPost, ...state.posts] };
 };
 ```
-AddPost is a pure function mapping the old state to the new state. When you click a button, Hyperapp automatically passes the old state to your action. Then, a newPost is created and added to the beginning of the posts list. 
-A common pattern is to destructure the old state and only update those properties that change. Our current state has no other properties, but the code is future proofed. 
+```AddPost``` is a pure function mapping previous state to the new state. 
+When you click a button, Hyperapp automatically passes previous state to your action. 
+```newPost``` is created and added to the beginning of the posts list. 
+A common pattern is to destructure previous state and only update those properties that change. 
+Our current state has no other properties, but the code is future proofed. 
+
+The following figure shows the same action in a visual format:
+<figure>
+    <img src="images/action.jpg" width="650" alt="Action" align="center">
+    <figcaption><em>Figure: Action</em></figcaption>
+    <br><br>
+</figure>
+
 
 Test your app in the browser and click the "Add Post" button several times. New items should be added to the list.
+
+<figure>
+    <img src="images/add_post_action.png.jpg" width="650" alt="Action" align="center">
+    <figcaption><em>Figure: AddPost action adding new items to the list</em></figcaption>
+    <br><br>
+</figure>
 
 ## Understanding Hyperapp data flow
 
