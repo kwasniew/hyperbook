@@ -133,7 +133,7 @@ Create empty ```src``` directory with ```index.html``` and ```App.js```. You wil
 </body>
 </html>
 ```
-HTML links to ```App.js``` as ES6 module (```type="module```), so you can use ES6 imports in JS code. 
+HTML links to ```App.js``` as ES6 module (```type="module"```), therefore you can use ES6 imports in JS code. 
 Hyperapp will render its content into ```<main id="app"></main>```.
 
 
@@ -149,8 +149,8 @@ app({
     node: document.getElementById("app")
 });
 ```
-To quickly start experimenting, you may fetch Hyperapp directly from CDN (e.g. unpkg.com). 
-The exported module provides two functions: h and app.
+To start experimenting, you can fetch Hyperapp directly from CDN (e.g. unpkg.com). 
+The exported module provides two functions: ```h``` and ```app```.
 
 The **app** function is your main integration point with the framework. 
 Pass an object with 3 parameters:
@@ -161,13 +161,17 @@ Pass an object with 3 parameters:
 Open your project directory using any static HTTP server. I'm using https://www.npmjs.com/package/http-server 
 ```
 npm i http-server -G
-http-server .
+http-server src
 ```
 
-Check if you browser renders this HTML:
-```html
-<h1 id="my-header">Welcome to Hyperapp!</h1>
-```
+By default ```http-server``` starts on http://127.0.0.1:8080
+
+Check if you browser renders same HTML as in the following figure:
+<figure>
+    <img src="images/getting_started.png" width="650" alt="Getting started result" align="center">
+    <figcaption><em>Figure: Getting started result</em></figcaption>
+    <br><br>
+</figure>
 
 ## Analyzing view rendering options
 
