@@ -472,6 +472,13 @@ Inside the ```view``` you map over a list of ```posts``` and render each of them
 As a rule of thumb, if your view gets too big, split it into smaller view fragments. 
 Pass as much state as needed. For example: ```listItem``` only needs a single ```post``` parameter.
 
+At the end of this section your view should look like this:
+<figure>
+    <img src="images/splitting_view.png" width="650" alt="Action" align="center">
+    <figcaption><em>Figure: Displaying a list of posts</em></figcaption>
+    <br><br>
+</figure>
+
 ## Changing state with actions
 
 **Actions** bring interactivity to your application. As users click buttons or type some text, you want to react to those events.
@@ -502,7 +509,7 @@ Our current state has no other properties, but the code is future proofed.
 The following figure shows the same action in a visual format:
 <figure>
     <img src="images/action.jpg" width="650" alt="Action" align="center">
-    <figcaption><em>Figure: Action</em></figcaption>
+    <figcaption><em>Figure: Action is a pure function of state</em></figcaption>
     <br><br>
 </figure>
 
