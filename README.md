@@ -1057,18 +1057,26 @@ Diagnosing problems with WebSockets:
 
 ## Exercise: avoiding duplicate posts
 
-Your task is to change the code, so that it only adds a post from the WebSocket. Modify AddPost action and stop adding newPost before we receive a confirmation from the server.
+Your task is to change the code, so that it only adds a post from the WebSocket. 
+Modify ```AddPost``` action and stop adding ```newPost``` until we receive a confirmation from the server.
 
 <details>
-    <summary id="avoiding_suplicate_posts">Solution</summary>
+    <summary id="avoiding_duplicate_posts">Solution</summary>
 
 Inside AddPost actions change this line:
 ```javascript
-const newState = { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
+    const newState = {
+      ...state,
+      currentPostText: "",
+      posts: [newPost, ...state.posts],
+    };
 ```
 To this:
 ```
-const newState = { ...state, currentPostText: "" };
+    const newState = {
+      ...state,
+      currentPostText: ""
+    };
 ```
 
 </details>
