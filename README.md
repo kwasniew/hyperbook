@@ -423,7 +423,8 @@ In the next section we're back to your app.
 
 ## Splitting view into smaller functions
 
-In the previous section you rendered static HTML. Even though the view function had access to the current state, it didn't actually use it. The next code snippet shows how to iterate over a list of items in a view function:
+In the previous section you rendered static HTML independent of the application state. 
+The next code snippet shows how to iterate over a list of items in a view function:
 
 ```javascript
 import { h, app } from "./web_modules/hyperapp.js";
@@ -432,34 +433,42 @@ import htm from "./web_modules/htm.js";
 const html = htm.bind(h);
 
 const state = {
-    posts: [
-        { username: "js_developers", body: "Modern JS frameworks are too complicated" },
-        { username: "js_developers", body: "Modern JS frameworks are too heavy" },
-        { username: "jorgebucaran", body: "There, I fixed it for you!" }
-    ]
+  posts: [
+    {
+      username: "js_developers",
+      body: "Modern JS frameworks are too complicated",
+    },
+    { username: "js_developers", body: "Modern JS frameworks are too heavy" },
+    { username: "jorgebucaran", body: "There, I fixed it for you!" },
+  ],
 };
 
-const listItem = post => html`
-    <li>
-        <strong>@${post.username}</strong>
-        <span>${post.body}</span>
-    </li>
+const listItem = (post) => html`
+  <li>
+    <strong>@${post.username}</strong>
+    <span> ${post.body}</span>
+  </li>
+`;
+
+const view = (state) => html`
+  <div>
+    <h1>Recent Posts</h1>
+    <ul>
+      ${state.posts.map(listItem)}
+    </ul>
+  </div>
 `;
 
 app({
   init: state,
-  view: (state) => html`
-    <div>
-      <h1>Recent Posts</h1>
-      <ul>
-        ${state.posts.map(listItem)}
-      </ul>
-    </div>
-  `,
+  view,
   node: document.getElementById("app"),
 });
 ```
-You map over a list of posts and render each of them using listItem view function. As a rule of thumb, if your view gets too big, split it into smaller view fragments and pass as much state as needed. For example: listItem only needs a single post.
+View is extracted into a separate function.
+Inside the ```view``` you map over a list of ```posts``` and render each of them using ```listItem``` view fragment. 
+As a rule of thumb, if your view gets too big, split it into smaller view fragments. 
+Pass as much state as needed. For example: ```listItem``` only needs a single ```post``` parameter.
 
 ## Changing state with actions
 
