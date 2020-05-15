@@ -598,12 +598,14 @@ const UpdatePostText = (state, event) => ({
 ```
 Compare ```UpdatePostText``` signature with ```AddPost``` signature.
 
-```javascript
+```
 (oldState) => newState
 (oldState, event) => newState
 ```
-Hyperapp actions accept either (oldState) or (oldState, event). You just need to provide the second optional parameter in your action signature. With those two parameters, Hyperapp will inject both sources of information.
-The event is a regular DOM event, therefore we can access ```event.target.value```. As mentioned before, it's all about transferable skills. 
+Hyperapp actions accept either ```(oldState)``` or ```(oldState, event)```. 
+With a second attribute provided, Hyperapp will inject both sources of information to your action.
+The ```event``` is a regular DOM event, therefore we can access ```event.target.value``` from DOM Event API. 
+As mentioned before, it's all about transferable skills. 
 
 Try to add a new post with some text. It should still not work. You need to copy the ```currentPostText``` to the newly added post.
 
@@ -614,7 +616,13 @@ const AddPost = (state) => {
 };
 ```
 
-With this change, everything should work as expected.
+With this change, you can start adding custom messages to the list.
+
+<figure>
+    <img src="images/custom_messages.png" width="650" alt="Adding custom messages to the list" align="center">
+    <figcaption><em>Figure: Adding custom messages to the list</em></figcaption>
+    <br><br>
+</figure>
 
 ## Extracting repetitive event data
 
