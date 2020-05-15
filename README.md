@@ -1210,7 +1210,7 @@ The unsubscribe function removes a listener from the ```EventSource``` and close
 
 ## Controlling subscription status
 
-You will add a capability to enable/disable live updates through the UI.
+You will add a capability to enable/disable live updates through the UI as shown in the following figure:
 
 <figure>
     <img src="images/liveupdate.png" width="650" alt="Live Update control" align="center">
@@ -1226,7 +1226,7 @@ const state = {
   liveUpdate: true
 };
 ```
-By default you'll be listening to SSE notifications.
+By default **Live Update** will be enabled.
 
 Add an action to toggle live update:
 ```javascript
@@ -1263,6 +1263,26 @@ app({
 });
 ```
 When ```state.liveUpdate``` is ```true``` a new subscription gets created. When ```state.liveUpdate``` is ```false```  you unsubscribe and close the connection.
+
+## Exercise: fetching latest posts on toggle
+
+When the **Live Update** is off you may loose some posts. Therefore, when a user enables the update load the latest posts.
+Modify ```ToggleLiveUpdate``` to ```LoadLatestPosts``` when appropriate.
+
+<details>
+    <summary id="fetching_posts_on_toggle">Solution</summary>
+
+```javascript
+const ToggleLiveUpdate = (state) => {
+  const newState = {
+    ...state,
+    liveUpdate: !state.liveUpdate,
+  };
+  return newState.liveUpdate ? [newState, LoadLatestPosts] : [newState]
+};
+```
+
+</details>
 
 ## Handling slow API
 
