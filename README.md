@@ -919,9 +919,9 @@ const SavePost = (post) =>
     action: (state, data) => state,
   });
 ```
-This effect wraps HTTP POST. The action to be triggered on successful response is not doing anything.
+This effect wraps HTTP POST. The action to be triggered on successful response is not doing anything yet.
 
-To use this effect in an action use the following signature: 
+To trigger this effect from an action use the following signature: 
 ```javascript
 const EffectfulActions = oldState => [newState, Effect];
 ```
@@ -931,12 +931,19 @@ If you have more than one effect wrap them in an array:
 ```javascript
 const EffectfulActions = oldState => [newState, [Effect1, Effect2]];
 ```
+
 Hyperapp applies the new state and schedules the effect almost instantly. 
 The return action inside the effect will trigger eventually e.g. when the HTTP response arrives.
 
 ## Exercise: making effectful action
 
 Change ```AddPost``` action to trigger SavePost effect when post is added to the local state.
+Use network tab to verify if the request is sent:
+<figure>
+    <img src="images/sending.png" width="650" alt="Sending JSON payload to the server" align="center">
+    <figcaption><em>Figure: Sending JSON payload to the server</em></figcaption>
+    <br><br>
+</figure>
 
 <details>
     <summary id="making_effectful_action">Solution</summary>
