@@ -1712,7 +1712,7 @@ In the object-oriented programming circles people often talk about creating test
 * ports and adapters architecture
 * and many others (onion, hexagonal, clean etc.)
 
-Lengthy books are written how to achieve the holy grail of architecture and much effort is required. 
+Lengthy books are written how to achieve the holy grail of architecture and usually much effort is required. 
 
 Functional architecture imposed by Hyperapp makes the holy grail a default. 
 As Mark Seemann noted in his [blog](https://blog.ploeh.dk/2016/03/18/functional-architecture-is-ports-and-adapters/) "functional architecture tends to fall into a pit of success".
@@ -1733,7 +1733,10 @@ The functional core makes decisions and defines the shape of your UI, the shell 
 Your effect signature is a port to the external world. 
 The actual effect definition invoked by the framework is an adapter.
 
-In terms of testability functional core allows for simple output-based unit testing. Invoke a function. Assert on the output. No mocks required.
+In terms of testability functional core allows for simple output-based unit testing:
+* invoke a function
+* assert on the output
+* skip the mocks
 
 ## Testing simple actions
 
