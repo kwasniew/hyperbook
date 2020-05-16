@@ -1890,7 +1890,7 @@ Write a unit test verifying ```UpdatePostText``` resets error request status to 
 
 ```AddPost``` action is difficult to unit test because it relies on ```Math.random()``` for guid generation. 
 
-More testable version would take id as an input parameter:
+More testable version would take ```id``` as an input parameter:
 ```javascript
 const AddPost = (state, id) => {
   ...
@@ -1905,7 +1905,7 @@ const addPostButton = ({ status }) => html`
   </button>
 `;
 ```
-```WithGuid``` doesn't exist yet. You're only sketching ideal API in code.
+```WithGuid``` doesn't exist yet. You're only sketching ideal future API in code.
 
 ```WithGuid``` should tell Hyperapp to generate a new id and pass it to a testable action:
 ```javascript
@@ -1923,22 +1923,37 @@ However the ```Guid``` effect is simple and it only accepts the action to invoke
 
 ## Testing effectful action
 
-Now you can test ```AddPost``` action.
+Test ```AddPost``` action.
 ```javascript
-    it("add post", () => {
-        const initState = { currentPostText: "text", requestState: {status: "idle"}, post: []};
+  it("add post", () => {
+    const initState = {
+      currentPostText: "text",
+      requestStatus: { status: "idle" },
+      post: [],
+    };
 
-        const [newState, [savePostEffect, savePostData]] = AddPost(initState, "1234");
+    const [newState, [savePostEffect, savePostData]] = AddPost(
+      initState,
+      "1234"
+    );
 
-        assert.deepStrictEqual(newState, { currentPostText: "", requestState: {status: "saving"}, post: []});
-        assert.deepStrictEqual(savePostData.url, "https://hyperapp-api.herokuapp.com/slow-api/post");
+    assert.deepStrictEqual(newState, {
+      currentPostText: "",
+      requestStatus: { status: "saving" },
+      post: [],
     });
+    assert.deepStrictEqual(
+      savePostData.url,
+      "https://hyperapp-api.herokuapp.com/api/post"
+    );
+  });
 ```
-This action returns new state and the effect that we can destructure to conveniently assert on the test output. 
-Action should clear the text, mark the request as saving and nothing should be added to the post list yet.
-For the effect part we ignore savePostEffect as it's for the framework. On the other hand we can verify if we passed correct data to the effect. In our case we only check the url. 
+This effectful action returns new state and the effect. Destructure the effect to conveniently assert on the effect data. 
+```AddPost``` should clear the ```currentPostText```, mark the request as ```saving``` and no posts should be added to the  ```post``` list yet.
+For the effect part ignore ```savePostEffect``` as it's only for the framework. 
+On the other hand you can verify if effect got correct data. In our case we only check the ```url```. 
 
-To emphasize that we ignore the effect definition in the test we can name it with underscore or leave a blank in the destructured array.
+To emphasize that you don't verify the effect definition, name it with ```_``` or leave a blank in the destructured array.
 ```javascript
 const [newState, [_, savePostData]] = AddPost(initState, "1234");
 const [newState, [, savePostData]] = AddPost(initState, "1234");
