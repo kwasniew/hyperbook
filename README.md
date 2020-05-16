@@ -1738,7 +1738,7 @@ In terms of testability functional core allows for simple output-based unit test
 * assert on the output
 * skip the mocks
 
-## Separating Hyperapp setup from the application building blocks
+## Separating framework setup from the application building blocks
 
 To make the code easier to test separate the ```app``` call from the application building blocks: state, view, actions and subscriptions.
 
@@ -1755,7 +1755,7 @@ app({
 });
 ```
 
-**Posts.js** should contain application building blocks and export what's necessary for **App.js**:
+**Posts.js** should export application building blocks for **App.js**:
 ```javascript
 export const view = (state) => html`
     ...
@@ -1784,12 +1784,13 @@ Less tooling is always good. I don't want my test framework to run my code throu
 * it **doesn't try to be a mocking framework** encouraging questionable and magical testing practices like overwriting imports for testability. 
 Relying on a test framework to mock imports is a dead end testing strategy. Your code can't be tested in other test runners. I prefer to rethink code
 structure to make it testable in every test runner. 
-* it has fast clean startup time that allows for **subsecond tests** without watchers. This is super important if you want to get into the flow.
+* it has fast clean startup time that allows for **subsecond tests** without watchers. It's difficult to explain why subsecond test suite is so important
+without experiencing it first-hand. I can only encourage you to give it a try. You may never want to go back to a typical slow testing setup. 
 * it runs your tests in Node.js and **in a browser**
 
-My main reservation about ```mocha``` is that it can't run plain Node.js files as tests, but it's minor compared to the benefits I mentioned before. 
+My main reservation about ```mocha``` is that it can't run plain Node.js files as tests, but it's minor nuisance compared to the benefits I mentioned before. 
 
-Make sure you have **Node 14** installed as it ships native ESM support.
+Make sure you have **Node 14** or higher version installed as it ships with native ESM support.
 
 Include those changes in **package.json**:
 ```json
@@ -1858,7 +1859,7 @@ export const UpdatePostText = (state, currentPostText) => ({
 ```
 
 Now the test should be green. 
-One of the tradeoffs of unit testing actions is that you need to expose them in the public API of the tested module
+One of the tradeoffs of unit testing actions is that you need to expose them in the public API of the tested module.
 
 ## Exercise: Testing simple actions
 
@@ -1887,31 +1888,38 @@ Write a unit test verifying ```UpdatePostText``` resets error request status to 
 
 ## Making actions more testable
 
-```AddPost``` action is difficult to test because it relies on Math.random() for guid generation. 
+```AddPost``` action is difficult to unit test because it relies on ```Math.random()``` for guid generation. 
 
-Our desired signature should take pregenerated id as input parameter:
+More testable version would take id as an input parameter:
 ```javascript
 const AddPost = (state, id) => {
   ...
 };
 ```
 
-Find where you use ```AddPost``` and replace it with:
+Find usage of```AddPost``` and replace it with:
 ```javascript
-const addPostButton = (requestState) => html`
-        <button onclick=${WithGuid(AddPost)} disabled=${requestState.status === "saving"}>Add Post</button>
-  `;
+const addPostButton = ({ status }) => html`
+  <button onclick=${WithGuid(AddPost)} disabled=${status === "saving"}>
+    Add Post
+  </button>
+`;
 ```
-```WithGuid``` doesn't exist yet but we're sketching our ideal API in code.
+```WithGuid``` doesn't exist yet. You're only sketching ideal API in code.
 
-```WithGuid``` should ask Hyperapp to generate a new id and pass the id to a testable action:
+```WithGuid``` should tell Hyperapp to generate a new id and pass it to a testable action:
 ```javascript
-const WithGuid = action => state => [state, Guid(action)];
-const Guid = action => [(dispatch, action) => {
-  dispatch(action, guid());
-}, action];
+const WithGuid = (action) => (state) => [state, Guid(action)];
+const Guid = (action) => [
+  (dispatch, action) => {
+    dispatch(action, guid());
+  },
+  action,
+];
 ```
-Previously you were passing configuration objects to your Http effects. But the Guid effect is simple and it only accepts the action to invoke. 
+```WithGuid``` is an effectful action. ```Guid``` is an effect. 
+Previously you were passing configuration objects to your ```Http``` effects. 
+However the ```Guid``` effect is simple and it only accepts the action to invoke. 
 
 ## Testing effectful action
 
