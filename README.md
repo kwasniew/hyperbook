@@ -1738,64 +1738,149 @@ In terms of testability functional core allows for simple output-based unit test
 * assert on the output
 * skip the mocks
 
+## Separating Hyperapp setup from the application building blocks
+
+To make the code easier to test separate the ```app``` call from the application building blocks: state, view, actions and subscriptions.
+
+**App.js** should setup Hyperapp:
+```javascript
+import { app } from "./web_modules/hyperapp.js";
+import {init, view, subscriptions} from "./Posts.js";
+
+app({
+  init,
+  view,
+  subscriptions,
+  node: document.getElementById("app"),
+});
+```
+
+**Posts.js** should contain application building blocks and export what's necessary for **App.js**:
+```javascript
+export const view = (state) => html`
+    ...
+`;
+
+export const subscriptions = (state) => [
+    state.liveUpdate &&
+    EventSourceListen({
+        action: SetPost,
+        url: "https://hyperapp-api.herokuapp.com/api/event/post",
+        event: "post",
+    }),
+];
+
+export const init = [state, LoadLatestPosts];
+```
+
+
 ## Testing simple actions
 
-```npm i mocha -D```
+You will use ```mocha``` as a test runner and test reporter.
 
-Why mocha and what are the tradeoffs I made choosing it?
-* (+) as of this writing it has native EcmaScript Modules (ESM) support so you don't need transpiler in testing. Less tooling is always good. I don't want my test framework to run my code through babel if it doesn't need to.
-* (+) it doesn't enourage questionable and magical testing practices like overwirting imports for testability. Relying on a test framework to mock imports is a dead end testing strategy. Your code can't be tested in other test runners. 
-* (+) fast startup time that allows for subsecond tests with clean start (without watchers). This is super important if you want to get into the flow.
-* (-) my main reservation about mocha is that it can't run plain Node.js files as tests. 
+Why ```mocha```?
+* it has **native EcmaScript Modules (ESM) support** so you don't need transpiler in testing. 
+Less tooling is always good. I don't want my test framework to run my code through babel if it doesn't need to.
+* it **doesn't try to be a mocking framework** encouraging questionable and magical testing practices like overwriting imports for testability. 
+Relying on a test framework to mock imports is a dead end testing strategy. Your code can't be tested in other test runners. I prefer to rethink code
+structure to make it testable in every test runner. 
+* it has fast clean startup time that allows for **subsecond tests** without watchers. This is super important if you want to get into the flow.
+* it runs your tests in Node.js and **in a browser**
 
-Make sure you have Node 14 installed as it ships native ESM support.
+My main reservation about ```mocha``` is that it can't run plain Node.js files as tests, but it's minor compared to the benefits I mentioned before. 
 
-In package.json set Node.js to use ESM by default and set the test script:
+Make sure you have **Node 14** installed as it ships native ESM support.
+
+Include those changes in **package.json**:
 ```json
 {
     "type": "module",
-    ...
     "scripts": {
-        "test": "mocha test/*Test.js"
+      "snowpack": "snowpack install --exclude 'test/**' --dest=src/web_modules",
+      "test": "mocha test/*Test.js"
+    },
+    "devDependencies": {
+      "mocha": "7.1.2"
     }
 }
 ```
+This code:
+* adds ```mocha``` as a development dependency
+* tells Node.js to use ESM modules (```"type": "module"```)
+* prevents ```snowpack``` from installing test dependencies
+* runs ```mocha```
 
-Write your first test in test/appTest.js
+Write your first test in **test/PostsTest.js**:
 ```javascript
 import assert from "assert";
-import {UpdatePostText} from "../src/app.js";
+import { UpdatePostText } from "../src/Posts.js";
 
-describe("App", () => {
-    it("can update post test", () => {
-        const initState = { currentPostText: "", requestState: {status: "idle"}};
-        
-        const newState = UpdatePostText(initState, "text");
-        
-        assert.deepStrictEqual(newState, { currentPostText: "text", requestState: {status: "idle"}});
+describe("Posts:", () => {
+  it("post text is updated", () => {
+    const initState = {
+      currentPostText: "",
+      requestStatus: { status: "idle" },
+    };
+
+    const newState = UpdatePostText(initState, "text");
+
+    assert.deepStrictEqual(newState, {
+      currentPostText: "text",
+      requestStatus: { status: "idle" },
     });
+  });
 });
 ```
-We use Node.js built-in assert module. Import statemets work without transpilation because latest Node.js versions have native ESM support (with ```"type": "module"``` set). The test prepares initial state. Then you invoke an action with a new post text. Finally you verify if the state update succeeds.
+This code uses Node.js built-in ```assert``` module. 
+
+The test:
+* prepares initial state
+* invokes an action with a new post text
+* verifies expected state changes
+
+You can think of this test as 3 blocks separated by empty spaces:
+* given
+* when
+* then
 
 Run the test:
 ```npm test```
 
+The test runner should report that ```UpdatePostText``` is not exported.
+
+Add ```export``` keyword:
+```javascript
+export const UpdatePostText = (state, currentPostText) => ({
+  ...state,
+  currentPostText,
+  requestStatus: idle,
+});
+```
+
+Now the test should be green. 
+One of the tradeoffs of unit testing actions is that you need to expose them in the public API of the tested module
+
 ## Exercise: Testing simple actions
 
-Write a unit test that verifies that ```UpdatePostText``` resets error request state to idle.
+Write a unit test verifying ```UpdatePostText``` resets error request status to idle.
 
 <details>
     <summary id="testing_actions">Solution</summary>
 
 ```javascript
-    it("update resets request state to idle", () => {
-        const initState = { currentPostText: "", requestState: {status: "error", error: "oh nooo"}};
+  it("post status is reset to idle", () => {
+    const initState = {
+      currentPostText: "",
+      requestStatus: { status: "error", error: "oh nooo" },
+    };
 
-        const newState = UpdatePostText(initState, "text");
+    const newState = UpdatePostText(initState, "text");
 
-        assert.deepStrictEqual(newState, { currentPostText: "text", requestState: {status: "idle"}});
+    assert.deepStrictEqual(newState, {
+      currentPostText: "text",
+      requestStatus: { status: "idle" },
     });
+  });
 ```
 
 </details>
