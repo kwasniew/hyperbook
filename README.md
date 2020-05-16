@@ -1355,7 +1355,7 @@ Test your disable button capability.
 
 ## Handling API errors
 
-Switch SavePost to a new url of the error API.
+Switch ```SavePost``` to a new url with API returning error responses.
 ```javascript
 const SavePost = (post) =>
   Http({
@@ -1365,23 +1365,26 @@ const SavePost = (post) =>
 ```
 The new API is not only slow, but also returns 500 errors.
 
-Enhance initial state with the error property.
+Enhance initial state with the ```error``` property:
 ```javascript
 const state = {
-  ...
+  currentPostText: "",
+  posts: [],
+  liveUpdate: true,
+  isSaving: false,
   error: ""
 };
 ```
 Eventually you will populate this field with an error value.
 
-Map the error property to the error text in the UI:
+Expose the ```error``` in the UI:
 ```javascript
 <div>${state.error}</div>
 <button onclick=${AddPost} disabled="${state.isSaving}">Add Post</button>
 ```
-You should add the error just above the "Add Post" button.
+You should put the error just above the **Add Post** button.
 
-Add ```PostError``` action that will be triggered on error. hyperapp-fx Http effect has a special error field for the error handling action.
+Add ```PostError``` action that will be triggered on HTTP errors. 
 ```javascript
 const PostSaved = state => ({...state, isSaving: false});
 const PostError = state => ({...state, isSaving: false, error: "Post cannot be saved. Please try again."});
@@ -1390,12 +1393,25 @@ const SavePost = (post) =>
   Http({
     ...
     action: PostSaved,
-    error: PostError,
+    error: PostError
   });
 ```
-```PostError``` should enable the "Add Post" button and set the error message. 
+```hyperapp-fx``` ```Http``` effect has a special error field for the error handling action.
+```PostError``` should enable the **Add Post** button and set the UI friendly error message. 
 
-Test your application. After the post submission the error is displayed. When you start typing a new text the error is still there. I'd expect the error to dissapear at this point. You can change ```SetPost``` action to remove the error message, but in the next section we'll see a better way to model state.
+Test your application. 
+
+<figure>
+    <img src="images/api-error.png" width="650" alt="Disabling post submission error" align="center">
+    <figcaption><em>Figure: Disabling post submission error</em></figcaption>
+    <br><br>
+</figure>
+
+
+After the post submission the error is displayed. 
+However, when you start typing a new text the error is still there. 
+I'd expect the error to disappear at this point. 
+You can change ```SetPost``` action to remove the error message, but in the next section you'll see a better way to model our state.
 
 ## Modeling only valid states
 
