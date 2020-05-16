@@ -1649,7 +1649,7 @@ The source of our bottleneck is the ```listItem``` function invoked multiple tim
 Excessive ```listItem``` calls result in multiple ```patch``` function calls. It's Hyperapp patching physical DOM tree to keep
 up with your changes. 
 
-## Optimising large DOM trees 
+## Optimizing large DOM trees 
 
 You want to avoid the unnecessary computation of the post list items when typing a new post text. 
 
@@ -1712,12 +1712,18 @@ In the object-oriented programming circles people often talk about creating test
 * ports and adapters architecture
 * and many others (onion, hexagonal, clean etc.)
 
-Lengthy books are written how to achieve the holy grail and much effort is required. 
+Lengthy books are written how to achieve the holy grail of architecture and much effort is required. 
 
-Functional architecture imposed by Hyperapp makes the holy grail a default. As Mark Seemann noted in his [blog](https://blog.ploeh.dk/2016/03/18/functional-architecture-is-ports-and-adapters/) "functional architecture tends to fall into a pit of success".
+Functional architecture imposed by Hyperapp makes the holy grail a default. 
+As Mark Seemann noted in his [blog](https://blog.ploeh.dk/2016/03/18/functional-architecture-is-ports-and-adapters/) "functional architecture tends to fall into a pit of success".
 
 You can visualize your app as state in the center. Actions returning new state sitting around it. And effects/subscriptions at the edges.
-![Functional Architecture](https://d82.intsig.net/sync/download_resize_jpg?user_id=1609921833&_t=1589277758&sid=D3A958EEF4EE4D39MK7yC8S6&folder_name=CamScanner_Page&file_name=tXT167Y7a7LT62S0dHT3LK1g.jpg&pixel=1024)
+
+<figure>
+    <img src="images/ports-and-adapters.jpg" width="650" alt="A different look at functional architecture" align="center">
+    <figcaption><em>Figure: A different look at functional architecture</em></figcaption>
+    <br><br>
+</figure>
 
 Your application is as a functional core with pure view functions, pure actions and immutable state.  
 The framework is an imperative shell sitting at the edges, interpreting effectful actions and handling side-effects.
