@@ -787,11 +787,11 @@ Side-effects in Hyperapp are made of effect definition and effect data:
 ```
 
 The effect definition will hide the ```fetch``` call or some other impure call, but you will never invoke it in the userland code.
-It's something you must return to the framework, so it can handle the impure parts.
+It's something you must return to the framework, so it can handle the impure part.
 
 <figure>
-    <img src="images/effect_definition.jpg" width="650" alt="Hyperapp can handle effect definitions from the userland" align="center">
-    <figcaption><em>Figure: Hyperapp can handle effect definitions from the userland</em></figcaption>
+    <img src="images/effect_definition.jpg" width="650" alt="Hyperapp handling effect definitions from the userland" align="center">
+    <figcaption><em>Figure: Hyperapp handling effect definitions from the userland</em></figcaption>
     <br><br>
 </figure>
 
@@ -843,7 +843,7 @@ app({
 ```init``` has overloaded signature. In addition to the initial state you can pass one or more actions to invoke on startup.
 
 With those changes in place test your application. A list of posts from the server should arrive and replace the hardcoded posts. 
-You may observe a content flip as Hyperapp replaces initial state with server posts.
+You may observe a content flip as Hyperapp replaces initial state with the server posts.
 
 <figure>
     <img src="images/initial_posts.png" width="650" alt="Loading initial posts" align="center">
@@ -857,7 +857,7 @@ const state = {
   posts: []
 };
 ```
-The initial content flip should be gone.
+It will remove the initial flip.
 
 ## Writing your own effects
 
@@ -908,7 +908,7 @@ import { Http } from "./web_modules/hyperapp-fx.js";
 
 ## Understanding effectful actions
 
-```LoadLatestPosts``` effect alias is invoked on application startup. What if we wanted to trigger ```Http``` effects from regular actions?
+```LoadLatestPosts``` alias for the ```Http``` effect is invoked on application startup. What if we wanted to trigger ```Http``` effects from regular actions?
 
 Create ```SavePost``` effect:
 ```javascript
@@ -929,21 +929,21 @@ This effect wraps HTTP POST. The action to be triggered on successful response i
 
 To trigger this effect from an action use the following signature: 
 ```javascript
-const EffectfulActions = oldState => [newState, Effect];
+const EffectfulAction = oldState => [newState, Effect];
 ```
 This is how you create **effecftul actions**.
-
-If you have more than one effect wrap them in an array:
-```javascript
-const EffectfulActions = oldState => [newState, [Effect1, Effect2]];
-```
 
 Hyperapp applies the new state and schedules the effect almost instantly. 
 The return action inside the effect will trigger eventually e.g. when the HTTP response arrives.
 
+If you have more than one effect wrap them in an array:
+```javascript
+const EffectfulAction = oldState => [newState, [Effect1, Effect2]];
+```
+
 ## Exercise: making effectful action
 
-Change ```AddPost``` action to trigger SavePost effect when post is added to the local state.
+Change ```AddPost``` action to trigger ```SavePost``` effect.  Do it every time a post is added to the local state.
 Use network tab to verify if the request is sent:
 <figure>
     <img src="images/sending.png" width="650" alt="Sending JSON payload to the server" align="center">
@@ -995,7 +995,7 @@ Import subscription definition:
 ```javascript
 import { Http, WebSocketListen } from "./web_modules/hyperapp-fx.js";
 ```
-```hyperapp-fx``` uses a convention ```*Listen``` to name subscription creating functions.
+```hyperapp-fx``` uses ```*Listen``` convention to name subscription creating functions.
 
 Write an action for handling incoming WebSocket events:
 ```javascript
@@ -1092,7 +1092,7 @@ To this:
 In this section you'll write your own subscription for [Server-Sent Events](https://www.smashingmagazine.com/2018/02/sse-websockets-data-flow-http2/).
 
 Server-Sent Events (SSE) is a lesser known, but much simpler HTTP-native alternative to WebSockets. 
-SSE also handles network failures more gracefully than plain WebSockets.
+SSE also handles network failures more gracefully than plain WebSockets. It can automatically reconnect on failed connections.
 
 In [Writing your own effects](#writing-your-own-effects) section you defined effects as follows:
 ```javascript
@@ -1224,7 +1224,7 @@ You will add a capability to enable/disable live updates through the UI as shown
     <br><br>
 </figure>
 
-Introduce intial state field ```liveUpdate```:
+Introduce intial state field called ```liveUpdate```:
 ```javascript
 const state = {
   currentPostText: "",
@@ -1250,7 +1250,7 @@ Add UI control for live update just below the **Add Post** button.
     <label for="liveUpdate">Live Update</label>
 ```
 The checkbox reflects ```liveUpdate``` status. Every time the checkbox changes it toggles the status.
-Label for the input field conveniently allows to click on the **Live Update** text to change the settings.
+Label for the input field conveniently allows for clicking **Live Update** text to change the settings.
 
 Control your subscription based on the ```liveUpdate``` status.
 ```javascript
@@ -1292,7 +1292,7 @@ const ToggleLiveUpdate = (state) => {
 
 ## Handling slow API
 
-Switch SavePost to a new url of the slow API.
+Switch ```SavePost``` to a new url with the slow API.
 ```javascript
 const SavePost = (post) =>
   Http({
@@ -1300,34 +1300,43 @@ const SavePost = (post) =>
     ...
   });
 ```
-When you test the app ```SavePost``` should take about 3 seconds before a notification arrives. While waiting for the response you can send more requests without getting confirmation that the previous ones succeeded. Assume you have a requriement to disable the "Add Post" button while the post is saving.
+When you test the app ```SavePost``` should take about 3 seconds before a notification arrives. 
+While waiting for the response you can send more requests without getting confirmation that the previous ones succeeded. 
+Assume you have a requirement to disable the **Add Post** button while the post is saving.
 
-Enhance initial state with the isSaving property.
+Enhance initial state with the ```isSaving``` property.
 ```javascript
 const state = {
-  ...
+  currentPostText: "",
+  posts: [],
+  liveUpdate: true,
   isSaving: false
 };
 ```
 
-Map the state property to the button disable property:
+Map the property to the button ```disable``` property:
 ```javascript
-<button onclick=${AddPost} disabled="${state.isSaving}">Add Post</button>
+<button onclick=${AddPost} disabled=${state.isSaving}>Add Post</button>
 ```
-From now on the button reflects the current state of the saving operation.
+The button reflects the current state of the saving operation.
 
-AddPost action disables the button:
+```AddPost``` action disables the button:
 ```javascript
 const AddPost = (state) => {
-  ...
-    const newState = { ...state, currentPostText: "", isSaving: true };
-  ...
+    ...
+    const newState = {
+      ...state,
+      currentPostText: "",
+      isSaving: true,
+    };
+    ...
 };
 ```
 
-```SavePost``` effectful action enables the button on successful response with a help of a new ```PostSaved``` action:
+```SavePost``` effectful action enables the button on a successful response.
+It invokes a newly created ```PostSaved``` action:
 ```javascript
-const PostSaved = state => ({...state, isSaving: false});
+const PostSaved = (state) => ({ ...state, isSaving: false });
 
 const SavePost = (post) =>
   Http({
@@ -1335,6 +1344,14 @@ const SavePost = (post) =>
     action: PostSaved,
   });
 ```
+
+Test your disable button capability.
+
+<figure>
+    <img src="images/disable.png" width="650" alt="Disabling Add Post button on submit" align="center">
+    <figcaption><em>Figure: Disabling Add Post button on submit</em></figcaption>
+    <br><br>
+</figure>
 
 ## Handling API errors
 
