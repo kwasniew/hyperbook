@@ -1614,8 +1614,8 @@ const LoadLatestPosts = Http({
 ```
 
 Start typing a new post. 
-With every typed charater Hyperapp has to do a Virtual DOM diffing of the entire page it controls. 
-If you have a fast machine the typing delay may not be even noticeable. Hyperapp is often fast enough without extra optimisation. 
+On every typed charater Hyperapp has to do a Virtual DOM diffing of the entire page it controls. 
+With a fast machine the typing delay may not even be noticeable. Hyperapp is often fast enough without extra optimisation. 
 
 Go to your DevTools and slow down your CPU to make the impact of large DOM tree updates noticeable.
 
@@ -1635,10 +1635,10 @@ Those extensions may significantly impact performance results.
     <br><br>
 </figure>
 
-Zoom in on the slow parts:
+Zoom in on the slowest part, which is the widest yellow box in the flame chart:
 
 <figure>
-    <img src="images/slow-cpu-impact.png" width="650" alt="Zooming in on performance bottleneck" align="center">
+    <img src="images/zoomin.png" width="650" alt="Zooming in on performance bottleneck" align="center">
     <figcaption><em>Figure: Zooming in on performance bottleneck</em></figcaption>
     <br><br>
 </figure>
