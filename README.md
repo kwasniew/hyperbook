@@ -1402,8 +1402,8 @@ const SavePost = (post) =>
 Test your application. 
 
 <figure>
-    <img src="images/api-error.png" width="650" alt="Disabling post submission error" align="center">
-    <figcaption><em>Figure: Disabling post submission error</em></figcaption>
+    <img src="images/api-error.png" width="650" alt="Displaying post submission error" align="center">
+    <figcaption><em>Figure: Displaying post submission error</em></figcaption>
     <br><br>
 </figure>
 
@@ -1424,16 +1424,17 @@ const state = {
 };
 ```
 
-There's 4 possible combinations that can be triggered:
+4 possible combinations can be triggered:
 * ```isSaving: false``` and empty error (request is idle, user is typing a new message)
 * ```isSaving: false``` and non-empty error (request error after form submission)
 * ```isSaving: true``` and empty error (request is pending)
-* ```isSaving: true``` and non-empty error (should never be possible)
+* ```isSaving: true``` and non-empty error (should be impossible)
 
-The last combination should be impossible. But the way we modelled our state makes it possible. Of course you can write tests to verify the combination is never triggered. But you can also model your state to make the unwanted state impossible.
+The last combination should be impossible. But the way we modelled our state makes it possible. 
+Of course you can write tests to verify the combination never occurs. But you can also model your state to make the impossible state impossible.
 
-Think of a concept of the request status.
-The request status can be in one of the states:
+Imagine a concept of a request status.
+The request status can be in 1 of 3 states:
 * ```{status: "idle"}```
 * ```{status: "pending"}```
 * ```{status: "error", message: "Post cannot be saved. Please try again."}```
@@ -1442,71 +1443,74 @@ In the next section you'll implement it.
 
 ## Implementing only valid states
 
-Introduce 3 valid states we defined in the modelling exercise and set the idle state as the initial one.
+Introduce 3 valid states we defined in the modeling exercise and set the idle status as the initial one.
 ```javascript
-const idle = {status: "idle"};
-const saving = {status: "saving"};
-const error = {status: "error", message: "Post cannot be saved. Please try again."};
+const idle = { status: "idle" };
+const saving = { status: "saving" };
+const error = {
+  status: "error",
+  message: "Post cannot be saved. Please try again.",
+};
 const state = {
   ...
-  requestState: idle
+  requestStatus: idle
 };
 ```
-A strategy to scale state is to split one big object into smaller objects and combine them.
+A common strategy to scale a growing state object is to split it into smaller objects and combine them.
 
-Find all the places where you were setting ```isSaving``` and ```error``` properties. 
+Find all the places where you were setting ```isSaving``` and ```error``` properties and replace them with ```requestStatus```. 
 
-```AddPost``` sets the state to saving:
+```AddPost``` sets the status to ```saving```:
 ```javascript
 const AddPost = (state) => {
-  ...
-    const newState = { ...state, currentPostText: "", requestState: saving };
-  ...
+    ...
+    const newState = {
+      ...state,
+      currentPostText: "",
+      requestStatus: saving
+    };
+    ...
 };
 ```
 
-```PostSaved``` sets the state to idle:
+```PostSaved``` sets the status to ```idle```:
 ```javascript
-const PostSaved = state => ({...state, requestState: idle});
+const PostSaved = (state) => ({ ...state, requestStatus: idle });
 ```
 
-```PostError``` sets the state to error:
+```PostError``` sets the status to ```error```:
 ```javascript
-const PostError = state => ({...state, requestState: error});
+const PostError = (state) => ({ ...state, requestStatus: error });
 ```
 
-Map the request state to the error message view fragment:
+Map the request status to ```errorMessage``` view fragment:
 ```javascript
-const errorMessage = (requestState) => {
-  if(requestState.status === "error") {
-    return html`
-        <div>${requestState.message}</div>
-  `;
+const errorMessage = ({ status, message }) => {
+  if (status === "error") {
+    return html` <div>${message}</div> `;
   }
   return "";
 };
 ```
-
-Map the request state to the correct button disabled status:
+Map the request status to the button ```disabled``` status:
 ```javascript
-const addPostButton = (requestState) => html`
-        <button onclick=${AddPost} disabled=${requestState.status === "saving"}>Add Post</button>
-  `;
+const addPostButton = ({ status }) => html`
+  <button onclick=${AddPost} disabled=${status === "saving"}>Add Post</button>
+`;
 ```
 
 Delete those two lines:
 ```javascript
 <div>${state.error}</div>
-<button onclick=${AddPost} disabled="${state.isSaving}">Add Post</button>
+<button onclick=${AddPost} disabled=${state.isSaving}>Add Post</button>
 ```
-And replace them with our new view functions:
-```javascript
-${errorMessage(state.requestState)}
-${addPostButton(state.requestState)}
-```
-A strategy to scale view functions is to split them into smaller view fragments.
 
-After this part revert your API to: https://hyperapp-api.herokuapp.com/api/post
+And replace them with your new view fragments:
+```javascript
+${errorMessage(state.requestStatus)}
+${addPostButton(state.requestStatus)}
+```
+A strategy to scale growing view functions is to split them into smaller view fragments and delegate to them.
 
 ## Exercise: removing error when typing a new post
 
@@ -1518,12 +1522,14 @@ Modify ```UpdatePostText``` action to remove the error when a user starts typing
 ```javascript
 const UpdatePostText = (state, currentPostText) => ({
   ...state,
-  requestState: idle,
   currentPostText,
+  requestStatus: idle
 });
 ```
 
 </details>
+
+After this part revert your API url in ```SavePost``` to: https://hyperapp-api.herokuapp.com/api/post
 
 ## Breaking from purity
 
