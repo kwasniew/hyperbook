@@ -1644,47 +1644,66 @@ Zoom in on the slowest part, which is the widest yellow box in the flame chart:
 </figure>
 
 ```render``` function seems to be our bottleneck. But the ```render``` function belongs to Hyperapp so keep looking for the code that you wrote. 
-Just below the ```render``` function you should see a ```view``` function invoking ```listItem``` mutliple times. 
+Just below the ```render``` function you should see a ```view``` function invoking ```listItem```  repeatedly. 
 The source of our bottleneck is the ```listItem``` function invoked multiple times when we type a new post.
+Excessive ```listItem``` calls result in multiple ```patch``` function calls. It's Hyperapp patching physical DOM tree to keep
+up with your changes. 
 
-## Optimising large DOM trees with memoization
+## Optimising large DOM trees 
 
-You want to avoid the unnecessary computation of the post list items view when typing a new post text. 
+You want to avoid the unnecessary computation of the post list items when typing a new post text. 
 
-Extract postList view fragment:
+Extract ```postList``` view fragment:
 ```javascript
-const postList = ({posts}) => html`
+const postList = ({ posts }) => html`
   <ul>
     ${posts.map(listItem)}
   </ul>
 `;
 ```
-Use it in your main view:
+Use it in the ```view``` function:
 ```javascript
-${postList({posts: state.posts})}
+{postList({ posts: state.posts })}
 ```
 
-Import Lazy function from Hyperapp core:
+Import ```Lazy``` function from Hyperapp:
 ```javascript
 import { h, app, Lazy } from "./web_modules/hyperapp.js";
 ```
-Decorate postList call with Lazy:
+```Lazy``` wraps view fragments that need to be optimized.
+
+Decorate ```postList``` with ```Lazy```:
 ```javascript
 const lazyPostList = ({posts}) => Lazy({view: postList, posts});
 ```
-Lazy expects a view to be decorated and other properties that will be passed to the original view function.
+```Lazy``` expects a ```view``` to optimize (```postList```) and other properties (```posts```) that will be passed to the ```postList```.
+The optimization implemented by ```Lazy``` is  called **memoization**. 
+```Lazy``` remembers the input and output of the previous ```postList``` invocation. 
+If you call it again with the same input the ```postList``` doesn't compute anything and ```lazyPostList``` returns previously saved result.
 
-Replace postList call with postListView call:
+Replace ```postList``` with ```lazyPostList```:
 ```javascript
 ${lazyPostList({posts: state.posts})}
 ```
-lazyPostList uses so-called memoization. It remembers the input and output of the previous invocation. If you call it again with the same input the function doesn't compute anything and returns previously saved result.
 
 Verify performance profile again.
 
-Most key presses should generate a pattern with much shorter JS execution times:
+<figure>
+    <img src="images/optimized.png" width="650" alt="Optimized view profile with shorter JS blocking time" align="center">
+    <figcaption><em>Figure: Optimized view profile with shorter JS blocking time</em></figcaption>
+    <br><br>
+</figure>
+Most key presses should generate a performance profile with much shorter JS blocking time.
 
-![optimized](https://i.imgur.com/YZBLxBj.png)
+```Lazy``` is the last part of Hyperapp API you need to learn.  There's nothing more. Congratulations!
+
+
+In the remaining sections I'll cover extra topics that are not part of Hyperapp core, but are still useful for day to day development.
+You will learn about:
+* testing
+* rendering on the server
+* routing
+* integrating with 3rd party libraries
 
 ## Understanding testable architecture
 
