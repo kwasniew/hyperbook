@@ -1961,43 +1961,49 @@ const [newState, [, savePostData]] = AddPost(initState, "1234");
 
 ## Separating application code from library code
 
-Before you start testing effects and subscriptions separate them in code.
-Create src/lib directory and move SSE and Guid related code there. Remember to export appropriate functions.
+Before you start testing effects and subscriptions separate them from the rest of the code.
+Create **src/lib** directory and move SSE and guid related code there. Remember to export appropriate functions.
 
-src/lib/eventsource/EventSource.js
+**src/lib/EventSource.js**
 ```javascript
 const eventSourceSubscription = (dispatch, data) => {
-    const es = new EventSource(data.url);
-    const listener = (event) => dispatch(data.action, event);
-    es.addEventListener("message", listener);
+  const es = new EventSource(data.url);
+  const listener = (event) => dispatch(data.action, event);
+  es.addEventListener("message", listener);
 
-    return () => {
-        es.removeEventListener("message", listener);
-    };
+  return () => {
+    es.removeEventListener("message", listener);
+    es.close();
+  };
 };
 export const EventSourceListen = (data) => [eventSourceSubscription, data];
 ```
 
-src/lib/guid/Guid.js
+**src/lib/Guid.js**
 ```javascript
 const guid = () => {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-        var r = (Math.random() * 16) | 0,
-            v = c == "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-    });
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 };
-export const WithGuid = action => state => [state, Guid(action)];
-export const Guid = action => [(dispatch, action) => {
+const Guid = (action) => [
+  (dispatch, action) => {
     dispatch(action, guid());
-}, action];
+  },
+  action,
+];
+
+export const WithGuid = (action) => (state) => [state, Guid(action)];
 ```
 
-In app.js you should now have:
+In **Posts.js** you should have those imports:
 ```javascript
-import {EventSourceListen} from "./lib/eventsource/EventSource.js";
-import {WithGuid} from "./lib/guid/Guid.js";
+import { EventSourceListen } from "./lib/EventSource.js";
+import { WithGuid } from "./lib/Guid.js";
 ```
+
 ## Testing effects and subscriptions
 
 Effects and subscriptions live at the edges of the system and need to talk to global APIs you don't control e.g. DOM API or fetch API. Therefore, effects and subscriptions are more difficult to unit test and it's left to the library authors providing those effects. 
