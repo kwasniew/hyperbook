@@ -19,7 +19,7 @@ You will need about 6 hours.
     * higher-order functions
     * currying
     * immutability
-* Some familiarity with browser dev tooling (HTML elements tab, network tab, performance tab)  will be beneficial   
+* Some familiarity with browser DevTools (HTML elements tab, network tab, performance tab)  will be beneficial   
 * Some familiarity with other JS frameworks will be beneficial    
 
 No prior experience with Hyperapp is needed.
@@ -1601,7 +1601,7 @@ const listItem = (post) => html`
   </li>
 `;
 ```
-Hyperapp internally uses ```key``` and you a developer uses ```data-key```.
+Hyperapp internally uses ```key``` and a developer uses ```data-key```.
 
 ## Finding runtime performance bottlenecks
 
@@ -1609,25 +1609,43 @@ Switch ```LoadLatestPosts``` to fetch 1000 items when the application starts:
 ```javascript
 const LoadLatestPosts = Http({
   url: "https://hyperapp-api.herokuapp.com/api/post?limit=1000",
-  action: SetPosts
+  action: SetPosts,
 });
 ```
 
-Start typing text into the text field. Every time you put a new character into the text field Hyperapp has to do a Virtual DOM diffing of the entire page it controls. If you have a fast machine the delay after typing a character may not be even noticeable. Hyperapp is often fast enough without any optimisations. 
+Start typing a new post. 
+With every typed charater Hyperapp has to do a Virtual DOM diffing of the entire page it controls. 
+If you have a fast machine the typing delay may not be even noticeable. Hyperapp is often fast enough without extra optimisation. 
 
-Go to Devtools and slow down your CPU to make the impact of large DOM tree updates noticeable.
+Go to your DevTools and slow down your CPU to make the impact of large DOM tree updates noticeable.
 
-![Slow CPU](https://i.imgur.com/PoWNBjD.png)
+<figure>
+    <img src="images/slowcpu.png" width="650" alt="Slowing down CPU in DevTools" align="center">
+    <figcaption><em>Figure: Slowing down CPU in DevTools</em></figcaption>
+    <br><br>
+</figure>
 
-Record CPU profile while typing the text. It should show significant time spent on JS execution:
+Record CPU profile while typing the text. It should show significant time spent on JS execution.
+I recommend to profile in the **Incognito mode** which usually has most browser extensions disabled.
+Those extensions may significantly impact performance results. 
 
-![Impact of slow CPU](https://i.imgur.com/V45f8Pi.png)
+<figure>
+    <img src="images/slow-cpu-impact.png" width="650" alt="Impact of slow CPU on runtime performance" align="center">
+    <figcaption><em>Figure: Impact of slow CPU on runtime performance</em></figcaption>
+    <br><br>
+</figure>
 
 Zoom in on the slow parts:
 
-![Zoom in](https://i.imgur.com/ZCYDY4H.png)
+<figure>
+    <img src="images/slow-cpu-impact.png" width="650" alt="Zooming in on performance bottleneck" align="center">
+    <figcaption><em>Figure: Zooming in on performance bottleneck</em></figcaption>
+    <br><br>
+</figure>
 
-render function seems to be the bottleck. But the render function belongs to Hyperapp so keep looking for the code that you wrote. Just below the render function you should have view function callling listItem mutliple times. The source of our bottlenect is listItem function invoked multiple times when we type the text.
+```render``` function seems to be our bottleneck. But the ```render``` function belongs to Hyperapp so keep looking for the code that you wrote. 
+Just below the ```render``` function you should see a ```view``` function invoking ```listItem``` mutliple times. 
+The source of our bottleneck is the ```listItem``` function invoked multiple times when we type a new post.
 
 ## Optimising large DOM trees with memoization
 
