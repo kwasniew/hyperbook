@@ -1533,10 +1533,14 @@ After this part revert your API url in ```SavePost``` to: https://hyperapp-api.h
 
 ## Breaking from purity
 
-Effects/subscriptions as data taken to the extreme means no side-effects in the userland code. setTimeout becomes an effect, setInterval becomes a subscription. HTTP calls become effects, SSE become subscriptions. 
-What about things like console.log or Math.random()? We can wrap them inside effects but sometimes it's more convenient to just use them directly in your code. 
+"Effects/subscriptions as data" taken to the extreme means no side-effects in the userland code. 
+```setTimeout``` becomes an effect, ````setInterval```` becomes a subscription. HTTP calls become effects, SSE become subscriptions. 
 
-Put this guid function based on Math.random() into your codebase:
+What about things like ```console.log``` or ```Math.random()```? 
+We can wrap them inside effects, but sometimes it's more convenient to use them directly. 
+Our next requirement is to add unique identifiers to the posts.
+
+Put this ```guid``` function based on ```Math.random()``` into your code:
 ```javascript
 const guid = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -1546,37 +1550,58 @@ const guid = () => {
 }
 ```
 
-Modify AddPost action to generate id for all new posts:
+Modify ```AddPost``` action to generate ```id``` for all new posts:
 ```javascript
-const newPost = { id: guid(), username: "fixed", body: state.currentPostText };
+    const newPost = {
+      id: guid(),
+      username: "fixed",
+      body: state.currentPostText,
+    };
 ```
 
-## Optimising lists of items with keys
+## Optimising long lists of items 
 
-Our application keeps adding new posts to the top of the list. When Hyperapp sees a new item in the new list and compares it with the first item in the old list they differ. Same with the second and third and all the other items. In other words all the old items got shifted by one. We know it, but the algorithm for the Virtual DOM diffing doesn't. To maintain a stable list item identity between the renders add a **key** attribute.
+Our application keeps adding new posts to the top of the list. 
+When Hyperapp sees a new item in the new list and compares it with the first item in the old list they differ. 
+Same with the second and third and all the other items. 
 
-![key attribute](https://camo.githubusercontent.com/b64d4e13c9eb4e3a1ac3fc6fcc569ca7bbf5563a/68747470733a2f2f692e696d6775722e636f6d2f655766385469582e706e67)
-With the extra hint from the key attribute Hyperapp avoids re-rendering the items that got shifted by one.
+<figure>
+    <img src="images/nokeys.jpg" width="650" alt="Lists without keys require unnecessary Virtual DOM computations" align="center">
+    <figcaption><em>Figure: Lists without keys require unnecessary Virtual DOM computations</em></figcaption>
+    <br><br>
+</figure>
 
-Modify listItem view function:
+The old items got shifted by one. We know it, but the algorithm for the Virtual DOM diffing doesn't. 
+To maintain a stable list item identity between the renders add a **key** attribute.
+
+<figure>
+    <img src="images/keys.jpg" width="650" alt="Lists with keys skip unnecessary Virtual DOM computations" align="center">
+    <figcaption><em>Figure: Lists with keys skip unnecessary Virtual DOM computations</em></figcaption>
+    <br><br>
+</figure>
+
+With the extra hint from the **key** attribute Hyperapp avoids re-rendering the items that got shifted by one.
+
+Modify ```listItem``` view function to include the ```key``` attribute:
 ```javascript
 const listItem = (post) => html`
-  <li key=${post.id} class="list-group-item" data-testid="item">
+  <li key=${post.id}>
     ...
   </li>
 `;
 ```
-Usually the best candidate for the key value is a stable identifier like the one we used. Don't use post content because it may not be unique. Don't use array index as it's not stable over re-renders.
+Usually the best candidate for the ```key``` value is a stable identifier (e.g. guid). 
+Don't use post content because it may not be unique. Don't use array index as it's not stable over re-renders.
 
-Since key attribute is not visible in the generated DOM you can also add data-key attribute for debugging purposes:
+Since ```key``` attribute is not visible in the generated DOM you can also add ```data-key``` attribute for debugging purposes:
 ```javascript
 const listItem = (post) => html`
-  <li key=${post.id} data-key=${post.id} class="list-group-item" data-testid="item">
+  <li key=${post.id} data-key=${post.id}>
     ...
   </li>
 `;
 ```
-Hyperapp internally uses key and you can use data-key for insepection.
+Hyperapp internally uses ```key``` and you a developer uses ```data-key```.
 
 ## Finding runtime performance bottlenecks
 
