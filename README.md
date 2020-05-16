@@ -1725,13 +1725,13 @@ You can visualize your app as state in the center. Actions returning new state s
     <br><br>
 </figure>
 
-Your application is as a functional core with pure view functions, pure actions and immutable state.  
-The framework is an imperative shell sitting at the edges, interpreting effectful actions and handling side-effects.
+Your application is as a **functional core** with pure view functions, pure actions and immutable state.  
+The framework is an **imperative shell** sitting at the edges, interpreting effectful actions and handling side-effects.
 
 The functional core makes decisions and defines the shape of your UI, the shell converts the decisions into side effects, gathers the inputs and renders physical DOM nodes.
 
-Your effect signature is a port to the external world. 
-The actual effect definition invoked by the framework is an adapter.
+Your effect signature is a **port** to the external world. 
+The actual effect definition invoked by the framework is an **adapter**.
 
 In terms of testability functional core allows for simple output-based unit testing:
 * invoke a function
