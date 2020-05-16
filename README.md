@@ -337,11 +337,11 @@ Update **package.json** with this ```snowpack``` setup:
   }
 }
 ```
-Snowpack is our development dependency. It provides ```snowpack install``` command that you will run after ```npm i```. 
-You tell snowpack to put the browser friendly bundles in ```src/web_modules```. By default it would put everything in the root-level
-```web_modules```.
+Snowpack is our development dependency. It provides ```snowpack install``` command that will run after ```npm i``` from the ```postinstall``` script. 
+You tell snowpack to put the browser friendly bundles in ```src/web_modules```. Without ```--dest```  it would put everything in the root-level
+```web_modules```. Since we serve the whole ```src``` directory everything needs to be inside.
 
-Rewrite your imports to use ```web_module```:
+Rewrite your imports to use ```web_modules```:
 ```
 import {h, app} from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
@@ -350,7 +350,7 @@ import htm from "./web_modules/htm.js";
 Run the installation command:
 ```npm i```
 
-At this point Snowpack will inspect your code and translate required modules from ```node_modules``` to ```web_modules```.
+Snowpack will inspect your code and translate required modules from ```node_modules``` to ```web_modules```.
 
 If you track your code in git add **src/web_modules** to **.gitignore**.
 
@@ -377,8 +377,8 @@ Add ```format``` command and ```prettier``` ```devDependency``` to **package.jso
   }
 }
 ```
-```format``` command willl format your JS files except from the ```web_modules``` and ```node_modules``` (excluded by default).
-And ```--write``` option will re-write the formatted files in place.
+```format``` command willl format your JS files except from the ```web_modules``` (excluded explicitly) and ```node_modules``` (excluded by default).
+With the ```--write``` option it will re-write the formatted files in place.
 
 
 Copy this malformed code to **App.js**:
@@ -418,7 +418,7 @@ npm run format
 ```
 The ```view``` code should get nicely aligned.
 
-You can connect prettier to your IDE/text editor but it's beyond the scope of this tutorial.
+You can connect prettier to your IDE/text editor to format on save, but it's beyond the scope of this tutorial.
 
 You took a detour to learn about some tools that play nicely with Hyperapp:
 * ```htm``` for HTML-like syntactic sugar
@@ -471,7 +471,7 @@ app({
   node: document.getElementById("app"),
 });
 ```
-View is extracted into a separate function.
+```view``` is extracted into a separate function.
 Inside the ```view``` you map over a list of ```posts``` and render each of them using ```listItem``` view fragment. 
 As a rule of thumb, if your view gets too big, split it into **smaller view fragments**. 
 Pass as much state as needed. For example: ```listItem``` only needs a single ```post``` parameter.
@@ -509,6 +509,8 @@ When you click a button, Hyperapp automatically passes previous state to your ac
 ```newPost``` is created and added to the beginning of the posts list. 
 A common pattern is to destructure previous state and only update those properties that change. 
 Our current state has no other properties, but the code is future proofed. 
+To keep your state updates simple, model your state as flat objects. The more nesting you do, the more
+elaborate update strategies you will need (e.g. [lenses](https://randycoulman.com/blog/2016/07/12/thinking-in-ramda-lenses/)). 
 
 The following figure shows the same action in a visual format:
 <figure>
@@ -531,7 +533,7 @@ Test your app in the browser and click the "Add Post" button several times. New 
 Hyperapp **data flow** is inspired by the [Elm Architecture](https://guide.elm-lang.org/architecture/):
 * view **V** interaction (e.g. click) triggers some action **A** 
 * action **A** changes state **S**
-* state **S** change triggers re-render of the view **V**
+* state **S** change re-renders the view **V**
 
 <figure>
     <img src="images/data-flow.jpg" width="650" alt="Functional data flow" align="center">
@@ -669,11 +671,11 @@ const UpdatePostText = (state, currentPostText) => ({
 });
 ```
 Shape the second argument of your action inside the input handler. 
-A two argument array with an action and a selector applies the event selector before the action is invoked. 
-In our case ```targetValue``` is applied to DOM event before invoking ```UpdatePostText```.
 ```javascript
 <input type="text" oninput=${[UpdatePostText, targetValue]} value=${state.currentPostText} autofocus />
 ```
+A two argument array with an action and a selector applies the event selector before the action is invoked. 
+In our case ```targetValue``` is applied to DOM event before invoking ```UpdatePostText```.
 
 If you keep using the ```[action, selector]``` array over and over, consider creating an alias:
 ```javascript
