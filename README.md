@@ -19,7 +19,7 @@ You will need about 6 hours.
     * higher-order functions
     * currying
     * immutability
-* Some familiarity with browser development tooling (HTML elements tab, network tab, performance tab)  will be beneficial   
+* Some familiarity with browser dev tooling (HTML elements tab, network tab, performance tab)  will be beneficial   
 * Some familiarity with other JS frameworks will be beneficial    
 
 No prior experience with Hyperapp is needed.
@@ -37,13 +37,13 @@ No prior experience with Hyperapp is needed.
 
 Modern frontend development is too complicated:
 * frameworks with 10000k+ LOC, impenetrable to non-core developers
-* tools with huge API surface area
+* libraries with huge API surface area
 * more and more JS "the bad parts" to learn
 * complex tooling to make everything work
 * layers upon layers of abstraction on top of the browser
 * elaborate performance tricks to improve performance
 * code mixing side-effects and application logic 
-* testing techniques encouraging monkey patching the language
+* testing techniques with mock imports encouraging untestable code
 
 ## What is your elevator pitch?
 
@@ -161,7 +161,7 @@ Pass an object with 3 parameters:
 * **view** - view function rendering current state
 * **node** - DOM node to mount the application to
 
-Open your project directory using any static HTTP server. I'm using https://www.npmjs.com/package/http-server 
+Expose your **src** directory using any static HTTP server. I'm using https://www.npmjs.com/package/http-server 
 ```
 npm i http-server -G
 http-server src
@@ -169,7 +169,7 @@ http-server src
 
 By default ```http-server``` starts on http://127.0.0.1:8080
 
-Check if you browser renders same HTML as in the following figure:
+Check if you browser renders the same HTML as shown in the figure:
 <figure>
     <img src="images/getting_started.png" width="650" alt="Getting started result" align="center">
     <figcaption><em>Figure: Getting started HTML</em></figcaption>
@@ -186,10 +186,10 @@ Check if you browser renders same HTML as in the following figure:
 
 In the functional approach to UI development, view is a pure function of state. 
 Hyperapp ```view``` function takes ```state``` object as an input and returns a data structure describing future DOM tree to build. 
-The returned data structure is known as the Virtual DOM. The framework can translate it into very efficient low-level DOM updates. 
+The returned data structure is known as the **Virtual DOM**. The framework can translate it into very efficient low-level DOM updates. 
 The important point is that you never work directly with DOM API in your application code. 
 Instead of making imperative calls such as ```document.createElement```, ```element.insertBefore``` or ```element.removeChild``` you declare
-what the view should look like and call it a day.  
+what the view should look like and let the framework figure out the details.  
 
 ## Analyzing view rendering options
 
@@ -228,7 +228,7 @@ What about something more complicated? How much effort would it take to translat
 </div>
 ```
 Translating between HTML and ```h``` function calls can get tiresome for nested HTML. 
-Even if you automate the process, you still have to mentally switch between JS representation and HTML representation you inspect in DevTools.
+Even if you automate the process, you still have to mentally switch between JS representation and HTML representation you see in DevTools.
 On the other hand if you write everything from scratch and prefer JS-driven templating, calling ```h``` function directly is a solid option. 
 
 ### JSX 
@@ -278,7 +278,7 @@ Why? Because sometimes CDNs:
 * have security breaches
 * go out of business
 
-Also having your local dependencies allows to work offline.
+Additionally, local dependencies allows for offline work.
 
 Create **package.json** in your root directory:
 ```json
@@ -315,7 +315,11 @@ It certainly works, but I had to inspect the contents of both libraries to provi
 ## Integrating Hyperapp with Snowpack 
 
 [Snowpack](https://www.snowpack.dev/) is a tool to translate selected ```node_modules``` into browser friendly bundles at dependency installation time.
-In essence it makes bundling JS optional at development time.
+It puts all dependencies as single file bundles in a predictable location called ```web_modules```. 
+It also has experimental support for deep imports so all transitive dependencies are resolved as a single browser-friendly file. 
+Deep imports work for libraries using ```require``` and [Node.js ESM modules](https://nodejs.org/api/esm.html). The latter means your dependency needs
+to use ```.js``` extension in import statements.  
+In essence Snowpack makes bundling JS optional at development time.
 
 Update **package.json** with this ```snowpack``` setup:
 ```json
