@@ -2328,7 +2328,7 @@ The first time you run the tests it intercepts all network calls and saves them 
 Afterwards it can replay traffic much faster than the original API.
 * inject fake implementation of all effects and subscriptions you want to replace. 
 The trick is to move all effects and subscriptions to the entry point of your application.
-In production you can start your app with real dependencies:
+In production you can start your app with real effects/subscriptions:
 ```javascript
 import { start } from "./App.js";
 import { Http } from "./web_modules/hyperapp-fx.js";
@@ -2337,11 +2337,11 @@ import { WithGuid } from "./lib/Guid.js";
 
 start({Http, EventSourceListen, WithGuid});
 ```
-In your tests your provide fake implementation of those APIs. 
+In your tests your can provide fake implementation of those effects/subscriptions. 
+This technique requires minor code changes. Each module with effects needs to expose a function for injecting them.
 This is essentialy what some people call a dependency injection, which is a fancy name for passing arguments to functions.
-This technique requires minor code changes. Each module dependent on effects needs to expose a function for injecting those. 
-
-I leave it to the reader to experiment with the technique.
+ 
+I leave it to the reader to experiment with those techniques.
 
 ## Preparing code for production
 
