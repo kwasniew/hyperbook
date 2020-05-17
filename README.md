@@ -1696,7 +1696,7 @@ Verify performance profile again.
 Most key presses should generate a performance profile with much shorter JS blocking time.
 
 ```Lazy``` is the last part of Hyperapp API you need to learn.  There's nothing more. Congratulations!
-
+After this section remove the ```limit``` query param from the API url.
 
 In the remaining sections I'll cover extra topics that are not part of Hyperapp core, but are still useful for day to day development.
 You will learn about:
@@ -2114,8 +2114,8 @@ Therefore they subvert a traditional [test pyramid](https://martinfowler.com/bli
 
 One popular option for integration testing your app is DOM emulation with ```jsdom``` and polyfills/test doubles for various API such as 
 ```fetch```, ```localStorage``` or ```EventSource```.
-This approach allows for Node.js testing your frontend code without spinning a browser. 
-Personally, I've spent a long time trying to match browser environment in this setup and I'm not sure if it's worth the effort. 
+This approach allows to write Node.js tests for your frontend code without spinning a browser. 
+Personally, I've spent too much time trying to match browser environment in this setup and I'm not sure if it's worth the effort. 
 Your mileage may vary though. Also, with ```jsdom``` you're not integration testing against a real browser. 
 
 ```jsdom``` based setup tradeoffs:
@@ -2138,9 +2138,9 @@ Browser based setup tradeoffs:
 
 ## Testing in a browser
 
-Mocha test runner can be run in Node.js and in a browser which is not a case for all the other test runners. 
+```mocha``` tests run in both Node.js and in different browsers. Not all test runners have this capability. 
 
-Create test/index.html with mocha browser test boilerplate:
+Create **test/index.html** with the following boilerplate:
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -2155,89 +2155,106 @@ Create test/index.html with mocha browser test boilerplate:
     <div id="app"></div>
 </div>
 
-<script src="https://unpkg.com/chai/chai.js"></script>
-<script src="https://unpkg.com/mocha/mocha.js"></script>
+<script src="https://unpkg.com/mocha@7.1.2/mocha.js"></script>
+<script src="https://unpkg.com/chai@4.2.0/chai.js"></script>
+<script src="https://unpkg.com/browse/@testing-library/dom@7.5.6/dist/@testing-library/dom.umd.js"></script>
 
 <script class="mocha-init">
     mocha.setup('bdd');
 </script>
-<script type="module" src="browser.test.js"></script>
+<script type="module" src="App.test.js"></script>
 <script type="module" class="mocha-exec">
     mocha.run();
 </script>
 </body>
 </html>
 ```
-This setup loads mocha and chai assertion library since browsers don't provide any assertion library as Node.js does.
-```<div id="app"></div>``` is a placeholder where our app will mount.
+This setup loads 3 scripts.
+* ```mocha``` - browser based test runner
+* ```chai``` - assertion library. Browsers don't provide built-in assertion libraries similar to Node ```assert```
+* ```@testing-library/dom``` - a helpful utility library you'll use for asynchronous rendering testing  
 
-Split app.js into app.js and init.js:
+We load the scripts from unpkg.com. In real world setup you'd rather load them locally. Also, all scripts other than
+```mocha``` could be loaded as ESM imports.
 
-src/init.js is a new file you'll reference in index.html 
+You app will mount to ```<div id="app"></div>```.
+
+Write a test in **test/App.test.js**:
 ```javascript
-import { init } from "./app.js";
-
-init();
-```
-
-src/app.js should export init function.
-```javascript
-export const init = () =>
-  app({
-    ...
-  });
-```
-The reason for this split is the ability to initialize a new instance of a new app per test.
-
-Integration testing heavily relies on DOM elements rendering asynchronously. Install a library to facilitate wating for those elements. 
-```
-  "webDependencies": {
-    "@testing-library/dom": "7.5.1"
-  },
-```
-```
-npm run snowpack
-```
-Even though we don't use testing-library in production code we still need it available in browser tests. So we run it through snowpack as any other browser dependency.
-
-Finally create a test in test/browser.test.js
-```javascript
-const {assert} = chai;
-import {init} from "../src/app.js";
-import {getAllByTestId, waitFor} from "../src/web_modules/@testing-library/dom.js";
+const { assert } = chai;
+const { getAllByTestId, waitFor } = TestingLibraryDom;
+import { start } from "../src/App.js";
 
 const container = () => document.getElementById("app");
 
 describe("App", () => {
-    beforeEach(function () {
-        container().innerHTML = "";
-    });
+  beforeEach(function () {
+    container().innerHTML = "";
+  });
 
-    it("Load initial posts", async () => {
-        init();
-        await waitFor(() => {
-            assert.strictEqual(getAllByTestId(container(), "item").length, 10);
-        });
+  it("Load initial posts", async () => {
+    start();
+    await waitFor(() => {
+      assert.strictEqual(getAllByTestId(container(), "item").length, 10);
     });
-
+  });
 });
-```
-The code cleans up the app container before every test. Inside a test, init a new instance of the app. Then wait for the 10 items to show up. ```waitFor``` runs until the assertion doesn't throw any errors or until it times out or mocha times out.
-```getAllByTestId``` is a utility querying for ```data-testid="item```. 
 
-Add the test data attribute to list item view fragment.
+```
+The code cleans up the app container before every test. It's important to start each test with a clean slate.
+Always prefer ```beforeEach``` over ```afterEach``` for cleanup as you may need to inspect a failing test every now and then.
+```afterEach``` would erase useful debugging information.
+Inside a test, start a new instance of the app. Then wait for the 10 items to show up. 
+```getAllByTestId``` is a utility querying for ```data-testid="item```. 
+```waitFor``` runs until:
+* the assertion doesn't throw any errors
+* waitFor times out 
+* mocha times out
+
+Change **src/App.js**:
+```javascript
+import { app } from "./web_modules/hyperapp.js";
+import { init, view, subscriptions } from "./Posts.js";
+
+export const start = () =>
+  app({
+    init,
+    view,
+    subscriptions,
+    node: document.getElementById("app"),
+  });
+```
+It defers app intialization so that it can be started anew in each test.
+
+Add **src/Start.js**:
+```javascript
+import { start } from "./App.js";
+
+start();
+```
+Refer to this file from **src/index.html**:
+```html
+<script type="module" src="Start.js"></script>
+```
+
+Add the test data attribute to the ```listItem``` view fragment in **src/Posts.js**`:
 ```javascript
 const listItem = (post) => html`
-  <li
-    ...
-    data-testid="item"
-  >
+  <li key=${post.id} data-key=${post.id} data-testid="item">
     ...
   </li>
 `;
 ```
 
-Open test.html in your browser. The test should be green.
+Start server from a root directory: ```http-server .```
+
+Open http://localhost:8080/test/ in your browser. The test should be green.
+
+<figure>
+    <img src="images/mocha-browser.png" width="650" alt="Mocha browser test output" align="center">
+    <figcaption><em>Figure: Mocha browser test output</em></figcaption>
+    <br><br>
+</figure>
 
 ## Testing more advanced scenario in a browser
 
