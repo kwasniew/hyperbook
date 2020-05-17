@@ -2299,6 +2299,7 @@ const {
   });
 ```
 The test starts a new app to make it independent of the other tests. One thing I'm missing in Hyperapp is the ability to stop all subscriptions from the previous test. 
+
 With the app started:
 * create a random message
 * send the message to the server - ```@testing-library``` simplifies firing DOM events such as typing a text. It also provides DOM queries
@@ -2318,27 +2319,29 @@ Put a test data attribute in **Posts.js**:
 
 Check if both tests are green.
 
-## Making integration tests faster
+## Making integration tests faster and more predictable
 
-You integration test executon time and correctness is heavily dependent on the API response time and availability. 
+You integration test execution time and reliability are heavily dependent on the API response time and availability. 
 There are at least two options you have to make it faster and more reliable:
-* record all HTTP traffic with a library like [PollyJS](https://netflix.github.io/pollyjs/#/). The first time you run your tests it intercepts all network calls and saves them to localStorage/REST API etc. Afterwards it can replay traffic much faster than the original API.
+* record all HTTP traffic with a library like [PollyJS](https://netflix.github.io/pollyjs/#/). 
+The first time you run the tests it intercepts all network calls and saves them to localStorage/REST API etc. 
+Afterwards it can replay traffic much faster than the original API.
 * inject fake implementation of all effects and subscriptions you want to replace. 
-
-The trick is to move all effects and subscriptions out of the app.js file.
-In production you can init your app with real dependencies
+The trick is to move all effects and subscriptions to the entry point of your application.
+In production you can start your app with real dependencies:
 ```javascript
-import { init } from "./app.js";
+import { start } from "./App.js";
 import { Http } from "./web_modules/hyperapp-fx.js";
-import { WebSocketListen } from "./web_modules/hyperapp-fx.js";
-import {EventSourceListen} from "./lib/eventsource/EventSource.js";
-import {WithGuid} from "./lib/guid/Guid.js";
+import { EventSourceListen } from "./lib/EventSource.js";
+import { WithGuid } from "./lib/Guid.js";
 
-init({Http, WebSocketListen, EventSourceListen, WithGuid});
+start({Http, EventSourceListen, WithGuid});
 ```
-And in your tests your provide fake implementation of those APIs. This is essentialy what some people call a dependency injection, which is a fancy name for passig arguments to functions. 
+In your tests your provide fake implementation of those APIs. 
+This is essentialy what some people call a dependency injection, which is a fancy name for passing arguments to functions.
+This technique requires minor code changes. Each module dependent on effects needs to expose a function for injecting those. 
 
-Since those techniques independent of a framework or even  a programming language we leave it to the reader to experiment with them.
+I leave it to the reader to experiment with the technique.
 
 ## Preparing code for production
 
