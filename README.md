@@ -2298,7 +2298,8 @@ const {
     await waitForMessage(`@anonymous ${newMessage}`);
   });
 ```
-The test starts a new app to make it independent of the other tests. One thing I'm missing in Hyperapp is the ability to stop all subscriptions from the previous test. 
+The test starts a new app to make it independent of the other tests. 
+TODO: One thing I'm missing in Hyperapp is the ability to stop all subscriptions from the previous test. 
 
 With the app started:
 * create a random message
