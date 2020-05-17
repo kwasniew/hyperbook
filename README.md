@@ -2006,7 +2006,7 @@ import { WithGuid } from "./lib/Guid.js";
 
 ## Testing effects and subscriptions
 
-Effects and subscriptions live at the edges of the system and need to talk to global APIs outside of your control e.g. DOM API or Fetch API. 
+Effects and subscriptions live at the edges of the system and interact with global APIs outside of your control e.g. DOM API or Fetch API. 
 Therefore, effects and subscriptions are more difficult to unit test. It's usually a job of the effect library author.
 
 ```javascript
@@ -2072,6 +2072,7 @@ describe("Event source subscription", () => {
 ```givenEventSource``` simulates SSE server emitting events and client side API reacting to those events.
 ```runFx```  simulates Hyperapp setting up a subscription and exposes ```dispatch``` mock function.
 ```dispatch.invokedWith``` is a convention to record mock interaction without using a mocking framework.
+
 In the test body ```emit``` a server event. Then verify if ```dispatch``` function was invoked with the event.
 After the test runs revert original ```EventSource``` in the global namespace (if there was one). 
 
@@ -2107,28 +2108,37 @@ As a bonus exercise verify if connection was closed.
 
 ## Comparing integration test options
 
-If you find yourself struggling with excessive mocking and hard to maintain tests consider integration testing your application. Some JS developer found their integrations tests give them more leverage than unit tests and subverted a traditional test pyramid.
+If you find yourself struggling with excessive mocking and hard to maintain tests consider integration testing your application. 
+Some JS developers find their **integration tests** give them more leverage than unit tests.
+Therefore they subvert a traditional [test pyramid](https://martinfowler.com/bliki/TestPyramid.html) and write more integration tests than unit tests.
 
-First option for integration tests is to emulate browser environment in Node.js with jsdom and polyfills for things like fetch, localStorage, SSE etc. Personally, I've spent much time trying to match browser environment in this setup and I'm not sure if it's worth the effort. Your mileage may vary though. Also, with jsdom you're not integration testing against a real browser. 
+One popular option for integration testing your app is DOM emulation with ```jsdom``` and polyfills/test doubles for various API such as 
+```fetch```, ```localStorage``` or ```EventSource```.
+This approach allows for Node.js testing your frontend code without spinning a browser. 
+Personally, I've spent a long time trying to match browser environment in this setup and I'm not sure if it's worth the effort. 
+Your mileage may vary though. Also, with ```jsdom``` you're not integration testing against a real browser. 
 
-jsdom based setup tradeoffs:
+```jsdom``` based setup tradeoffs:
 * (+) easy to run from CLI without extra tooling
-* (+) faster tests in CI server than browser tests
+* (+) faster tests in CI server than spinning-up browser tests
 * (-) slow startup time for the first test which makes subsecond testing impossible
 * (-) can't find browser discrepancies
 
-Another option is to run your tests in a browser where you can inspect everything after a failing tests. Mocha test runner can be run in Node.js and in a browser which is not a case for all the other test runners. 
+Another option is to run your tests in a real browser.
+With this approach all APIs just work and you can inspect a failing tests with your DevTools. 
 
 Browser based setup tradeoffs:
-* (+) testing real browser
+* (+) testing a real browser
 * (+) easy to inspect the environment after a failing tests
 * (+) all APIs just work
-* (+) with an open browser first test starts instantly in development 
+* (+) with an open browser first test starts instantly  
 * (-) cleaning the environment between tests is cumbersome
-* (-) requires complex tooling to run in CI server
-* (-) with many tests it's slower than jsdom because of the rendering overhead
+* (-) requires complex tooling to run in the CI server
+* (-) with many tests it's slower than ```jsdom``` because of the rendering overhead
 
 ## Testing in a browser
+
+Mocha test runner can be run in Node.js and in a browser which is not a case for all the other test runners. 
 
 Create test/index.html with mocha browser test boilerplate:
 ```html
