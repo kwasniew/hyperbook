@@ -2006,85 +2006,101 @@ import { WithGuid } from "./lib/Guid.js";
 
 ## Testing effects and subscriptions
 
-Effects and subscriptions live at the edges of the system and need to talk to global APIs you don't control e.g. DOM API or fetch API. Therefore, effects and subscriptions are more difficult to unit test and it's left to the library authors providing those effects. 
+Effects and subscriptions live at the edges of the system and need to talk to global APIs outside of your control e.g. DOM API or Fetch API. 
+Therefore, effects and subscriptions are more difficult to unit test. It's usually a job of the effect library author.
 
 ```javascript
 import assert from "assert";
-import {EventSourceListen} from "../src/lib/eventsource/EventSource.js";
+import { EventSourceListen } from "../src/lib/EventSource.js";
+
+const givenEventSource = (serverUrl) => {
+  const listeners = {};
+  let isClosed = false;
+  const es = {
+    addEventListener(name, listener) {
+      listeners[name] = listener;
+    },
+    removeEventListener(name, listener) {
+      delete listeners[name];
+    },
+    close() {
+      isClosed = true;
+    },
+  };
+  const emit = (event) => {
+    Object.values(listeners).forEach((listener) => {
+      listener(event);
+    });
+  };
+
+  function EventSource(url) {
+    if (url === serverUrl) return es;
+  }
+  global.EventSource = EventSource;
+  
+  return { emit, isClosed: () => isClosed };
+};
 
 const runFx = ([effect, data]) => {
-    const dispatch = (action, event) => dispatch.invokedWith = [action, event];
-    const unsubscribe = effect(dispatch, data);
-    return { dispatch, unsubscribe }
+  const dispatch = (action, event) => (dispatch.invokedWith = [action, event]);
+  const unsubscribe = effect(dispatch, data);
+  return { dispatch, unsubscribe };
 };
-
-const eventServer = url => {
-    const listeners = {};
-    const emit = (event) => Object.values(listeners).forEach(listener => {
-        listener(event);
-    });
-
-    class EventSource {
-        constructor(url) {
-            this.url = url;
-        }
-        addEventListener(name, listener) {
-            if(this.url === url) {
-                listeners[name] = listener;
-            }
-        }
-        removeEventListener(name, listener) {
-            if(this.url === url) {
-                const registeredListener = listeners[name];
-                if(registeredListener === listener) {
-                    delete listeners[name];
-                }
-            }
-        }
-    }
-    return {EventSource, emit};
-};
-
-const action = "action";
 
 describe("Event source subscription", () => {
-    const defaultEventSource = global.EventSource;
-    afterEach(() => {
-        global.EventSource = defaultEventSource;
-    });
-    it("dispatch message events", () => {
-        const {emit, EventSource} = eventServer("http://example.com");
-        global.EventSource = EventSource;
-        const {dispatch, unsubscribe} = runFx(EventSourceListen({url: "http://example.com", action}));
+  const defaultEventSource = global.EventSource;
+  afterEach(() => {
+    global.EventSource = defaultEventSource;
+  });
 
-        emit({data: "event data"});
+  it("dispatches events", () => {
+    const { emit } = givenEventSource("http://example.com");
+    const { dispatch } = runFx(
+      EventSourceListen({ url: "http://example.com", action: "action" })
+    );
 
-        assert.deepStrictEqual(dispatch.invokedWith, ["action", {data: "event data"}])
-    });
+    emit({ data: "event data" });
+
+    assert.deepStrictEqual(dispatch.invokedWith, [
+      "action",
+      { data: "event data" },
+    ]);
+  });
 });
-```
-In the test we provide a fake version of the event server that will emit events. This server also gives you fake EventSource implementation you can put into a global object. ```runFx``` function simulates Hyperapp setting up a subscription. Then you emit a test event and verify if dispatch was called with the correct data. ```dispatch``` function is a manual mock with a custom invokedWith field to verify the intended intecraction. After the test runs you should revert original EventSource in the global namespace if there was one. 
 
-The code and tests for effects/subscriptions is not as easy to reason about as the rest of the code. It's the essential complexity of the Web platform that you work with. And because this code is not very convenient to work with Hyperapp keeps it at the edges and doesn't allow your application code to get polluted. All those callback event listeners, eagerly resolving promises (e.g. fetch) are hidden away from your application logic.
+```
+```givenEventSource``` simulates SSE server emitting events and client side API reacting to those events.
+```runFx```  simulates Hyperapp setting up a subscription and exposes ```dispatch``` mock function.
+```dispatch.invokedWith``` is a convention to record mock interaction without using a mocking framework.
+In the test body ```emit``` a server event. Then verify if ```dispatch``` function was invoked with the event.
+After the test runs revert original ```EventSource``` in the global namespace (if there was one). 
+
+The code and tests for effects/subscriptions are conceptually more complicated than the rest of the code. 
+It's the essential complexity of the Web platform that you integrate with. 
+Because this code is not very convenient to work with Hyperapp keeps it at the edges and doesn't allow your application code to get polluted. 
+All those callback event listeners and eagerly resolving promises (e.g. ```fetch```) are hidden away from your application logic.
 
 ## Exercise: Testing effects and subscriptions
 
-Write a second test that verifies if emitting an event after unsubscribe triggers no actions.
+Write a second test that verifies if emitting an event after ```unsubscribe``` triggers no ```dispatch``` calls.
+As a bonus exercise verify if connection was closed.
 
 <details>
     <summary id="testing_effects">Solution</summary>
 
 ```javascript
-    it("unsubscribe from messages", () => {
-        const {emit, EventSource} = eventServer("http://example.com");
-        global.EventSource = EventSource;
-        const {dispatch, unsubscribe} = runFx(EventSourceListen({url: "http://example.com", action}));
+  it("ignores events emitted after unsubscribe", () => {
+    const { emit, isClosed } = givenEventSource("http://example.com");
+    const { dispatch, unsubscribe } = runFx(
+      EventSourceListen({ url: "http://example.com", action: "action" })
+    );
+    unsubscribe();
 
-        unsubscribe();
-        emit({data: "event data"});
+    emit({ data: "event data" });
 
-        assert.deepStrictEqual(dispatch.invokedWith, undefined);
-    });
+    assert.deepStrictEqual(dispatch.invokedWith, undefined);
+    assert.ok(isClosed());
+  });
 ```
 
 </details>
@@ -2905,9 +2921,11 @@ If your principles are different probably you'll make different choice.
 
 ### Elm
 
-Type-Driven Development in Elm makes for a very nice development experience. Compiler taking care of runtime exceptions is very helpful.
+Type-Driven Development in Elm makes for a very nice and beginner friendly development experience. 
+Compiler taking care of runtime exceptions is very helpful.
 Refactoring is much easier than in the JS/TS world. The tradeoff is that Elm requires build tooling in development. You can't use a browser as your REPL.
-Also some APIs that haven't been ported to Elm are harder to work with than in JS. 
+Also some APIs that haven't been ported to Elm are harder to work with than in JS. Finally, due to limited support for generics and lack
+of higher-kinded types some duplication is necessary. For some people it's a bug, for some others it's a feature.
 
 ### React
 
