@@ -500,7 +500,7 @@ There's no extra framework-specific events to learn.
 Add the action itself. Put it between the state and view declarations:
 ```javascript
 const AddPost = (state) => {
-  const newPost = { username: "fixed user", body: "fixed text" };
+  const newPost = { username: "anonymous", body: "fixed text" };
   return { ...state, posts: [newPost, ...state.posts] };
 };
 ```
@@ -624,7 +624,7 @@ Try to add a new post with some text. It should still not work. You need to copy
 
 ```javascript
 const AddPost = (state) => {
-  const newPost = { username: "fixed user", body: state.currentPostText };
+  const newPost = { username: "anonymous", body: state.currentPostText };
   return { ...state, posts: [newPost, ...state.posts] };
 };
 ```
@@ -699,7 +699,7 @@ But first, try to do it on your own.
 
 ```javascript
 const AddPost = (state) => {
-  const newPost = { username: "fixed user", body: state.currentPostText };
+  const newPost = { username: "anonymous", body: state.currentPostText };
   return { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
 };
 ```
@@ -717,7 +717,7 @@ Application should ignore **Add Post** clicks when the text is empty.
 ```javascript
 const AddPost = (state) => {
   if(state.currentPostText.trim()) {
-      const newPost = { username: "fixed user", body: state.currentPostText };
+      const newPost = { username: "anonymous", body: state.currentPostText };
       return { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
   }  else {
       return state;
@@ -957,7 +957,7 @@ Use network tab to verify if the request is sent:
 ```javascript
 const AddPost = state => {
   if (state.currentPostText.trim()) {
-    const newPost = { username: "fixed", body: state.currentPostText };
+    const newPost = { username: "anonymous", body: state.currentPostText };
     const newState = { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
     return [newState, SavePost(newPost)];
   } else {
@@ -1554,7 +1554,7 @@ Modify ```AddPost``` action to generate ```id``` for all new posts:
 ```javascript
     const newPost = {
       id: guid(),
-      username: "fixed",
+      username: "anonymous",
       body: state.currentPostText,
     };
 ```
@@ -2204,6 +2204,7 @@ describe("App", () => {
 The code cleans up the app container before every test. It's important to start each test with a clean slate.
 Always prefer ```beforeEach``` over ```afterEach``` for cleanup as you may need to inspect a failing test every now and then.
 ```afterEach``` would erase useful debugging information.
+
 Inside a test, start a new instance of the app. Then wait for the 10 items to show up. 
 ```getAllByTestId``` is a utility querying for ```data-testid="item```. 
 ```waitFor``` runs until:
@@ -2237,7 +2238,7 @@ Refer to this file from **src/index.html**:
 <script type="module" src="Start.js"></script>
 ```
 
-Add the test data attribute to the ```listItem``` view fragment in **src/Posts.js**`:
+Add the test data attribute to the ```listItem``` view fragment in **src/Posts.js**:
 ```javascript
 const listItem = (post) => html`
   <li key=${post.id} data-key=${post.id} data-testid="item">
@@ -2246,7 +2247,7 @@ const listItem = (post) => html`
 `;
 ```
 
-Start server from a root directory: ```http-server .```
+Start a server from the root directory: ```http-server .```
 
 Open http://localhost:8080/test/ in your browser. The test should be green.
 
@@ -2256,34 +2257,66 @@ Open http://localhost:8080/test/ in your browser. The test should be green.
     <br><br>
 </figure>
 
-## Testing more advanced scenario in a browser
+## Testing more advanced browser scenario
 
-Add a test for input submission and waiting for SSE notification:
+Add a test for the post submission and waiting for the SSE notification:
 ```javascript
-import {findByTestId, findByText, fireEvent, getAllByTestId, waitFor} from "../src/web_modules/@testing-library/dom.js";
+const {
+  getAllByTestId,
+  waitFor,
+  findByTestId,
+  findByText,
+  fireEvent,
+} = TestingLibraryDom;
 
-    it("Add a post", async () => {
-        init();
-        const input = await findByTestId(container(), "input");
-        const newMessage = `new message ${new Date().toJSON()}`;
-        input.value = newMessage;
-        fireEvent.input(input);
-        const button = await findByText(container(), "Add Post");
-        button.click();
-        await waitFor(() => {
-            assert.strictEqual(getAllByTestId(container(), "item")[0].textContent, `@fixed ${newMessage}`);
-        });
-    })
+  const randomMessage = () => `new message ${new Date().toJSON()}`;
+
+  const sendMessage = async (newMessage) => {
+    const input = await findByTestId(container(), "post-input");
+    input.value = newMessage;
+    fireEvent.input(input);
+
+    const button = await findByText(container(), "Add Post");
+    button.click();
+  };
+
+  const waitForMessage = async (message) => {
+    await waitFor(() => {
+      assert.strictEqual(
+        getAllByTestId(container(), "item")[0].textContent,
+        message
+      );
+    });
+  };
+
+  it("Add a post as anonymous user", async () => {
+    start();
+    const newMessage = randomMessage();
+
+    await sendMessage(newMessage);
+
+    await waitForMessage(`@anonymous ${newMessage}`);
+  });
 ```
-Init the app again so that we don't have leftovers from the previous test. Find input by test data attribute. You will add it in a second. Fill in the text input with a new message and simulate "Add Post" button click. Wait until your message show up at the top of the message list.
+The test starts a new app to make it independent of the other tests. One thing I'm missing in Hyperapp is the ability to stop all subscriptions from the previous test. 
+With the app started:
+* create a random message
+* send the message to the server - ```@testing-library``` simplifies firing DOM events such as typing a text. It also provides DOM queries
+that wait for DOM elements to appear in the UI.
+* wait for the message to show up at the top of the post list 
 
-Put a test data attribute in your only input:
+Put a test data attribute in **Posts.js**:
 ```javascript
-<input
-          data-testid="input"
-          ...
-        />
+    <input
+      data-testid="post-input"
+      type="text"
+      oninput=${[UpdatePostText, targetValue]}
+      value=${state.currentPostText}
+      autofocus
+    />
 ```
+
+Check if both tests are green.
 
 ## Making integration tests faster
 
