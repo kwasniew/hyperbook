@@ -2573,6 +2573,37 @@ export const init = [state, LoadLatestPosts, ReadUsername];
 
 </details>
 
+## Exercise: testing logged in user posts submission
+
+Write an integration tests for a logged-in user posting with her login username.
+
+Hints:
+* use ```randomMessage```, ```sendMessage```, ```waitForMessage``` helper functions you already have in **App.test.js**
+* remove logged-in user from ```localStorage``` before each test
+* simulate logged-in user with this code ```localStorage.setItem("hyperposts", JSON.stringify("kate"));```
+
+<details>
+    <summary id="logged_in_posts">Solution</summary>
+
+```javascript
+  beforeEach(function () {
+    container().innerHTML = "";
+    localStorage.removeItem("hyperposts");
+  });
+
+  it("Add a post as logged in user", async () => {
+    localStorage.setItem("hyperposts", JSON.stringify("kate"));
+    start();
+    const newMessage = randomMessage();
+
+    await sendMessage(newMessage);
+
+    await waitForMessage(`@kate ${newMessage}`);
+  });
+```
+
+</details>
+
 ## Preparing pages for client side routing
 
 Server-side routing is easier than client-side routing. You let the browser handle links, forms and history when clicking back and forward buttons. However in certain situation you need to take over the browser job and handle routing/navigation in JS. It also means you need to keep a global state across the pages which makes state management more difficult. 
