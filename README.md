@@ -351,6 +351,9 @@ Run the installation command:
 ```npm i```
 
 Snowpack will inspect your code and translate required modules from ```node_modules``` to ```web_modules```.
+Letting Snowpack inspect your imports is the workflow that we'll use in this tutorial. 
+If you don't want to have same dependencies living both in ```node_modules``` and translated ```web_modules```
+you can use Snowpack's [webDependencies](https://www.snowpack.dev/#webdependencies).
 
 If you track your code in git add **src/web_modules** to **.gitignore**.
 
@@ -2482,19 +2485,19 @@ import { html } from "./Html.js";
 import { WriteToStorage } from "./web_modules/hyperapp-fx.js";
 
 const state = {
-  login: "",
+  username: "",
 };
 
 const targetValue = (event) => event.target.value;
 
-const ChangeLogin = (state, login) => [
-  { ...state, login },
-  WriteToStorage({ key: "hyperposts", value: login }),
+const ChangeLogin = (state, username) => [
+  { ...state, username },
+  WriteToStorage({ key: "hyperposts", value: username }),
 ];
 
 const view = (state) => html`
   <form method="get" action="/">
-    <input onchange=${[ChangeLogin, targetValue]} value=${state.login} />
+    <input oninput=${[ChangeLogin, targetValue]} value=${state.username} />
     <button>Login</button>
   </form>
 `;
@@ -2864,24 +2867,30 @@ This behavior may change in future versions.
 
 Test the navigation between the two pages. All anchor tags should be handled client-side. 
 ```page.js``` hijacks browser links so you don't need to create custom link element. 
-However, when you login and go to the posts page a full page reload is performed. 
+However, when you submit your login a full page reload happens. 
 ```page.js``` doesn't handle forms, only links.
 Therefore, you need to create a custom action for the form submission. You'll do this next.
 
 ## Wrapping 3rd party library into effects
 
-You can wrap 3rd party libraries not only into subscription, but also into one-off effects and effectful actions.
+You can wrap 3rd party libraries not only into subscriptions, but also into one-off effects and effectful actions.
 
-Add Navigate action and effect to router.js:
+Add the ```Navigate``` action to **Router.js**:
 ```javascript
-const navigateEffect = location => [(_, location) => {
+const navigateEffect = (location) => [
+  (_, location) => {
     page(location);
-}, location];
-export const Navigate = location => (state) => [state, navigateEffect(location)];
+  },
+  location,
+];
+export const Navigate = (location) => (state) => [
+  state,
+  navigateEffect(location),
+];
 ```
-```page(location)``` is a way of telling ```page.js``` to navigate to a given url. You wrapped the call inside the effect.
+```page(location)``` navigates to a given URL. 
 
-Use it in login.js:
+Use the action in **Login.js**:
 ```javascript
 import {Navigate} from "./router.js";
 
@@ -2892,18 +2901,19 @@ export const view = (state) => html`
 `;
 ```
 
-When you test the code it still doesn't work. Default browser submit event still fires. You need to prevnet it.
+If you test the code it still wouldn't work. A default browser submit still fires. In the next section you'll prevent it.
 
 ## Preventing browser events
 
-Add a little helper library ```@hyperapp/events```
+Add a little helper library ```@hyperapp/events```:
 ```json
-  "webDependencies": {
+  "dependencies": {
+    ...
     "@hyperapp/events": "0.0.4"
-  }
+  },
 ```
 
-Use it in login.js
+Use it in **Login.js**
 ```javascript
 import {preventDefault} from "./web_modules/@hyperapp/events.js";
 
@@ -2913,9 +2923,13 @@ export const view = (state) => html`
   </form>
 `;
 ```
-```preventDefault``` wraps any action and returns a new action. The new action calls ```event.preventDefault()``` and delegates everything else to the original action. 
+```preventDefault``` decorates any event based action. The wrapping action calls ```event.preventDefault()``` 
+and delegates everything else to the original action.
 
-With this change your client-side navigation should work.
+Install your new dependency:
+```npm i``` 
+
+Now your client-side navigation should work.
 
 ## Rendering view and state into a string
 
