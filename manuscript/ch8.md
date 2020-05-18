@@ -1,5 +1,5 @@
 # Hyperapp: functional programming in your browser with 500 lines of code
-# Chapter 7: Modeling state
+# Chapter 8: Modeling state
 
 ## Handling slow API
 
