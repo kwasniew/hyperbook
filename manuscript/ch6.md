@@ -211,6 +211,7 @@ const EffectfulAction = oldState => [newState, Effect1, Effect2];
 
 Change ```AddPost``` action to trigger ```SavePost``` effect.  Do it every time a post is added to the local state.
 Use network tab to verify if the request is sent:
+
 ![Figure: Sending JSON payload to the server](images/sending.png)
 
 <details>
