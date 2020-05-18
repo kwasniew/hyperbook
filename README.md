@@ -3174,11 +3174,62 @@ app.get("/login", async (req, res) => {
 });
 ```
 
-You can expland on this exercise. Some ideas for further experiments:
+You can expand on this exercise. Some ideas for further experiments:
 * serialize state and pass it from server to client to avoid double fetching initial list of posts
 * build shared routing abstraction for the client and the server
 
 </details>
+
+## Preparing code for production
+
+Before you ship your code to production you may need to:
+* translate modern ES6+ code to ES5 so older browsers can understand it
+* generate a single or a few JS bundles to avoid serving too many files
+
+If you're only targeting modern browsers and serving code over HTTP/2 you may be able to skip those steps.
+
+In this tutorial we use [Parcel](https://parceljs.org/) - a zero-configuration bundler.
+
+```
+npm i parcel -D
+```
+
+Add a script to build your production code:
+```json
+  "scripts": {
+    "build": "parcel build src/index.html"
+  }
+```
+```npm run build```
+
+Parcel will generate a ```dist``` directory with the production optimized code.
+
+Verify your production distribution locally:
+```
+http-server dist
+```
+
+Current Parcel version (1.x) has a bug causing console.error: ```Uncaught ReferenceError: parcelRequire is not defined```.
+It will be fixed in Parcel 2 release.
+
+## Deploying code to Netlify
+
+I'm using Netlify to host this project. In the following figure you will find my deployment settings:
+
+<figure>
+    <img src="images/netlify.png" width="650" alt="Netlify deployment settings" align="center">
+    <figcaption><em>Figure: Netlify deployment settings</em></figcaption>
+    <br><br>
+</figure>
+
+Once you connect your Github repo configure:
+* branch to deploy: I'm using a branch called "parcel". On master I keep a lightweight setup without a bundler.
+* build command: ```npm run build``` from the previous step
+* publish directory: ```dist``` a default Parcel directory
+
+Every time you push to the branch Netlify will deploy a new version.
+
+You can find my deployed version here: https://hyperposts.netlify.app/
 
 ## Summary
 
