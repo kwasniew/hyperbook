@@ -246,6 +246,7 @@ Note: Hyperapp is dropping support for ```JSX``` soon.
 ### htm
 
 [htm](https://github.com/developit/htm) is a tiny library with HTML-like syntax and no build tool requirement. 
+If you want to replace ```htm``` with ```h``` calls in production, you can use ```babel-plugin-htm```.
 
 Change you **App.js** code to use ```htm```:
 ```javascript
@@ -3209,12 +3210,12 @@ Verify your production distribution locally:
 http-server dist
 ```
 
-Current Parcel version (1.x) has a bug causing console.error: ```Uncaught ReferenceError: parcelRequire is not defined```.
+Current Parcel version (1.x) has a bug causing ```console.error```: ```Uncaught ReferenceError: parcelRequire is not defined```.
 It will be fixed in Parcel 2 release.
 
 ## Deploying code to Netlify
 
-I'm using Netlify to host this project. In the following figure you will find my deployment settings:
+I'm using [Netlify](https://www.netlify.com/) to host this project. In the following figure you will find my deployment settings:
 
 <figure>
     <img src="images/netlify.png" width="650" alt="Netlify deployment settings" align="center">
@@ -3227,9 +3228,41 @@ Once you connect your Github repo configure:
 * build command: ```npm run build``` from the previous step
 * publish directory: ```dist``` a default Parcel directory
 
-Every time you push to the branch Netlify will deploy a new version.
+Every time you push to the branch, Netlify will deploy a new version.
 
 You can find my deployed version here: https://hyperposts.netlify.app/
+
+## Optimizing code size
+
+One of the most underrated performance optimizations is using lighter frameworks and libraries.
+
+Use ```bundlephobia``` to check the size of our dependencies (minified+gzipped):
+* https://bundlephobia.com/result?p=hyperapp@2.0.4 (1.9kB)
+* https://bundlephobia.com/result?p=hyperapp-fx@2.0.0-beta.1 (1.6kB)
+* https://bundlephobia.com/result?p=@hyperapp/events@0.0.4 (0.8kB)
+* https://bundlephobia.com/result?p=htm@3.0.4 (0.7kB)
+* https://bundlephobia.com/result?p=page@1.11.6 (3.9kB)
+
+To make this comparison relevant here are some of the popular libraries:
+* https://bundlephobia.com/result?p=@angular/core@9.1.7 (90kB)
+* https://bundlephobia.com/result?p=react-dom@16.13.1 (36kB)
+* https://bundlephobia.com/result?p=vue@2.6.11 (22.8kB)
+
+Using Hyperapp is a performance optimization in and of itself.
+
+Check your application bundle size in the browser.
+
+<figure>
+    <img src="images/rube_goldberg_machine.jpg" width="650" alt="Bundle size with minification and Brotli compression" align="center">
+    <figcaption><em>Figure: Bundle size with minification and Brotli compression</em></figcaption>
+    <br><br>
+</figure>
+
+With minification and Brotli compression (from Netlify server) the application is only 10kB. 
+It easily fits into most [performance budgets](https://web.dev/performance-budgets-101/).
+
+Note: I was using scope hoisting/tree shaking feature of Parcel ```parcel build src/index.html --experimental-scope-hoisting```.
+Without this optimization the application was 12kB.
 
 ## Summary
 
