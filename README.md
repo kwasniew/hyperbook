@@ -2653,17 +2653,20 @@ First, expose init action for each of your pages:
 
 **src/Posts.js**
 ```javascript
-export const InitPage = (location) => [
-  { location, ...state },
+export const InitPage = (_, params) => [
+  { location: params.location, ...state },
   [LoadLatestPosts, ReadUsername],
 ];
 ```
 You expose a way for the router to inject the current location into the current page state. 
-```InitPage``` also fires all init effects.
+```InitPage``` action:
+* ignores state from the previous page (```_```)
+* sets initial state for the posts page (```state```) 
+* fires all init effects for the posts page
 
 Do the same thing in **src/Login.js**:
 ```javascript
-export const InitPage = (location) => (state) => ({ location, ...state });
+export const InitPage = (_, { location }) => ({ location, ...state });
 ```
 There's not effects to trigger on this page. 
 Make sure to remove the ```app()``` call. You'll moving towards one centralized app setup in the next section.
@@ -2681,12 +2684,131 @@ Setup you Single-Page Application in **App.js**:
 ```javascript
 import { app } from "./web_modules/hyperapp.js";
 import {
+  view as postsView,
+  subscriptions,
+} from "./Posts.js";
+import { view as loginView } from "./Login.js";
+import { layout } from "./Layout.js";
+
+const pages = {
+  "/": postsView,
+  "/login": loginView,
+};
+const view = (state) => {
+  const page = pages[state.location];
+  return page ? page(state) : "Loading...";
+};
+
+export const start = () =>
+  app({
+    init: {},
+    view: layout(view),
+    subscriptions,
+    node: document.getElementById("app"),
+  });
+```
+You start with mapping each path to a corresponding page.
+The main view function selects a page based on ```state.location``` that you'll set in the next section.
+The ```init``` is an empty object for now. You'll invoke page init actions from the router.
+
+## Integrating with 3rd party libraries
+
+In this section you'll integrate your code with a client-side router [page.js](https://github.com/visionmedia/page.js/). 
+Hyperapp may get it's own dedicated client side router in future, but the section is still relevant.
+I use it to show how Hyperapp can work with any library outside of its ecosystem. 
+
+Add ```page.js``` to ```package.json```:
+```json
+  "dependencies": {
+    "htm": "3.0.4",
+    "hyperapp": "2.0.4",
+    "hyperapp-fx": "2.0.0-beta.1",
+    "page": "1.11.6"
+  },
+```
+
+Looking at ```page.js``` documentation I came up with the following API calls:
+```javascript
+import page from "./web_modules/page.js";
+
+page("/", fn); // register a route and call fn when a user navigates to the url
+page("/login", fn);
+
+page.start(); // start client-side routing
+page.stop(); // stop client-side routing
+```
+
+Install ```page.js``` and let ```snowpack``` adjust it to the browser environment:
+```npm i```
+
+When wrapping 3rd party libraries you normally put them inside subscriptions or effects.
+
+Create **src/Router.js** with a subscription wrapping ```page.js```:
+```javascript
+import page from "./web_modules/page.js";
+
+const routeSubscription = (dispatch, data) => {
+    page("/", () => {
+
+    });
+    page("/login", () => {
+
+    });
+
+    page.start();
+
+    return () => {
+        page.stop();
+    };
+};
+```
+Start the router when the subscription is created. Stop the router when subscription is unsubscribed from.
+
+## Mapping 3rd party calls to Hyperapp actions
+
+Fill in the page URL change handlers with dispatch calls.
+```javascript
+import page from "./web_modules/page.js";
+import { InitPage as InitLoginPage } from "./Login.js";
+import { InitPage as InitPostsPage } from "./Posts.js";
+
+const SetLocation = (state, location) => ({ location });
+
+const routeSubscription = (dispatch, data) => {
+  page("/", () => {
+    dispatch(SetLocation, "/");
+    dispatch(InitPostsPage);
+  });
+  page("/login", () => {
+    dispatch(SetLocation, "/login");
+    dispatch(InitLoginPage);
+  });
+
+  page.start();
+
+  return () => {
+    page.stop();
+  };
+};
+```
+When a user navigates to a URL store the location. It can be used for page view selection. 
+Our router has a private action ```SetLocation```. 
+Next, you need to initialise a current page. 
+This code depends on application specific actions and can be more generic. That's what you'll do in the next section.
+
+## Driving router design from the outside
+
+Start from **App.js** where you'll use the router.
+```javascript
+import { app } from "./web_modules/hyperapp.js";
+import {
   InitPage as InitPosts,
   view as postsView,
   subscriptions,
 } from "./Posts.js";
 import { InitPage as InitLogin, view as loginView } from "./Login.js";
 import { layout } from "./Layout.js";
+import { RouteListen } from "./Router.js";
 
 const pages = {
   "/": postsView,
@@ -2705,127 +2827,48 @@ export const start = () =>
   app({
     init: {},
     view: layout(view),
-    subscriptions,
+    subscriptions: (state) => [subscriptions(state), RouteListen(pageInitActions)],
     node: document.getElementById("app"),
   });
 ```
-You start with mapping each path to a corresponding page and page init action.
-The main view function selects a page based on ```state.location``` that you'll set in the next section.
-The ```init``` is an empty object for now. You'll invoke page init actions from the router.
+Our hypothetical ```RouteListen``` subscription should be configured with ```pageInitActions``` to invoke on page transitions.
 
-## Integrating with 3rd party libraries
-
-In this section you'll integrate our app with a client-side router [page.js](https://github.com/visionmedia/page.js/). 
-I use it to demo how Hyperapp can work with any library outside of its ecosystem. When wrapping 3rd party libraries you normally put them inside subscriptions and effects.
-
-Add page.js to your web dependencies:
-```json
-  "webDependencies": {
-    ...
-    "page": "1.11.6",
-    ...
-  },
-```
-
-Looking at page.js documentation I came up with the following API calls you may need:
-```
-import page from "./web_modules/page.js";
-
-page("/", fn); // register a route and call fn when a user navigated to the url
-page("/login", fn);
-
-page.start(); // start client-side routing
-page.stop(); // stop client-side routing
-```
-
-Wrap this code into a subscription src/router.js:
+From the previous usage we can create the following **Router.js** implementation:
 ```javascript
 import page from "./web_modules/page.js";
 
 const routeSubscription = (dispatch, data) => {
-    page("/", () => {
-    
+  Object.entries(data).map(([location, init]) => {
+    page(location, (context) => {
+      setTimeout(() => {
+        dispatch(init, { location, ...context.params });
+      });
     });
-    page("/login", () => {
-    
-    });
+  });
 
-    page.start();
+  page.start();
 
-    return () => {
-        page.stop();
-    };
-};
-```
-Start the router when the subscription is created. Stop the router when subscription is unsubscribed from.
-
-## Mapping 3rd party calls to Hyperapp actions
-
-Fill in the page URL change handlers with some dispatch calls.
-```javascript
-import page from "./web_modules/page.js";
-
-const SetLocation = (state, location) => ({location});
-
-const routeSubscription = (dispatch, data) => {
-    page("/", () => {
-        dispatch(SetLocation, "/");
-        dispatch(InitPostsPage);
-    });
-    page("/login", () => {
-        dispatch(SetLocation, "/login");
-        dispatch(InitLoginPage);
-    });
-
-    ...
-};
-```
-When a user navigates to a URL you need to store the location for the correct view display. Our router has a private action ```SetLocation```. Then you need to initialise a current page. 
-This code can be more generic. You can move the app spacific configuration to the caller. That's our next section.
-
-## Driving router design from the outside
-
-Start from a file where you'll use the router.
-```javascript
-import {RouteListen} from "./router.js";
-
-const routeInitActions = {
-    "/": InitPostsPage,
-    "/login": InitLoginPage
+  return () => {
+    page.stop();
+  };
 };
 
-export const init = () =>
-    app({
-        ...
-        subscriptions: (state) => [
-            ...
-            RouteListen(routeInitActions)
-        ]
-    });
+export const RouteListen = (data) => [routeSubscription, data];
+
 ```
-Ideally, we want to have ```RouteListen``` subscription with the route init actions config.
+```RouteListen``` is parametrized with data so you don't need to hardcode concrete page init actions anymore. 
+In the subscription definition iterate over the config object and register a handler for each of the pages. 
+Surprisingly, you need to wrap a dispatch call in ```setTimeout```. 
+Current Hyperapp implementation expects asynchronous calls to dispatch, otherwise it goes into the infinite loop. 
+This behavior may change in future versions. 
 
-Implement the ideal API in router.js:
-```javascript
-const routeSubscription = (dispatch, data) => {
-    Object.entries(data).map(([location, init]) => {
-        page(location, (context) => {
-            setTimeout(() => {
-                dispatch(SetLocation, location);
-                dispatch(init, context.params);
-            });
-        });
-    });
-    ...
-};
+Test the navigation between the two pages. All anchor tags should be handled client-side. 
+```page.js``` hijacks browser links so you don't need to create custom link element. 
+However, when you login and go to the posts page a full page reload is performed. 
+```page.js``` doesn't handle forms, only links.
+Therefore, you need to create a custom action for the form submission. You'll do this next.
 
-export const RouteListen = data => [routeSubscription, data];
-```
-```RouteListen``` is parametrized with data. In the subscription definition iterate over the config object and register a page for each of them. You should also wrap the dispatch calls in setTimeout. Current Hyperapp implementation expects asynchronous calls to dispatch, otherwise it goes into the infinite loop. It may change in future version of the framework. 
-
-Test the nevigation between our two pages. All anchor tags should be handles client-side. ```page.js``` hijack browser links so you don't need to create custom link tags. One are where you still need to create a custom action is the form submission. When you login and go to the posts page a full reload is performed. ```page.js``` doesn't handle forms, only links.
-
-## Wrapping 3rd party library intro effects
+## Wrapping 3rd party library into effects
 
 You can wrap 3rd party libraries not only into subscription, but also into one-off effects and effectful actions.
 
