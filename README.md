@@ -3253,7 +3253,7 @@ Using Hyperapp is a performance optimization in and of itself.
 Check your application bundle size in the browser.
 
 <figure>
-    <img src="images/rube_goldberg_machine.jpg" width="650" alt="Bundle size with minification and Brotli compression" align="center">
+    <img src="images/sizes.png" width="650" alt="Bundle size with minification and Brotli compression" align="center">
     <figcaption><em>Figure: Bundle size with minification and Brotli compression</em></figcaption>
     <br><br>
 </figure>
