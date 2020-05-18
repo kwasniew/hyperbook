@@ -1,3 +1,5 @@
+[![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-blue.svg)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
+
 # Hyperapp: functional programming in your browser with 500 lines of code
 
 This book gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
