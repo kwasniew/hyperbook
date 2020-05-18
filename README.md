@@ -1,6 +1,6 @@
-# Complete Intro to Hyperapp and its ecosystem.
+# Hyperbook: a complete intro to Hyperapp for those who have 4 hours to spare
 
-This tutorial gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
+This tutorial/mini-book gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
 
 ## How to read it
 
