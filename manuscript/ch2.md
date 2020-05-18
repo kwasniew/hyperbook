@@ -1,23 +1,6 @@
 # Hyperapp: functional programming in your browser with 500 lines of code
 # Chapter 2: View as a function of state
 
-## Introducing the problem
-
-You will be building a messaging/chat application called **HyperPosts**. I decided to choose a boring and familiar domain purposefully. 
-To ease the learning process you will only focus on the framework concepts instead of learning new and unfamiliar domain.
-
-You will find a deployed version of this app on netlify: https://hyperposts.netlify.app/
-
-You will find source code on github: https://github.com/kwasniew/hyperbook-tutorial
-
-The following two figures show 2 screens you'll be building:
-* main screen with a post submit form and a list of posts streamed from the server
-* login screen to set your username
-
-![Figure: Hyperposts main screen](images/main.png)
-![Figure: Hyperposts login screen](images/login.png)
-
-
 ## Getting started
 
 When learning a new framework it's important to understand every single step you take and every single line of code you write. 
