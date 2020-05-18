@@ -2903,7 +2903,7 @@ If you test the code it still wouldn't work. A default browser submit still fire
 ## Preventing browser events
 
 Add a little helper library ```@hyperapp/events```:
-```json
+```
   "dependencies": {
     ...
     "@hyperapp/events": "0.0.4"
@@ -2937,9 +2937,9 @@ It leads to 2 problems:
 * you install the same dependency twice: in the ```node_modules``` and in the ```web_modules```.
 * you have to exclude server code from the translation
 
-Snowpack comes with a feature called [webDependencies](https://www.snowpack.dev/#webdependencies):
+Snowpack comes with a feature called [webDependencies](https://www.snowpack.dev/#webdependencies).
 
-Change your **package.json** to this code:
+Change your **package.json**:
 ```
 {
   "type": "module",
@@ -2967,8 +2967,8 @@ Change your **package.json** to this code:
 }
 ```
 After this split:
-* server-side dependencies will come from ```dependencies```. I already added a ```hyperapp-render``` library dependency you'll use in the next section. 
-* client-side dependencies will come from ```webDependencies```. I moved all previous dependencies here.
+* server-side dependencies come from ```dependencies```. I already added a ```hyperapp-render``` dependency you'll be using in the next section. 
+* client-side dependencies come from ```webDependencies```. I moved all previous dependencies here.
 
 Also, we exclude all code from import analysis (```--exclude '**/*'```). In our new workflow all client-side dependencies have to be listed explicitly in ```webDependencies```.
 
@@ -2990,65 +2990,83 @@ However, you can also translate Hyperapp Virtual DOM to HTML string with a help 
 Create **Server.js** in a root directory of your project (one level above **src**):
 ```javascript
 import render from "hyperapp-render";
-import {state, view} from "./app.js";
+import { state, view } from "./src/Posts.js";
 
 const html = render.renderToString(view(state));
 
 console.log(html);
 ```
-Make sure your src/app.js exports the main view function and initial state. ```hyperapp-render``` should serialize your view with state into HTML string.
+Make sure your **src/Posts.js** exports main view function and the initial state. 
+```hyperapp-render``` should serialize your view and state into HTML string.
 
 Run it in Node.js:
-```node src/server.js```
+```node Server.js```
 
 ## Rendering view and state from HTTP server
 
-You've just seen how to turn your Hyperapp views and state into HTML. You can serve this HTML from your HTTP server.
+You've just seen how to turn your Hyperapp views and state into HTML. You can serve this HTML from any HTTP server.
 
-Install a popular and minimal Node.js Web application server framework express:
+Install a popular and minimal Node.js Web application server framework [express](https://expressjs.com/):
 ```
-npm i express
+  "dependencies": {
+    "express": "4.17.1"
+  },
 ```
+```npm i```
 
-Expose your Hyperapp view as a resource with HTML representation:
+Expose your Hyperapp posts as a resource with HTML representation:
 ```javascript
 import render from "hyperapp-render";
 import express from "express";
-import {state, view} from "./src/app.js";
+import { state, view } from "./src/Posts.js";
 
 const app = express();
 
 app.get("/", (req, res) => {
-    const html = render.renderToString(view(state));
-    res.send(html);
+  const html = render.renderToString(view(state));
+  res.send(html);
 });
 app.listen(3000, () => {
-    console.log("Listening on 3000");
+  console.log("Listening on 3000");
 });
 ```
 
-Run your server:
+Run it:
 ```
-node src/server.js
+node Server.js
 ```
 
 Open ```http://localhost:3000```.
 
-It should serve unstyled HTML with a form and empty list of posts.
+It should return unstyled HTML with a form and empty list of posts.
+
+<figure>
+    <img src="images/ssr-simple.png" width="650" alt="Serving server-rendered Hyperapp" align="center">
+    <figcaption><em>Figure: Serving server-rendered Hyperapp</em></figcaption>
+    <br><br>
+</figure>
 
 ## Fetching data on the server
 
-In this section you'll add a list of posts to the server rendered HTML. 
-When fetching data from 3rd party APIs server and client significantly differ.
+In this section you'll add a list of posts to your HTML representation. 
 
-Client fetches data in the background. In our client side app ```LoadLatestPosts``` effect starts when you open a browser and data is fetched in the bacground. When the data arrives Hyperapp re-renders a view with a newly fetched response.
+Server and client code have different data fetching patterns.
+Client-side code usually fetches data in the background. 
+For example, ```LoadLatestPosts``` effect starts when you open a browser and data is fetched in the background. 
+When the data arrives Hyperapp re-renders a view with a newly fetched response data.
 
-Server has to wait for the data and only then render the response. So the wait before render behavior is a major difference. 
+Server-side code has to wait for the data first and only then render the response. So this "wait before render" behavior is a major difference. 
 
-In this tutorial you won't be trying to create universal data fetching effects that can be shared between a client and a server. Instead we'll use axios and handle data fetching separately. 
+In this tutorial you won't be trying to create universal data fetching effects that can be shared between a client and a server. 
+Instead we'll use ```axios``` and handle data in a server specific way.
 ```
-npm i axios
+  "dependencies": {
+    "axios": "0.19.2",
+    "express": "4.17.1",
+    "hyperapp-render": "3.2.0"
+  },
 ```
+```npm i```
 
 ```javascript
 import render from "hyperapp-render";
@@ -3069,17 +3087,27 @@ app.listen(3000, () => {
     console.log("Listening on 3000");
 });
 ```
-Make sure ```SetPosts``` action is exposed. We can reuse the action on the server. 
+Make sure ```SetPosts``` action is exported and use it in your server-side code. 
 
-Once you open your app in the browser a list of posts should be rendered.
+Open your app in the browser. A list of posts should be rendered.
 
-As you've just seen Hyperapp can be used as a server-side template engine with a help of ```hyperapp-render```.
+<figure>
+    <img src="images/ssr-data.png" width="650" alt="Serving server-rendered Hyperapp with data" align="center">
+    <figcaption><em>Figure: Serving server-rendered Hyperapp with data</em></figcaption>
+    <br><br>
+</figure>
+
+To re-iterate what you've just learner: Hyperapp can be used as **a server-side template engine** with a help of ```hyperapp-render```.
 
 ## Hydrating server side code on the client side
 
-Hydration is a fancy name for taking control over server-side rendered content on the client side. For large applications server-side rendering with or without hydration always improves the time to visible content. However when it comes to time to interactivity hydration always performs worse than server-side rendering or client side-rendering alone. In other words with hydration you pay the rendering tax twice. Since Hyperapp is really small you may not notice the hydration penalty.
+**Hydration** is a fancy name for taking control over server-side rendered content on the client side. 
+For large applications server-side rendering with or without hydration always improves the time to visible content. 
+However when it comes to time to interactivity hydration always performs worse than server-side rendering or client side-rendering alone. 
+In other words with hydration you pay the rendering tax twice (HTML rendering and JS rendering/hydrating). 
+Since Hyperapp is really small you may not even notice the hydration penalty.
 
-Move index.html into server.js and put it into a template string:
+Move **src/index.html** content into **Server.js** and put it into a template string:
 ```javascript
 const htmlTemplate = (content) => /*HTML*/ `
     <!DOCTYPE html>
