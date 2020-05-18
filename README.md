@@ -2357,7 +2357,8 @@ With **server-side** routing you create one app per page. Each page:
 * can even use a different framework
 * can use only HTML/CSS when JS is not needed
 * can use natural code splitting without any tools
-To integrate pages together you use hypermedia: links and forms. 
+
+You integrate pages together with hypermedia: links and forms. 
 To read more about this architecture go to Self-Contained Systems [website](https://scs-architecture.org/).
 
 With **client-side** routing you manage page transitions in JS and you need a client-side router. 
@@ -2391,7 +2392,7 @@ import {html} from "./Html.js";
 
 In this section you'll add a global layout with shared navigation.
 
-First write our ideal signature for the layout decorator in **src/App.js**. 
+First write our ideal signature for the layout decorator in **src/App.js**:
 ```javascript
   app({
     view: layout(view),
@@ -2399,7 +2400,7 @@ First write our ideal signature for the layout decorator in **src/App.js**.
 ```
 ```layout``` should wrap the original view function and return a new function with a state parameter.
 
-Create **src/Layout.js** with a function matching the specification.
+Create **src/Layout.js** with a function matching this specification.
 ```javascript
 export const layout = (view) => (state) => html``;
 ```
@@ -2471,9 +2472,9 @@ This is almost the same HTML you wrote for the main page. The only difference is
 Create **src/Login.js**:
 ```javascript
 import { app } from "./web_modules/hyperapp.js";
-import { layout } from "./layout.js";
-import { html } from "./html.js";
-import {WriteToStorage} from "./web_modules/hyperapp-fx.js";
+import { layout } from "./Layout.js";
+import { html } from "./Html.js";
+import { WriteToStorage } from "./web_modules/hyperapp-fx.js";
 
 const state = {
   login: "",
@@ -2481,7 +2482,10 @@ const state = {
 
 const targetValue = (event) => event.target.value;
 
-const ChangeLogin = (state, login) => [{...state, login}, WriteToStorage({key: "hyperposts", value: login})];
+const ChangeLogin = (state, login) => [
+  { ...state, login },
+  WriteToStorage({ key: "hyperposts", value: login }),
+];
 
 const view = (state) => html`
   <form method="get" action="/">
@@ -2496,13 +2500,21 @@ app({
   node: document.getElementById("app"),
 });
 ```
-This is another Hyperapp application. In this tutorial we use exactly the same Hyperapp version for the login page, but it doesn't have to be. Server-side routing allows for independent evolution of your pages. Each of them can upgrade its framework version independently of the others.
+This is another Hyperapp application. 
+In this tutorial we use exactly the same Hyperapp version for the login page as for the posts page. However, having two separate pages allows to evolve
+framework versions independently. You don't have to upgrade all your pages at once.
 
-The code for the login page should be familiar to you by now. The only new thing is ```WriteToStorage``` effect from the ```hyperapp-fx``` library. As the user types the login we save it to the ```localStorage```. 
+The code for the login page should look familiar by now. 
+The only new thing is the ```WriteToStorage``` effect from the ```hyperapp-fx``` library. 
+As the user types the login we save it to the ```localStorage```. 
 
-```WriteToStorage({key: "hyperposts", value: login})``` basically translates to ```localStorage.setItem("hyperposts", login)```.
+```WriteToStorage({key: "hyperposts", value: login})``` basically translates to ```localStorage.setItem("hyperposts", JSON.stringify(login))```.
 
-When our user clicks the "Login" button a regular HTML form should take her to the main page. As you want to let the server handle navigation between the pages, don't hijack the form and let the browser do what it's good at - handling hypermedia.
+When the user clicks the **Login** button a regular HTML form should take her to the main page.
+Navigation is handled by the browser talking to the HTTP server. No JS is involved. 
+It turns out browsers are really good at handling hypermedia.
+You just have to make sure that JS doesn't hijack form submission. 
+ 
 
 ## Exercise: reading from local storage
 
