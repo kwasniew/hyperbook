@@ -3258,8 +3258,10 @@ Check your application bundle size in the browser.
     <br><br>
 </figure>
 
-With minification and Brotli compression (from Netlify server) the application is only 10kB. 
-It easily fits into most [performance budgets](https://web.dev/performance-budgets-101/).
+With minification and Brotli compression (from the Netlify server) the application is only 10kB. 
+It easily fits into most real-world [performance budgets](https://web.dev/performance-budgets-101/). What it means in practice is
+that Hyperapp is a great tool when you need to build apps for the network and CPU constrained devices, without 
+sacrificing developer experience.
 
 Note: I was using scope hoisting/tree shaking feature of Parcel ```parcel build src/index.html --experimental-scope-hoisting```.
 Without this optimization the application was 12kB.
