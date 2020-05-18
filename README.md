@@ -9,7 +9,7 @@ Later sections will build upon the previous ones, so don't skip anything.
 
 ## How long does it take
 
-You will need about 4 hours because this document is 7 times longer than Hyperapp source code.
+You will need about 4 hours because this document is 7 times longer than Hyperapp [source code](https://github.com/jorgebucaran/hyperapp/blob/master/src/index.js).
 
 ## Prerequisites
 
