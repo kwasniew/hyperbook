@@ -3,10 +3,12 @@
 
 This book gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
 
-## How to read it
+## How to use it
 
 To benefit the most, read sections in order. I will explain every single concept with code, images and words. 
 Later sections will build upon the previous ones, so don't skip anything.
+The book was designed to be a hands-on tutorial so have your code editor
+open all the time and code along with me. It's gonna be fun!
 
 ## How long does it take
 
