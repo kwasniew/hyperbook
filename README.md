@@ -9,7 +9,7 @@ Later sections will build upon the previous ones, so don't skip anything.
 
 ## How long does it take
 
-You will need about 6 hours.
+You will need about 4 hours.
 
 ## Prerequisites
 
