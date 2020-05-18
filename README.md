@@ -2604,6 +2604,38 @@ Hints:
 
 </details>
 
+## Exercise: displaying username in the header
+
+In this exercise you'll see the benefits of having a single application state.
+Display current username in the application header as shown in the following figure:
+<figure>
+    <img src="images/username-header.png" width="650" alt="Displaying username in the header" align="center">
+    <figcaption><em>Figure: Displaying username in the header</em></figcaption>
+    <br><br>
+</figure>
+
+<details>
+    <summary id="displaying_username_in_header">Solution</summary>
+
+```javascript
+export const layout = (view) => (state) => html`
+  <div>
+    <header>
+      <h1>@${state.username} HyperPosts</h1>
+      ${nav}
+    </header>
+    <main>
+      ${view(state)}
+    </main>
+  </div>
+`;
+```
+
+This is one of the many benefits of having a single state object instead of local component state.
+Single app state approach also shines when you need to persist you entire state to localStorage or some remote API.
+
+</details>
+
 ## Preparing pages for client side routing
 
 Server-side routing is easier than client-side routing. You let the browser handle links, forms and history when clicking back and forward buttons. However in certain situation you need to take over the browser job and handle routing/navigation in JS. It also means you need to keep a global state across the pages which makes state management more difficult. 
