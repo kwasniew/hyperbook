@@ -3109,36 +3109,51 @@ Since Hyperapp is really small you may not even notice the hydration penalty.
 
 Move **src/index.html** content into **Server.js** and put it into a template string:
 ```javascript
-const htmlTemplate = (content) => /*HTML*/ `
-    <!DOCTYPE html>
-    <html>
+const htmlTemplate = (content) => /* HTML */ `
+  <!DOCTYPE html>
+  <html lang="en">
     <head>
-        <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
-        <script type="module" src="init.js"></script>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>HyperPosts</title>
+      <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css" />
+      <script type="module" src="Start.js"></script>
     </head>
     <body>
-    <main>
+      <main>
         <div id="app">${content}</div>
-    </main>
+      </main>
     </body>
-    </html>
+  </html>
 `;
 ```
 You'll be replacing ```content``` placeholder with dynamically rendered content.
-Note: ````/*HTML*/``` comment is for prettier to auto-format the string as HTML just the same way it works with ```html`````.
+Note: ```/* HTML */``` comment is for prettier to auto-format the string as HTML.
 
-Update server.js to serve static files in src directory. Put it after GET "/" handler so that index.html has lower precedence over our root resource. Also, replace the ```content``` placeholder with the actual content.
+Update **Server.js**:  
 ```javascript
 app.get("/", async (req, res) => {
-    ...
-    res.send(htmlTemplate(content));
+  const response = await axios.get(
+    "https://hyperapp-api.herokuapp.com/api/post"
+  );
+  const posts = response.data;
+  const stateWithPosts = SetPosts(state, posts);
+  const content = render.renderToString(layout(view)(stateWithPosts));
+  res.send(htmlTemplate(content));
 });
 app.use(express.static("src"));
 ```
+Wrap your ```view``` into a ```layout```.
+Pass a server generated content into your HTML template.
+Serve static files from the **src** directory. 
+Put the static handler after GET "/" handler so ```src/index.html``` has lower precedence than our root resource.
 
+Run it:
 ```
-node server.js
+node Server.js
 ```
+
+Test your posts page with JS enabled and disabled.
 
 ## Passing server state to the client
 
