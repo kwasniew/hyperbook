@@ -1,6 +1,6 @@
 # Hyperapp: functional programming in your browser with 500 lines of code
 
-This tutorial/mini-book gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
+This book gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
 
 ## How to read it
 
@@ -62,11 +62,11 @@ That allows for writing easy to understand, performant and testable code
 Unlike other JS frameworks
 Hyperapp fits in one 500 LOC file with zero dependencies and facilitates programming in a tiny subset of JS "the very best parts"
 ```
-In this tutorial I'll try to back up this bold statement. 
+In this book I'll try to back up this bold statement. 
 
 ## Learning outcomes
 
-By the end of this tutorial you will learn to:
+By the end of this book you will learn to:
 * develop frontend code using mostly pure functions and object literals 
 * setup build tool free development workflow to avoid tooling fatigue
 * render views as simple functions, not stateful components
