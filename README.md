@@ -3155,85 +3155,28 @@ node Server.js
 
 Test your posts page with JS enabled and disabled.
 
-## Passing server state to the client
+## Exercise: server side-rendering and hydration 
 
-Current version of your application fetches the post list twice. First on the server, second on the client in ```LoadLatestPosts``` effect. You can skip the second rendering. 
+Implement server-side rendering and hydration for the login page. Test your app with JS enabled and disabled.
 
-In app.js change the init property value:
+<details>
+    <summary id="ssr_and_hydration">Solution</summary>
+
 ```javascript
-export const init = () =>
-  app({
-    init: window.initialState ? window.initialState : [state, LoadLatestPosts],
-    ...
-  });
-```
-Backend and frontend will use window.intialState to pass the state. If the state is provided we skip the initial empty state setting and post loading effect.
+import { state as loginState, view as loginView } from "./src/Login.js";
 
-In server.js change htmlTemplate to accept not only content, but also state. Put the state into ```window.initialState``` where frontend code will find it.
-```javascript
-const htmlTemplate = (content, state) => /*HTML*/ `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
-        <script type="module" src="init.js"></script>
-        <script>
-            window.initialState = ${state};
-        </script>
-    </head>
-    <body>
-    <main>
-        <div id="app">${content}</div>
-    </main>
-    </body>
-    </html>
-`;
-```
+app.get("/login", async (req, res) => {
+  const content = render.renderToString(layout(loginView)(loginState));
 
-Make sure to serialize the object into string
-```javascript
-import serialize from "serialize-javascript";
-
-app.get("/", async (req, res) => {
-    ...
-    res.send(htmlTemplate(content, serialize(stateWithPosts)));
+  res.send(htmlTemplate(content));
 });
 ```
 
-Test your app with JS enabled and disabled. Both versions should work. 
+You can expland on this exercise. Some ideas for further experiments:
+* serialize state and pass it from server to client to avoid double fetching initial list of posts
+* build shared routing abstraction for the client and the server
 
-## Preparing code for production
-
-Before you ship your code to production you may need to:
-* translate modern ES6+ code to ES5 so older browsers can understand it
-* generate a single or a few JS bundles to avoid serving too many files
-
-If you're only targeting modern browsers and serving code over HTTP/2 you may be able to skip those steps.
-
-In this tutorial we use [Parcel](https://parceljs.org/) - a zero-configuration bundler.
-
-```
-npm i parcel@next -D
-```
-
-Add a script to build your production code:
-```json
-  "scripts": {
-    "build": "parcel build src/index.html"
-  }
-```
-
-Parcel will generate a ```dist``` directory with the production optimized index.html and JS bundle.
-
-Verify your production distribution locally:
-```
-http-server dist
-```
-
-Here's a deployed version of our application: TODO
-
-TODO: Hyperapp + application is smaller than most framework code. No matter how much code splitting you do in React.
-TODO: remove htm
+</details>
 
 ## Summary
 
@@ -3287,13 +3230,13 @@ My choice of technology is filtered through those principles:
 * Compose solutions from simple tools solving narrow problems aka Unix Philosophy.
 * Prioritize tools that give you fast feedback (fast build, fast subsecond tests etc.).  
 
-If your principles are different probably you'll make different choice.
+If your principles are different probably you'd make different choices.
 
 ### Elm
 
 Type-Driven Development in Elm makes for a very nice and beginner friendly development experience. 
 Compiler taking care of runtime exceptions is very helpful.
-Refactoring is much easier than in the JS/TS world. The tradeoff is that Elm requires build tooling in development. You can't use a browser as your REPL.
+Refactoring is much easier than in the JS/TS world. The tradeoff is that Elm requires build tools in development. You can't use a browser as your REPL.
 Also some APIs that haven't been ported to Elm are harder to work with than in JS. Finally, due to limited support for generics and lack
 of higher-kinded types some duplication is necessary. For some people it's a bug, for some others it's a feature.
 
