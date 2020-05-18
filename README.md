@@ -351,9 +351,6 @@ Run the installation command:
 ```npm i```
 
 Snowpack will inspect your code and translate required modules from ```node_modules``` to ```web_modules```.
-Letting Snowpack inspect your imports is the workflow that we'll use in this tutorial. 
-If you don't want to have same dependencies living both in ```node_modules``` and translated ```web_modules```
-you can use Snowpack's [webDependencies](https://www.snowpack.dev/#webdependencies).
 
 If you track your code in git add **src/web_modules** to **.gitignore**.
 
@@ -2931,13 +2928,66 @@ Install your new dependency:
 
 Now your client-side navigation should work.
 
+## Separating client dependencies from server dependencies
+
+In the next section you'll be adding server-side code living in the same codebase as Hyperapp client-side code.
+
+So far you've been using Snowpack to inspect all production code for imports and translating appropriate ```node_modules``` to ```web_modules```.
+It leads to 2 problems:
+* you install the same dependency twice: in the ```node_modules``` and in the ```web_modules```.
+* you have to exclude server code from the translation
+
+Snowpack comes with a feature called [webDependencies](https://www.snowpack.dev/#webdependencies):
+
+Change your **package.json** to this code:
+```
+{
+  "type": "module",
+  "scripts": {
+    "snowpack": "snowpack install --exclude '**/*' --dest=src/web_modules",
+    "postinstall": "npm run snowpack",
+    "format": "prettier --write '**/!(web_modules)/*.js'",
+    "test": "mocha test/*Test.js"
+  },
+  "dependencies": {
+    "hyperapp-render": "3.2.0"
+  },
+  "webDependencies": {
+    "@hyperapp/events": "0.0.4",
+    "htm": "3.0.4",
+    "hyperapp": "2.0.4",
+    "hyperapp-fx": "2.0.0-beta.1",
+    "page": "1.11.6"
+  },
+  "devDependencies": {
+    "mocha": "7.1.2",
+    "prettier": "2.0.5",
+    "snowpack": "2.0.0-beta.20"
+  }
+}
+```
+After this split:
+* server-side dependencies will come from ```dependencies```. I already added a ```hyperapp-render``` library dependency you'll use in the next section. 
+* client-side dependencies will come from ```webDependencies```. I moved all previous dependencies here.
+
+Also, we exclude all code from import analysis (```--exclude '**/*'```). In our new workflow all client-side dependencies have to be listed explicitly in ```webDependencies```.
+
+Test the install:
+```npm i```
+
+<figure>
+    <img src="images/webdependencies.png" width="650" alt="Snowpack web_modules installed from webDependencies" align="center">
+    <figcaption><em>Figure: Snowpack web_modules installed from webDependencies</em></figcaption>
+    <br><br>
+</figure>
+
 ## Rendering view and state into a string
 
-So far you've been using Hyperapp to translate views into DOM nodes. 
+So far you've been using Hyperapp to serialize Virtual DOM nodes into DOM nodes. 
 
-You can also translate Hyperapp view to HTML string with a help of a library called [hyperapp-render](https://github.com/kriasoft/hyperapp-render).
+However, you can also translate Hyperapp Virtual DOM to HTML string with a help of a library called [hyperapp-render](https://github.com/kriasoft/hyperapp-render).
 
-Create server.js in a root directory of your project:
+Create **Server.js** in a root directory of your project (one level above **src**):
 ```javascript
 import render from "hyperapp-render";
 import {state, view} from "./app.js";
