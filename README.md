@@ -1,4 +1,4 @@
-# Complete Intro to Hyperapp
+# Complete Intro to Hyperapp and its ecosystem.
 
 This tutorial gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
 
@@ -9,7 +9,7 @@ Later sections will build upon the previous ones, so don't skip anything.
 
 ## How long does it take
 
-You will need about 4 hours.
+You will need about 4 hours because this document is 7 times longer than Hyperapp source code.
 
 ## Prerequisites
 
@@ -3210,7 +3210,7 @@ Also, no need for hooks and special linting rules. No need for nonstandard langu
 
 ### Performance
 
-* Fast load time: with one file and zero dependencies Hyperapp loads fast by default (only 2kB). It doesn't require sophisticated performance tricks to load faster.
+* Fast load time: with one file and zero dependencies Hyperapp loads fast by default (less than 2 kB). It doesn't require sophisticated performance tricks to load faster.
 * No compromise in runtime performance: https://krausest.github.io/js-framework-benchmark/current.html 
 
 ### Correctness
