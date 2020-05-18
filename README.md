@@ -27,7 +27,7 @@ No prior experience with Hyperapp is needed.
 ## Why do we need another framework?
 
 <figure>
-    <img src="images/rube_goldberg_machine.jpg" width="650" alt="Rube Goldberg Machine" align="center">
+    <img src="images/rube-goldberg-machine.jpg" width="650" alt="Rube Goldberg Machine" align="center">
     <figcaption><em>Figure: Rube Goldberg Machine - a metaphore for accidental complexity</em></figcaption>
     <br><br>
 </figure>
@@ -48,7 +48,7 @@ Modern frontend development is too complicated:
 ## What is your elevator pitch?
 
 <figure>
-    <img src="images/elevator_pitch.jpg" width="650" alt="Hyperapp Elevator Pitch" align="center">
+    <img src="images/elevator-pitch.jpg" width="650" alt="Hyperapp Elevator Pitch" align="center">
     <figcaption><em>Figure: Hyperapp Elevator Pitch</em></figcaption>
     <br><br>
 </figure>
@@ -171,7 +171,7 @@ By default ```http-server``` starts on http://127.0.0.1:8080
 
 Check if you browser renders the same HTML as shown in the figure:
 <figure>
-    <img src="images/getting_started.png" width="650" alt="Getting started result" align="center">
+    <img src="images/getting-started.png" width="650" alt="Getting started result" align="center">
     <figcaption><em>Figure: Getting started HTML</em></figcaption>
     <br><br>
 </figure>
@@ -481,7 +481,7 @@ Pass as much state as needed. For example: ```listItem``` only needs a single ``
 
 At the end of this section your view should look like this:
 <figure>
-    <img src="images/splitting_view.png" width="650" alt="Displaying a list of posts" align="center">
+    <img src="images/splitting-view.png" width="650" alt="Displaying a list of posts" align="center">
     <figcaption><em>Figure: Displaying a list of posts</em></figcaption>
     <br><br>
 </figure>
@@ -526,7 +526,7 @@ The following figure shows the same action in a visual format:
 Test your app in the browser and click the "Add Post" button several times. New items should be added to the list.
 
 <figure>
-    <img src="images/add_post_action.png" width="650" alt="AddPost action adding new items to the list" align="center">
+    <img src="images/add-post-action.png" width="650" alt="AddPost action adding new items to the list" align="center">
     <figcaption><em>Figure: AddPost action adding new items to the list</em></figcaption>
     <br><br>
 </figure>
@@ -618,7 +618,7 @@ As mentioned before, it's all about transferable skills.
 
 The following figure shows updated conceptual model of Hyperapp actions with an extra event parameter:
 <figure>
-    <img src="images/action_with_event.jpg" width="650" alt="Action is a pure function of state and event" align="center">
+    <img src="images/action-with-event.jpg" width="650" alt="Action is a pure function of state and event" align="center">
     <figcaption><em>Figure: Action is a pure function of state and event</em></figcaption>
     <br><br>
 </figure>
@@ -768,7 +768,7 @@ This is the essence of moving impure code to the edges of the system. Framework 
 But how should Hyperapp know how to interpret this object? 
 
 <figure>
-    <img src="images/arbitrary_effect.jpg" width="650" alt="Hyperapp can't interpret arbitrary data" align="center">
+    <img src="images/arbitrary-effect.jpg" width="650" alt="Hyperapp can't interpret arbitrary data" align="center">
     <figcaption><em>Figure: Hyperapp can't interpret arbitrary data</em></figcaption>
     <br><br>
 </figure>
@@ -793,7 +793,7 @@ The effect definition will hide the ```fetch``` call or some other impure call, 
 It's something you must return to the framework, so it can handle the impure part.
 
 <figure>
-    <img src="images/effect_definition.jpg" width="650" alt="Hyperapp handling effect definitions from the userland" align="center">
+    <img src="images/effect-definition.jpg" width="650" alt="Hyperapp handling effect definitions from the userland" align="center">
     <figcaption><em>Figure: Hyperapp handling effect definitions from the userland</em></figcaption>
     <br><br>
 </figure>
@@ -850,7 +850,7 @@ With those changes in place test your application. A list of posts from the serv
 You may observe a content flip as Hyperapp replaces initial state with the server posts.
 
 <figure>
-    <img src="images/initial_posts.png" width="650" alt="Loading initial posts" align="center">
+    <img src="images/initial-posts.png" width="650" alt="Loading initial posts" align="center">
     <figcaption><em>Figure: Loading initial posts</em></figcaption>
     <br><br>
 </figure>
