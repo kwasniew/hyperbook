@@ -841,6 +841,7 @@ app({
 });
 ```
 ```init``` has overloaded signature. In addition to the initial state you can pass one or more actions to invoke on startup.
+```init``` value is like the result of an action, which can be either a state or state+effects. 
 
 With those changes in place test your application. A list of posts from the server should arrive and replace the hardcoded posts. 
 You may observe a content flip as Hyperapp replaces initial state with the server posts.
@@ -939,6 +940,10 @@ The return action inside the effect will trigger eventually e.g. when the HTTP r
 If you have more than one effect wrap them in an array:
 ```javascript
 const EffectfulAction = oldState => [newState, [Effect1, Effect2]];
+```
+Or pass directly comma-separated at the end of the main array:
+```javascript
+const EffectfulAction = oldState => [newState, Effect1, Effect2];
 ```
 
 ## Exercise: making effectful action
@@ -1178,7 +1183,7 @@ Looking at our subscription signature it's not much different from any short-liv
 You could event plug the subscription into the init:
 ```javascript
 app({
-    init: [state, LoadLatestPosts, EventSourceListen({action: SetPost, url: 'https://hyperapp-api.herokuapp.com/api/event/post'})],
+    init: [state, [LoadLatestPosts, EventSourceListen({action: SetPost, url: 'https://hyperapp-api.herokuapp.com/api/event/post'})]],
     ...
 });
 ```
@@ -2568,7 +2573,7 @@ const ReadUsername = ReadFromStorage({
   action: SetUsername,
 });
 
-export const init = [state, LoadLatestPosts, ReadUsername];
+export const init = [state, [LoadLatestPosts, ReadUsername]];
 ```
 
 </details>
@@ -2636,67 +2641,77 @@ Single app state approach also shines when you need to persist you entire state 
 
 </details>
 
-## Preparing pages for client side routing
+## Preparing for client side routing
 
-Server-side routing is easier than client-side routing. You let the browser handle links, forms and history when clicking back and forward buttons. However in certain situation you need to take over the browser job and handle routing/navigation in JS. It also means you need to keep a global state across the pages which makes state management more difficult. 
+Server-side routing is easier than client-side routing. 
+You let the browser handle links, forms, history, back and forward buttons. 
+However in certain scenarios you need to take over the browser's job and handle routing in JS (e.g. in offline apps). 
+It results in the increased complexity of your application state and subscriptions.
+With client-side routing you need to track a current page and react to navigation events.
+ 
+First, expose init action for each of your pages:
 
-
-First, expose action for page initialization on each of your pages.
-
-src/posts.js
+**src/Posts.js**
 ```javascript
-export const InitPage = (state) => [{...state, ...initState}, [LoadLatestPosts, ReadLogin]];
+export const InitPage = (location) => [
+  { location, ...state },
+  [LoadLatestPosts, ReadUsername],
+];
 ```
-You're merging new page initState with the whole app state. If there's any field in the previous ```state``` and the ```initState``` the latter will overwrite the former. We could create a nested state for each page but it would complicate state updates.
-```InitPage``` not only sets the initial state, but also fires all effects.
+You expose a way for the router to inject the current location into the current page state. 
+```InitPage``` also fires all init effects.
 
-Do the same thing in src/login.js
+Do the same thing in **src/Login.js**:
 ```javascript
-export const InitPage = (state) => [{...state, ...initialState}];
+export const InitPage = (location) => (state) => ({ location, ...state });
 ```
-There's not effects to trigger on this page so only state merging happens. Make sure to remove the ```app()``` call on this page. We'll be moving to one centralized app setup.
+There's not effects to trigger on this page. 
+Make sure to remove the ```app()``` call. You'll moving towards one centralized app setup in the next section.
+
+Finally export the ```view``` from **Login.js**:
+```javascript
+export const view = (state) => html`
+    ...
+`;
+```
 
 ## Setting up the main app
 
-In src/app.js you'll setup the whole SPA.
+Setup you Single-Page Application in **App.js**:
 ```javascript
-import {layout} from "./layout.js";
-import {EventSourceListen} from "./lib/eventsource/EventSource.js";
-import {SetPost} from "./posts.js";
-import {view as postsView, InitPage as InitPostsPage} from "./posts.js";
-import {view as loginView, InitPage as InitLoginPage} from "./login.js";
-import {app} from "./web_modules/hyperapp.js";
+import { app } from "./web_modules/hyperapp.js";
+import {
+  InitPage as InitPosts,
+  view as postsView,
+  subscriptions,
+} from "./Posts.js";
+import { InitPage as InitLogin, view as loginView } from "./Login.js";
+import { layout } from "./Layout.js";
 
-const views = {
-    "/": postsView,
-    "/login": loginView
+const pages = {
+  "/": postsView,
+  "/login": loginView,
 };
-const routeInitActions = {
-    "/": InitPostsPage,
-    "/login": InitLoginPage
+const pageInitActions = {
+  "/": InitPosts,
+  "/login": InitLogin,
+};
+const view = (state) => {
+  const page = pages[state.location];
+  return page ? page(state) : "Loading...";
 };
 
-const view = state => {
-    const routeView = views[state.location];
-    return routeView ? routeView(state): "Loading...";
-};
-
-export const init = () =>
-    app({
-        init: {},
-        view: layout(view),
-        subscriptions: (state) => [
-            state.liveUpdate &&
-            EventSourceListen({
-                action: SetPost,
-                url: "https://hyperapp-api.herokuapp.com/api/event/post",
-            })
-        ],
-        node: document.getElementById("app"),
-    });
+export const start = () =>
+  app({
+    init: {},
+    view: layout(view),
+    subscriptions,
+    node: document.getElementById("app"),
+  });
 ```
-You start with mapping each URL path to a corresponding view and init action.
-The main view function will look up the actual view based on the ```state.location``` property that you'll add next.
+You start with mapping each path to a corresponding page and page init action.
+The main view function selects a page based on ```state.location``` that you'll set in the next section.
+The ```init``` is an empty object for now. You'll invoke page init actions from the router.
 
 ## Integrating with 3rd party libraries
 
@@ -2858,40 +2873,6 @@ export const view = (state) => html`
 ```preventDefault``` wraps any action and returns a new action. The new action calls ```event.preventDefault()``` and delegates everything else to the original action. 
 
 With this change your client-side navigation should work.
-
-
-## Preparing code for production
-
-Before you ship your code to production you may need to:
-* translate modern ES6+ code to ES5 so older browsers can understand it
-* generate a single or a few JS bundles to avoid serving too many files
-
-If you're only targeting modern browsers and serving code over HTTP/2 you may be able to skip those steps.
-
-In this tutorial we use [Parcel](https://parceljs.org/) - a zero-configuration bundler.
-
-```
-npm i parcel@next -D
-```
-
-Add a script to build your production code:
-```json
-  "scripts": {
-    "build": "parcel build src/index.html"
-  }
-```
-
-Parcel will generate a ```dist``` directory with the production optimized index.html and JS bundle.
-
-Verify your production distribution locally:
-```
-http-server dist
-```
-
-Here's a deployed version of our application: TODO
-
-TODO: Hyperapp + application is smaller than most framework code. No matter how much code splitting you do in React.
-TODO: remove htm
 
 ## Rendering view and state into a string
 
@@ -3071,6 +3052,38 @@ app.get("/", async (req, res) => {
 
 Test your app with JS enabled and disabled. Both versions should work. 
 
+## Preparing code for production
+
+Before you ship your code to production you may need to:
+* translate modern ES6+ code to ES5 so older browsers can understand it
+* generate a single or a few JS bundles to avoid serving too many files
+
+If you're only targeting modern browsers and serving code over HTTP/2 you may be able to skip those steps.
+
+In this tutorial we use [Parcel](https://parceljs.org/) - a zero-configuration bundler.
+
+```
+npm i parcel@next -D
+```
+
+Add a script to build your production code:
+```json
+  "scripts": {
+    "build": "parcel build src/index.html"
+  }
+```
+
+Parcel will generate a ```dist``` directory with the production optimized index.html and JS bundle.
+
+Verify your production distribution locally:
+```
+http-server dist
+```
+
+Here's a deployed version of our application: TODO
+
+TODO: Hyperapp + application is smaller than most framework code. No matter how much code splitting you do in React.
+TODO: remove htm
 
 ## Summary
 
