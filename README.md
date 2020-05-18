@@ -2323,10 +2323,10 @@ Check if both tests are green.
 ## Making integration tests faster and more predictable
 
 You integration test execution time and reliability are heavily dependent on the API response time and availability. 
-There are at least two options you have to make it faster and more reliable:
+There are at least two options to make your tests faster and more reliable:
 * record all HTTP traffic with a library like [PollyJS](https://netflix.github.io/pollyjs/#/). 
 The first time you run the tests it intercepts all network calls and saves them to localStorage/REST API etc. 
-Afterwards it can replay traffic much faster than the original API.
+Afterwards it can replay the traffic much faster than the original API. When the API changes you make a new recording.
 * inject fake implementation of all effects and subscriptions you want to replace. 
 The trick is to move all effects and subscriptions to the entry point of your application.
 In production you can start your app with real effects/subscriptions:
@@ -2339,238 +2339,74 @@ import { WithGuid } from "./lib/Guid.js";
 start({Http, EventSourceListen, WithGuid});
 ```
 In your tests your can provide fake implementation of those effects/subscriptions. 
-This technique requires minor code changes. Each module with effects needs to expose a function for injecting them.
-This is essentialy what some people call a dependency injection, which is a fancy name for passing arguments to functions.
+This technique requires minor code changes. Each module with effects needs to expose a function for injecting those.
+This is essentially what some people call a dependency injection. A fancy name for passing arguments to functions.
  
 I leave it to the reader to experiment with those techniques.
 
-## Preparing code for production
+## Analyzing routing options
 
-Before you ship your code to production you may need to:
-* translate modern ES6+ code to ES5 so older browsers can understand it
-* generate a single or a few JS bundles so we don't serve too many files
+In the next few sections you'll start adding a new login page. With more than a single page our system requires some kind of routing.
+There are two routing options:
+* server-side
+* client-side
 
-In this tutorial we use Parcel - a zero-configuration bundler.
+With **server-side** routing you create one app per page. Each page:
+* can evolve independently
+* can use a different version of a framework
+* can even use a different framework
+* can use only HTML/CSS when JS is not needed
+* can use natural code splitting without any tools
+To integrate pages together you use hypermedia: links and forms. 
+To read more about this architecture go to Self-Contained Systems [website](https://scs-architecture.org/).
 
-```
-npm i parcel@next -D
-```
+With **client-side** routing you manage page transitions in JS and you need a client-side router. 
+Most JS routers:
+* hijack links and forms to prevent default browser behavior
+* call ```history.pushState``` to update URL bar
+* listen to ```popstate``` events to make the back button work
 
-Add a script to build your production code:
-```json
-  "scripts": {
-    "build": "parcel build src/index.html"
-  }
-```
+## Extracting htm binding
 
-Parcel will generate a ```dist``` directory with the production optimized index.html and JS bundle.
+Before you build a new page extract code for binding ```htm``` to ```h```.
 
-Verify your production distribution locally:
-```
-http-server dist
-```
-
-Here's a deployed version of our application: TODO
-
-TODO: Hyperapp + application is smaller than most framework code. No matter how much code splitting you do in React.
-TODO: remove htm
-
-## Rendering view and state into a string
-
-So far you've been using Hyperapp to translate views into DOM nodes. 
-
-You can also translate Hyperapp view to HTML string with a help of a library called [hyperapp-render](https://github.com/kriasoft/hyperapp-render).
-
-Create server.js in a root directory of your project:
+Create **src/Html.js**:
 ```javascript
-import render from "hyperapp-render";
-import {state, view} from "./app.js";
+import { h } from "./web_modules/hyperapp.js";
+import htm from "./web_modules/htm.js";
 
-const html = render.renderToString(view(state));
-
-console.log(html);
-```
-Make sure your src/app.js exports the main view function and initial state. ```hyperapp-render``` should serialize your view with state into HTML string.
-
-Run it in Node.js:
-```node src/server.js```
-
-## Rendering view and state from HTTP server
-
-You've just seen how to turn your Hyperapp views and state into HTML. You can serve this HTML from your HTTP server.
-
-Install a popular and minimal Node.js Web application server framework express:
-```
-npm i express
+export const html = htm.bind(h);
 ```
 
-Expose your Hyperapp view as a resource with HTML representation:
+Use the ```html``` template literal in **src/Posts.js**:
 ```javascript
-import render from "hyperapp-render";
-import express from "express";
-import {state, view} from "./src/app.js";
+import { app, Lazy } from "./web_modules/hyperapp.js";
+import {html} from "./Html.js";
 
-const app = express();
-
-app.get("/", (req, res) => {
-    const html = render.renderToString(view(state));
-    res.send(html);
-});
-app.listen(3000, () => {
-    console.log("Listening on 3000");
-});
+// delete htm binding
+// const html = htm.bind(h);
 ```
-
-Run your server:
-```
-node src/server.js
-```
-
-Open ```http://localhost:3000```.
-
-It should serve unstyled HTML with a form and empty list of posts.
-
-## Fetching data on the server
-
-In this section you'll add a list of posts to the server rendered HTML. 
-When fetching data from 3rd party APIs server and client significantly differ.
-
-Client fetches data in the background. In our client side app ```LoadLatestPosts``` effect starts when you open a browser and data is fetched in the bacground. When the data arrives Hyperapp re-renders a view with a newly fetched response.
-
-Server has to wait for the data and only then render the response. So the wait before render behavior is a major difference. 
-
-In this tutorial you won't be trying to create universal data fetching effects that can be shared between a client and a server. Instead we'll use axios and handle data fetching separately. 
-```
-npm i axios
-```
-
-```javascript
-import render from "hyperapp-render";
-import express from "express";
-import {state, view, SetPosts} from "./src/app.js";
-import axios from "axios";
-
-const app = express();
-
-app.get("/", async (req, res) => {
-    const response = await axios.get("https://hyperapp-api.herokuapp.com/api/post");
-    const posts = response.data;
-    const stateWithPosts = SetPosts(state, posts);
-    const html = render.renderToString(view(stateWithPosts));
-    res.send(html);
-});
-app.listen(3000, () => {
-    console.log("Listening on 3000");
-});
-```
-Make sure ```SetPosts``` action is exposed. We can reuse the action on the server. 
-
-Once you open your app in the browser a list of posts should be rendered.
-
-As you've just seen Hyperapp can be used as a server-side template engine with a help of ```hyperapp-render```.
-
-## Hydrating server side code on the client side
-
-Hydration is a fancy name for taking control over server-side rendered content on the client side. For large applications server-side rendering with or without hydration always improves the time to visible content. However when it comes to time to interactivity hydration always performs worse than server-side rendering or client side-rendering alone. In other words with hydration you pay the rendering tax twice. Since Hyperapp is really small you may not notice the hydration penalty.
-
-Move index.html into server.js and put it into a template string:
-```javascript
-const htmlTemplate = (content) => /*HTML*/ `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
-        <script type="module" src="init.js"></script>
-    </head>
-    <body>
-    <main>
-        <div id="app">${content}</div>
-    </main>
-    </body>
-    </html>
-`;
-```
-You'll be replacing ```content``` placeholder with dynamically rendered content.
-Note: ````/*HTML*/``` comment is for prettier to auto-format the string as HTML just the same way it works with ```html`````.
-
-Update server.js to serve static files in src directory. Put it after GET "/" handler so that index.html has lower precedence over our root resource. Also, replace the ```content``` placeholder with the actual content.
-```javascript
-app.get("/", async (req, res) => {
-    ...
-    res.send(htmlTemplate(content));
-});
-app.use(express.static("src"));
-```
-
-```
-node server.js
-```
-
-## Passing server state to the client
-
-Current version of your application fetches the post list twice. First on the server, second on the client in ```LoadLatestPosts``` effect. You can skip the second rendering. 
-
-In app.js change the init property value:
-```javascript
-export const init = () =>
-  app({
-    init: window.initialState ? window.initialState : [state, LoadLatestPosts],
-    ...
-  });
-```
-Backend and frontend will use window.intialState to pass the state. If the state is provided we skip the initial empty state setting and post loading effect.
-
-In server.js change htmlTemplate to accept not only content, but also state. Put the state into ```window.initialState``` where frontend code will find it.
-```javascript
-const htmlTemplate = (content, state) => /*HTML*/ `
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
-        <script type="module" src="init.js"></script>
-        <script>
-            window.initialState = ${state};
-        </script>
-    </head>
-    <body>
-    <main>
-        <div id="app">${content}</div>
-    </main>
-    </body>
-    </html>
-`;
-```
-
-Make sure to serialize the object into string
-```javascript
-import serialize from "serialize-javascript";
-
-app.get("/", async (req, res) => {
-    ...
-    res.send(htmlTemplate(content, serialize(stateWithPosts)));
-});
-```
-
-Test your app with JS enabled and disabled. Both versions should work. 
 
 ## Decorating view with layout and navigation
 
-First write the ideal signature for the layout decorator. You're designing layout decorator API by using it before it's implemented.
+In this section you'll add a global layout with shared navigation.
+
+First write our ideal signature for the layout decorator in **src/App.js**. 
 ```javascript
   app({
     view: layout(view),
   });
 ```
-```layout``` should wrap the original view function and return a new function accepting state as a parameter. 
+```layout``` should wrap the original view function and return a new function with a state parameter.
 
-Create src/layout.js with a function matching the specification.
+Create **src/Layout.js** with a function matching the specification.
 ```javascript
-export const layout = (content) => (state) => html``;
+export const layout = (view) => (state) => html``;
 ```
 
 Fill in the gaps:
 ```javascript
-import { html } from "./html.js";
+import { html } from "./Html.js";
 
 const nav = html`
   <nav>
@@ -2581,58 +2417,47 @@ const nav = html`
   </nav>
 `;
 
-export const layout = (content) => (state) => html`
+export const layout = (view) => (state) => html`
   <div>
     <header>
       <h1>HyperPosts</h1>
       ${nav}
     </header>
     <main>
-      ${content(state)}
+      ${view(state)}
     </main>
   </div>
 `;
-```
-```layout``` provides a common header with navigation links. It invokes the ```content``` view function with the current state you get from the framework.
 
-Import the layout and test your app:
+```
+```layout``` provides a common header with two navigation links.
+Then it delegates main content rendering to the ```view``` function. 
+
+
+Import the layout in **src/App.js** and test your app:
 ```javascript
-import { layout } from "./layout.js";
+import { layout } from "./Layout.js";
 ```
 
-## Analyzing routing options
-
-In the next section you'll start adding a new login page. With more than a single page our system requires some kind of routing.
-There are two routing options:
-* server-side
-* client-side
-
-With **server-side** routing you create one app per page. Each page:
-* can evolve independently
-* can use a different version of a framework
-* can even use a different framework
-* can use only HTML/CSS
-To integrate pages together you use hypermedia: links and forms. To explore this topic go to Self-Contained Systems architecture [website](https://scs-architecture.org/).
-
-With **client-side** routing you manage page transitions in JS and you need a client-side router. 
-Most JS routers:
-* hijack links and forms to prevent default browser behavior
-* call ```history.pushState``` to update browser URL bar
-* listen to ```popstate``` events to make the back button work
+<figure>
+    <img src="images/layout.png" width="650" alt="Layout decorating main posts page" align="center">
+    <figcaption><em>Figure: Layout decorating main posts page</em></figcaption>
+    <br><br>
+</figure>
 
 ## Routing between HTML pages
 
-To facilitate server side routing you'll create a second HTML page src/login.html.
+To explore server-side routing create a second HTML page **src/login.html**.
 
 ```html
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>HyperPosts</title>
     <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
-    <script type="module" src="login.js"></script>
+    <script type="module" src="Login.js"></script>
 </head>
 <body>
 <main>
@@ -2641,9 +2466,9 @@ To facilitate server side routing you'll create a second HTML page src/login.htm
 </body>
 </html>
 ```
-This is almost the same HTML you wrote for the main page. The only difference is a script it references (login.js).
+This is almost the same HTML you wrote for the main page. The only difference is a JS file name.
 
-Create src/login.js:
+Create **src/Login.js**:
 ```javascript
 import { app } from "./web_modules/hyperapp.js";
 import { layout } from "./layout.js";
@@ -2928,6 +2753,219 @@ export const view = (state) => html`
 ```preventDefault``` wraps any action and returns a new action. The new action calls ```event.preventDefault()``` and delegates everything else to the original action. 
 
 With this change your client-side navigation should work.
+
+
+## Preparing code for production
+
+Before you ship your code to production you may need to:
+* translate modern ES6+ code to ES5 so older browsers can understand it
+* generate a single or a few JS bundles to avoid serving too many files
+
+If you're only targeting modern browsers and serving code over HTTP/2 you may be able to skip those steps.
+
+In this tutorial we use [Parcel](https://parceljs.org/) - a zero-configuration bundler.
+
+```
+npm i parcel@next -D
+```
+
+Add a script to build your production code:
+```json
+  "scripts": {
+    "build": "parcel build src/index.html"
+  }
+```
+
+Parcel will generate a ```dist``` directory with the production optimized index.html and JS bundle.
+
+Verify your production distribution locally:
+```
+http-server dist
+```
+
+Here's a deployed version of our application: TODO
+
+TODO: Hyperapp + application is smaller than most framework code. No matter how much code splitting you do in React.
+TODO: remove htm
+
+## Rendering view and state into a string
+
+So far you've been using Hyperapp to translate views into DOM nodes. 
+
+You can also translate Hyperapp view to HTML string with a help of a library called [hyperapp-render](https://github.com/kriasoft/hyperapp-render).
+
+Create server.js in a root directory of your project:
+```javascript
+import render from "hyperapp-render";
+import {state, view} from "./app.js";
+
+const html = render.renderToString(view(state));
+
+console.log(html);
+```
+Make sure your src/app.js exports the main view function and initial state. ```hyperapp-render``` should serialize your view with state into HTML string.
+
+Run it in Node.js:
+```node src/server.js```
+
+## Rendering view and state from HTTP server
+
+You've just seen how to turn your Hyperapp views and state into HTML. You can serve this HTML from your HTTP server.
+
+Install a popular and minimal Node.js Web application server framework express:
+```
+npm i express
+```
+
+Expose your Hyperapp view as a resource with HTML representation:
+```javascript
+import render from "hyperapp-render";
+import express from "express";
+import {state, view} from "./src/app.js";
+
+const app = express();
+
+app.get("/", (req, res) => {
+    const html = render.renderToString(view(state));
+    res.send(html);
+});
+app.listen(3000, () => {
+    console.log("Listening on 3000");
+});
+```
+
+Run your server:
+```
+node src/server.js
+```
+
+Open ```http://localhost:3000```.
+
+It should serve unstyled HTML with a form and empty list of posts.
+
+## Fetching data on the server
+
+In this section you'll add a list of posts to the server rendered HTML. 
+When fetching data from 3rd party APIs server and client significantly differ.
+
+Client fetches data in the background. In our client side app ```LoadLatestPosts``` effect starts when you open a browser and data is fetched in the bacground. When the data arrives Hyperapp re-renders a view with a newly fetched response.
+
+Server has to wait for the data and only then render the response. So the wait before render behavior is a major difference. 
+
+In this tutorial you won't be trying to create universal data fetching effects that can be shared between a client and a server. Instead we'll use axios and handle data fetching separately. 
+```
+npm i axios
+```
+
+```javascript
+import render from "hyperapp-render";
+import express from "express";
+import {state, view, SetPosts} from "./src/app.js";
+import axios from "axios";
+
+const app = express();
+
+app.get("/", async (req, res) => {
+    const response = await axios.get("https://hyperapp-api.herokuapp.com/api/post");
+    const posts = response.data;
+    const stateWithPosts = SetPosts(state, posts);
+    const html = render.renderToString(view(stateWithPosts));
+    res.send(html);
+});
+app.listen(3000, () => {
+    console.log("Listening on 3000");
+});
+```
+Make sure ```SetPosts``` action is exposed. We can reuse the action on the server. 
+
+Once you open your app in the browser a list of posts should be rendered.
+
+As you've just seen Hyperapp can be used as a server-side template engine with a help of ```hyperapp-render```.
+
+## Hydrating server side code on the client side
+
+Hydration is a fancy name for taking control over server-side rendered content on the client side. For large applications server-side rendering with or without hydration always improves the time to visible content. However when it comes to time to interactivity hydration always performs worse than server-side rendering or client side-rendering alone. In other words with hydration you pay the rendering tax twice. Since Hyperapp is really small you may not notice the hydration penalty.
+
+Move index.html into server.js and put it into a template string:
+```javascript
+const htmlTemplate = (content) => /*HTML*/ `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
+        <script type="module" src="init.js"></script>
+    </head>
+    <body>
+    <main>
+        <div id="app">${content}</div>
+    </main>
+    </body>
+    </html>
+`;
+```
+You'll be replacing ```content``` placeholder with dynamically rendered content.
+Note: ````/*HTML*/``` comment is for prettier to auto-format the string as HTML just the same way it works with ```html`````.
+
+Update server.js to serve static files in src directory. Put it after GET "/" handler so that index.html has lower precedence over our root resource. Also, replace the ```content``` placeholder with the actual content.
+```javascript
+app.get("/", async (req, res) => {
+    ...
+    res.send(htmlTemplate(content));
+});
+app.use(express.static("src"));
+```
+
+```
+node server.js
+```
+
+## Passing server state to the client
+
+Current version of your application fetches the post list twice. First on the server, second on the client in ```LoadLatestPosts``` effect. You can skip the second rendering. 
+
+In app.js change the init property value:
+```javascript
+export const init = () =>
+  app({
+    init: window.initialState ? window.initialState : [state, LoadLatestPosts],
+    ...
+  });
+```
+Backend and frontend will use window.intialState to pass the state. If the state is provided we skip the initial empty state setting and post loading effect.
+
+In server.js change htmlTemplate to accept not only content, but also state. Put the state into ```window.initialState``` where frontend code will find it.
+```javascript
+const htmlTemplate = (content, state) => /*HTML*/ `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
+        <script type="module" src="init.js"></script>
+        <script>
+            window.initialState = ${state};
+        </script>
+    </head>
+    <body>
+    <main>
+        <div id="app">${content}</div>
+    </main>
+    </body>
+    </html>
+`;
+```
+
+Make sure to serialize the object into string
+```javascript
+import serialize from "serialize-javascript";
+
+app.get("/", async (req, res) => {
+    ...
+    res.send(htmlTemplate(content, serialize(stateWithPosts)));
+});
+```
+
+Test your app with JS enabled and disabled. Both versions should work. 
+
 
 ## Summary
 
