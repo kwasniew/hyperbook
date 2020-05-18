@@ -241,6 +241,8 @@ view: state => <h1 id="my-header"><span>{state.text}</span></h1>
 To make JSX work, you need to run a transpiler from JSX to ```h``` function calls. 
 If adding a build step to your development process is not your thing, we have one more option.
 
+Note: Hyperapp is dropping support for ```JSX``` soon. 
+
 ### htm
 
 [htm](https://github.com/developit/htm) is a tiny library with HTML-like syntax and no build tool requirement. 
