@@ -1,4 +1,4 @@
-# Hyperbook: a complete intro to Hyperapp for those who have 4 hours to spare
+# Hyperapp: functional programming in your browser with 500 lines of code
 
 This tutorial/mini-book gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
 
