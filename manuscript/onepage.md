@@ -550,7 +550,7 @@ Hyperapp connects the circles and takes care of:
 * dispatching actions
 * re-rendering the view
 
-This approach makes your code very declarative as you never have to perform fine-grain view updates. 
+This approach makes your code very declarative as you never have to perform fine-grained view updates. 
 At any given time, your view is the HTML/DOM projection of your current state.
 And state is the ultimate source of truth. 
 In other words, state is not spread across many JS components or even worse, in the DOM itself.
