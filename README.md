@@ -2510,6 +2510,12 @@ As the user types the login we save it to the ```localStorage```.
 
 ```WriteToStorage({key: "hyperposts", value: login})``` basically translates to ```localStorage.setItem("hyperposts", JSON.stringify(login))```.
 
+<figure>
+    <img src="images/login.png" width="650" alt="Login page" align="center">
+    <figcaption><em>Figure: Login page</em></figcaption>
+    <br><br>
+</figure>
+
 When the user clicks the **Login** button a regular HTML form should take her to the main page.
 Navigation is handled by the browser talking to the HTTP server. No JS is involved. 
 It turns out browsers are really good at handling hypermedia.
@@ -2518,7 +2524,14 @@ You just have to make sure that JS doesn't hijack form submission.
 
 ## Exercise: reading from local storage
 
-On the main posts page your task will be to read the login and set the current username in the state object. When the user submits a post use the username instead of "anonymous" username we used so far.
+Read the login username and set it on the posts page. 
+When the user submits a new post use her actual username instead of "anonymous".
+
+<figure>
+    <img src="images/username.png" width="650" alt="Posts submitted with a login username" align="center">
+    <figcaption><em>Figure: Posts submitted with a login username</em></figcaption>
+    <br><br>
+</figure>
 
 To make it easier here's a starter code for reading from storage:
 ```javascript
@@ -2531,14 +2544,31 @@ const ReadLogin = ReadFromStorage({key: "hyperposts", action: ({value}) => ...})
     <summary id="reading_local_storage">Solution</summary>
 
 ```javascript
-const SetUsername = (state, {value}) => value ? ({...state, username: value}) : state;
-const ReadLogin = ReadFromStorage({key: "hyperposts", action: SetUsername})
+import { ReadFromStorage } from "./web_modules/hyperapp-fx.js";
 
-export const init = () =>
-  app({
-    init: window.initialState ? window.initialState : [state, LoadLatestPosts, ReadLogin],
-    ...
-  });
+export const state = {
+  ...
+  username: "anonymous",
+};
+
+export const AddPost = (state, id) => {
+  ...
+    const newPost = {
+      id,
+      username: state.username,
+      body: state.currentPostText,
+    };
+  ...  
+};
+
+const SetUsername = (state, { value }) =>
+  value ? { ...state, username: value } : state;
+const ReadUsername = ReadFromStorage({
+  key: "hyperposts",
+  action: SetUsername,
+});
+
+export const init = [state, LoadLatestPosts, ReadUsername];
 ```
 
 </details>
