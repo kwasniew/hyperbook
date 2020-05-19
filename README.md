@@ -2,7 +2,7 @@
 
 # Hyperapp: architectural "pit of success" in your browser
 
-## Book
+## Table of Contents
 
 * [Preface](manuscript/preface.md)
 * [Chapter 1: Elevator Pitch](manuscript/ch1.md)

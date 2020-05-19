@@ -1,6 +1,10 @@
 # Preface
 
-This book gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
+> If I had more time, I would have written a shorter letter.
+>
+> -- Mark Twain
+
+This book gives you full coverage of Hyperapp - a tiny framework for building JS web interfaces.
 
 ## How to use it
 
