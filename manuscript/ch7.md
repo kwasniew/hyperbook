@@ -8,7 +8,7 @@ It doesn't fit the the short-lived HTTP request-response model.
 
 In Hyperapp you use **subscriptions** to handle those **long-lived** effects. 
 
-To build intuition about subscriptions look at the different even sources that fit the model:
+To build intuition about subscriptions look at different even sources that fit this model:
 * WebSockets
 * setInterval
 * mouse moves
@@ -68,7 +68,7 @@ Test your application. Add a new post.
 ![Figure: Adding post twice](images/websockets.png)
 
 The post should be added to the list twice. 
-Directly from the local state update and a few milliseconds later from a WebSocket. 
+Directly from the local state update and a few milliseconds later from a WebSocket success action. 
 You'll fix this behavior in the next exercise. 
 For now, test your WebSocket connection in two different browser windows. See if the messages are propagated correctly.
 
@@ -84,12 +84,12 @@ Diagnosing problems with WebSockets:
 ## Exercise: avoiding duplicate posts
 
 Your task is to change the code, so that it only adds a post from the WebSocket. 
-Modify ```AddPost``` action and stop adding ```newPost``` until we receive a confirmation from the server.
+Modify the ```AddPost``` action and stop adding ```newPost``` until we receive a confirmation from the server.
 
 <details>
     <summary id="avoiding_duplicate_posts">Solution</summary>
 
-Inside ```AddPost``` action change this line:
+Inside ```AddPost``` action change this code:
 ```javascript
     const newState = {
       ...state,
@@ -114,7 +114,7 @@ In this section you'll write your own subscription for [Server-Sent Events](http
 Server-Sent Events (SSE) is a lesser known, but much simpler HTTP-native alternative to WebSockets. 
 SSE also handles network failures more gracefully than plain WebSockets. It can automatically reconnect on failed connections.
 
-In [Writing your own effects](#writing-your-own-effects) section you defined effects as follows:
+In [Writing your own effects](/ch6.md#writing-your-own-effects) section you defined effects as follows:
 ```javascript
 const httpEffect = (dispatch, data) => {};
 ```
