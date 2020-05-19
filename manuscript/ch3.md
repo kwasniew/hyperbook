@@ -3,14 +3,14 @@
 ## Using Hyperapp from npm
 
 Using modules directly from CDN is convenient for simple experiments. 
-However, for the regular development you want to have local version of all dependencies. 
+However, for the regular development you want to have local version of your dependencies. 
 Why? Because sometimes CDNs:
 * go down
 * are slow to respond
 * have security breaches
 * go out of business
 
-Additionally, local dependencies allows for offline work.
+Additionally, local dependencies allow for offline work.
 
 Create **package.json** in your root directory:
 ```json
@@ -21,7 +21,7 @@ Create **package.json** in your root directory:
   }
 }
 ```
-Put the same versions of dependencies as this book to avoid surprises.
+Use the same versions of dependencies as this book to avoid surprises.
 
 Install dependencies:
 ```
@@ -35,13 +35,19 @@ You can try to reference npm dependencies from **App.js**:
 import {h, app} from "hyperapp";
 import htm from "htm";
 ```
-But unfortunately browsers can't resolve those dependencies.
+But unfortunately browsers can't resolve those.
 
-Since both ```hyperapp``` and ```htm``` are zero-dependency libraries you can load them from **node_modules**:
+Since both ```hyperapp``` and ```htm``` are zero-dependency libraries you can load them using **node_modules** path:
 ```javascript
 import {h, app} from "../node_modules/hyperapp/src/index.js";
 import htm from "../node_modules/htm/dist/htm.mjs";
 ```
+
+Start HTTP server from the root:
+```http-server .```
+
+Open ```http://127.0.0.1:8080/src``` and test your app.
+
 It certainly works, but I had to inspect the contents of both libraries to provide correct paths.
 
 ## Integrating Hyperapp with Snowpack 
