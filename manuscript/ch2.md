@@ -75,7 +75,7 @@ Check if you browser renders the following HTML:
 In the functional approach to UI development, view is a pure function of state. 
 Hyperapp ```view``` function takes ```state``` object as an input and returns a data structure describing future DOM tree to build. 
 The returned data structure is known as the **Virtual DOM**. The framework can translate it into very efficient low-level DOM updates. 
-The important point is that you never work directly with DOM API in your application code. 
+With Hyperapp you never work directly with the DOM API in your application code. 
 Instead of making imperative calls such as ```document.createElement```, ```element.insertBefore``` or ```element.removeChild``` you declare
 what the view should look like and let the framework figure out the details.  
 
@@ -89,8 +89,8 @@ View function needs to build a Virtual DOM data structure. You have at least 3 o
 
 ### h
 
-Currently your application uses built-in **h** function to make Virtual DOM nodes.
-Change your view function to wrap the text in a ```span``` element:
+Currently your application uses built-in **h** function to create Virtual DOM nodes.
+Change your ```view``` function to wrap the text in a ```span``` element:
 ```javascript
 state => h("h1", {id: "my-header"}, [h("span", {}, state.text)])
 ```
@@ -99,7 +99,8 @@ Check the generated HTML:
 <h1 id="my-header"><span>Welcome to Hyperapp!</span></h1>
 ```
 
-What about something more complicated? How much effort would it take to translate the following snippet into ```h``` function calls?
+What about creating something more complicated? 
+How much effort would it take to translate the following snippet into the ```h``` function calls?
 ```html
 <div>
     <h1>Recent Posts</h1>
@@ -115,9 +116,9 @@ What about something more complicated? How much effort would it take to translat
     </ul>
 </div>
 ```
-Translating between HTML and ```h``` function calls can get tiresome for nested HTML. 
+Translating between HTML and the ```h``` function calls can get tiresome for nested HTML. 
 Even if you automate the process, you still have to mentally switch between JS representation and HTML representation you see in DevTools.
-On the other hand if you write everything from scratch and prefer JS-driven templating, calling ```h``` function directly is a solid option. 
+However, if you write everything from scratch and prefer JS-driven templating, calling ```h``` function directly is a solid option. 
 
 ### JSX 
 
@@ -126,7 +127,7 @@ On the other hand if you write everything from scratch and prefer JS-driven temp
 view: state => <h1 id="my-header"><span>{state.text}</span></h1>
 ```
 
-To make JSX work, you need to run a transpiler from JSX to ```h``` function calls. 
+To make JSX work, you need to run a transpiler from JSX to the ```h``` function calls. 
 If adding a build step to your development process is not your thing, we have one more option.
 
 Note: Hyperapp is dropping support for ```JSX``` soon. 
@@ -134,7 +135,6 @@ Note: Hyperapp is dropping support for ```JSX``` soon.
 ### htm
 
 [htm](https://github.com/developit/htm) is a tiny library with HTML-like syntax and no build tool requirement. 
-If you want to replace ```htm``` with ```h``` calls in production, you can use ```babel-plugin-htm```.
 
 Change you **App.js** code to use ```htm```:
 ```javascript
@@ -158,3 +158,5 @@ app({
 function buildVirtualNode(type, props, ...children) {}
 ```
 ```h``` function happens to match the signature.
+
+Note: If you want to replace ```htm``` with ```h``` calls in production, you can use ```babel-plugin-htm```.
