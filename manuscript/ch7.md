@@ -186,7 +186,7 @@ If your browser [doesn't support SSE](https://caniuse.com/#search=eventsource) u
 
 ## Understanding differences between init effect and subscription
 
-Looking at our subscription signature it's not much different from any short-live effect. 
+Looking at your subscription signature it's not much different from any short-live effect. 
 You could event plug the subscription into the init:
 ```javascript
 app({
@@ -201,7 +201,8 @@ The moment you need to stop listening to the event source they start to differ.
 
 ## Unsubscribing from subscriptions
 
-Subscriptions are long-lived effects you can unsubscribe from. Return the code to unsubscribe from the subscription definition.
+Subscriptions are long-lived effects you can unsubscribe from. 
+Return the code to unsubscribe in the subscription definition.
 ```javascript
 const eventSourceSubscription = (dispatch, data) => {
    return () => {
@@ -247,7 +248,7 @@ Add an action to toggle live update:
 const ToggleLiveUpdate = state => ({...state, liveUpdate: !state.liveUpdate});
 ```
 
-Add UI control for live update just below the **Add Post** button.
+Add a UI control for live update just below the **Add Post** button.
 ```javascript
     <input
       type="checkbox"
@@ -257,7 +258,7 @@ Add UI control for live update just below the **Add Post** button.
     />
     <label for="liveUpdate">Live Update</label>
 ```
-The checkbox reflects ```liveUpdate``` status. Every time the checkbox changes it toggles the status.
+This checkbox reflects the ```liveUpdate``` status. Every time the checkbox changes it toggles the status.
 Label for the input field conveniently allows for clicking **Live Update** text to change the settings.
 
 Control your subscription based on the ```liveUpdate``` status.
@@ -280,7 +281,7 @@ When ```state.liveUpdate``` is ```true``` a new subscription gets created. When 
 
 ## Exercise: fetching latest posts on toggle
 
-When the **Live Update** is off you may loose some posts. Therefore, when a user enables the update load the latest posts.
+When the **Live Update** is off you may loose some posts. Therefore, when a user enables the update, load the latest posts.
 Modify ```ToggleLiveUpdate``` to ```LoadLatestPosts``` when appropriate.
 
 <details>
