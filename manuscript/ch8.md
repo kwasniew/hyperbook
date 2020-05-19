@@ -131,8 +131,8 @@ const state = {
 * ```isSaving: true``` and empty error (request is pending)
 * ```isSaving: true``` and non-empty error (should be impossible)
 
-The last combination should be impossible. But the way we modelled our state makes it possible. 
-Of course you can write tests to verify the combination never occurs. But you can also model your state to make the impossible state impossible.
+The last combination should be impossible. But the way we modeled our state makes it possible. 
+Of course you can write some tests to verify the combination never occurs. But you can also model your state to **make the impossible state impossible**.
 
 Imagine a concept of a request status.
 The request status can be in 1 of 3 states:
@@ -144,7 +144,7 @@ In the next section you'll implement it.
 
 ## Implementing only valid states
 
-Introduce 3 valid states we defined in the modeling exercise and set the idle status as the initial one.
+Introduce 3 valid states we defined in the modeling exercise and set the ```idle``` status as the initial one.
 ```javascript
 const idle = { status: "idle" };
 const saving = { status: "saving" };
@@ -153,8 +153,10 @@ const error = {
   message: "Post cannot be saved. Please try again.",
 };
 const state = {
-  ...
-  requestStatus: idle
+  currentPostText: "",
+  posts: [],
+  liveUpdate: true,
+  requestStatus: idle,
 };
 ```
 A common strategy to scale a growing state object is to split it into smaller objects and combine them.
@@ -184,7 +186,7 @@ const PostSaved = (state) => ({ ...state, requestStatus: idle });
 const PostError = (state) => ({ ...state, requestStatus: error });
 ```
 
-Map the request status to ```errorMessage``` view fragment:
+Map request status to the ```errorMessage``` view fragment:
 ```javascript
 const errorMessage = ({ status, message }) => {
   if (status === "error") {
@@ -193,7 +195,7 @@ const errorMessage = ({ status, message }) => {
   return "";
 };
 ```
-Map the request status to the button ```disabled``` status:
+Map request status to the button ```disabled``` status:
 ```javascript
 const addPostButton = ({ status }) => html`
   <button onclick=${AddPost} disabled=${status === "saving"}>Add Post</button>
@@ -215,7 +217,7 @@ A strategy to scale growing view functions is to split them into smaller view fr
 
 ## Exercise: removing error when typing a new post
 
-Modify ```UpdatePostText``` action to remove the error when a user starts typing a new post.
+Modify the ```UpdatePostText``` action to remove the error message when a user starts typing a new post.
 
 <details>
     <summary id="cleaning_text_input">Solution</summary>
@@ -230,4 +232,4 @@ const UpdatePostText = (state, currentPostText) => ({
 
 </details>
 
-After this part revert your API url in ```SavePost``` to: https://hyperapp-api.herokuapp.com/api/post
+After this part revert your API ```url`` in ```SavePost``` to: https://hyperapp-api.herokuapp.com/api/post
