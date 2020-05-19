@@ -2,8 +2,8 @@
 
 ## Splitting view into smaller functions
 
-In the previous chapters you rendered static HTML independent of the application state. 
-The next code snippet shows how to iterate over a list of items in a view function:
+In the previous chapters you rendered static HTML with hardcoded nodes. 
+The next code snippet shows how to render a dynamic view with a list of posts.
 
 ```javascript
 import { h, app } from "./web_modules/hyperapp.js";
@@ -61,9 +61,9 @@ First, add a button just below the ```h1``` element:
 <h1>Recent Posts</h1>
 <button onclick=${AddPost}>Add Post</button>
 ```
-The ```onclick``` translates to DOM API click event. 
+The ```onclick``` attribute translates to the DOM API click events. 
 More precisely, Hyperapp translates the ```onclick``` into ```button.addEventListener('click')```. 
-Everything you know about DOM API is still relevant and transferable. 
+Everything you know about the DOM API is still relevant and transferable. 
 There's no extra framework-specific events to learn.
 
 Add the action itself. Put it between the state and view declarations:
@@ -85,7 +85,7 @@ The following figure shows the same action in a visual format:
 ![Figure: Action is a pure function of state](images/action.jpg)
 
 
-Test your app in the browser and click the "Add Post" button several times. New items should be added to the list.
+Test your app in the browser and click the **Add Post** button several times. New items should be added to the list.
 
 ![Figure: AddPost action adding new items to the list](images/add-post-action.png)
 
