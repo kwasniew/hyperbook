@@ -10,7 +10,7 @@ We can wrap them inside effects, but sometimes it's more convenient to use them 
 Our next requirement is to add unique identifiers to the posts.
 
 Put this ```guid``` function based on ```Math.random()``` into your code:
-```javascript
+```js
 const guid = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -21,7 +21,7 @@ const guid = () => {
 Don't worry about a growing size of the file. We'll solve this problem in the later chapters. 
 
 Modify the ```AddPost``` action to generate ```id``` for all new posts:
-```javascript
+```js
     const newPost = {
       id: guid(),
       username: "anonymous",
@@ -45,7 +45,7 @@ To maintain a stable list item identity between the renders add a **key** attrib
 With the extra hint from the **key** attribute Hyperapp avoids re-rendering the items that got shifted by one.
 
 Modify the ```listItem``` view function to include the ```key``` attribute:
-```javascript
+```js
 const listItem = (post) => html`
   <li key=${post.id}>
     ...
@@ -56,7 +56,7 @@ Usually the best candidate for the ```key``` value is a stable identifier (e.g. 
 Don't use post content because it may not be unique. Don't use array index as it's not stable over re-renders.
 
 Since the ```key``` attribute is not visible in the generated DOM you can also add ```data-key``` attribute for debugging purposes:
-```javascript
+```js
 const listItem = (post) => html`
   <li key=${post.id} data-key=${post.id}>
     ...
@@ -68,7 +68,7 @@ Hyperapp internally uses ```key``` and a developer uses ```data-key```.
 ## Finding runtime performance bottlenecks
 
 Switch ```LoadLatestPosts``` to fetch 1000 items when the application starts:
-```javascript
+```js
 const LoadLatestPosts = Http({
   url: "https://hyperapp-api.herokuapp.com/api/post?limit=1000",
   action: SetPosts,
@@ -104,7 +104,7 @@ up with your changes.
 You want to avoid the unnecessary computation of the post list items when typing a new post text. 
 
 Extract the ```postList``` view fragment:
-```javascript
+```js
 const postList = ({ posts }) => html`
   <ul>
     ${posts.map(listItem)}
@@ -112,18 +112,18 @@ const postList = ({ posts }) => html`
 `;
 ```
 Use it in the ```view``` function:
-```javascript
+```js
 ${postList({ posts: state.posts })}
 ```
 
 Import ```Lazy``` function from Hyperapp:
-```javascript
+```js
 import { h, app, Lazy } from "./web_modules/hyperapp.js";
 ```
 ```Lazy``` wraps view fragments that need to be optimized.
 
 Decorate ```postList``` with ```Lazy```:
-```javascript
+```js
 const lazyPostList = ({posts}) => Lazy({view: postList, posts});
 ```
 ```Lazy``` expects a ```view``` to optimize (```postList```) and other properties (```posts```) that will be passed to the ```postList```.
@@ -132,7 +132,7 @@ The optimization implemented by ```Lazy``` is  called **memoization**.
 If you call it again with the same input the ```postList``` doesn't compute anything and ```lazyPostList``` returns previously saved result.
 
 Replace ```postList``` with ```lazyPostList```:
-```javascript
+```js
 ${lazyPostList({posts: state.posts})}
 ```
 

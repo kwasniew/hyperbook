@@ -5,7 +5,7 @@
 In the previous chapters you rendered static HTML with hardcoded nodes. 
 The next code snippet shows how to render a dynamic view with a list of posts.
 
-```javascript
+```js
 import { h, app } from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
 
@@ -57,7 +57,7 @@ At the end of this section your view should look like this:
 **Actions** bring interactivity to your application. As users click buttons or type some text, you want to react to those events.
 
 First, add a button just below the ```h1``` element:
-```javascript
+```js
 <h1>Recent Posts</h1>
 <button onclick=${AddPost}>Add Post</button>
 ```
@@ -67,7 +67,7 @@ Everything you know about the DOM API is still relevant and transferable.
 There's no extra framework-specific events to learn.
 
 Add the action itself. Put it between the state and view declarations:
-```javascript
+```js
 const AddPost = (state) => {
   const newPost = { username: "anonymous", body: "fixed text" };
   return { ...state, posts: [newPost, ...state.posts] };

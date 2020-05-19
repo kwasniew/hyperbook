@@ -141,7 +141,7 @@ Hyperapp will render its content into ```<div id="app"></main>```.
 
 
 **App.js**
-```javascript
+```js
 import {h, app} from "https://unpkg.com/hyperapp?module";
 
 const state = {text: "Welcome to Hyperapp!"};
@@ -203,7 +203,7 @@ View function needs to build a Virtual DOM data structure. You have at least 3 o
 
 Currently your application uses built-in **h** function to make Virtual DOM nodes.
 Change your view function to wrap the text in a ```span``` element:
-```javascript
+```js
 state => h("h1", {id: "my-header"}, [h("span", {}, state.text)])
 ```
 Check the generated HTML:
@@ -249,7 +249,7 @@ Note: Hyperapp is dropping support for ```JSX``` soon.
 If you want to replace ```htm``` with ```h``` calls in production, you can use ```babel-plugin-htm```.
 
 Change you **App.js** code to use ```htm```:
-```javascript
+```js
 import {h, app} from "https://unpkg.com/hyperapp?module";
 import htm from 'https://unpkg.com/htm?module';
 
@@ -266,7 +266,7 @@ app({
 ```htm``` connects to Hyperapp via ```bind``` function. Write your HTML inside ```html``` tagged template. Under the hood ```htm``` translates everything to the low-level ```h``` function calls.
 
 ```htm``` works with any Virtual DOM framework matching the signature:
-```javascript
+```js
 function buildVirtualNode(type, props, ...children) {}
 ```
 ```h``` function happens to match the signature.
@@ -302,14 +302,14 @@ On quick inspection of **node_modules** you'll find no transitive dependencies. 
 to the party.
 
 You can try to reference npm dependencies from **App.js**:
-```javascript
+```js
 import {h, app} from "hyperapp";
 import htm from "htm";
 ```
 But unfortunately browsers can't resolve those dependencies.
 
 Since both ```hyperapp``` and ```htm``` are zero-dependency libraries you can load them from **node_modules**:
-```javascript
+```js
 import {h, app} from "../node_modules/hyperapp/src/index.js";
 import htm from "../node_modules/htm/dist/htm.mjs";
 ```
@@ -385,7 +385,7 @@ With the ```--write``` option it will re-write the formatted files in place.
 
 
 Copy this malformed code to **App.js**:
-```javascript
+```js
 import { h, app } from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
 
@@ -435,7 +435,7 @@ In the next section we're back to your app.
 In the previous section you rendered static HTML independent of the application state. 
 The next code snippet shows how to iterate over a list of items in a view function:
 
-```javascript
+```js
 import { h, app } from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
 
@@ -491,7 +491,7 @@ At the end of this section your view should look like this:
 **Actions** bring interactivity to your application. As users click buttons or type some text, you want to react to those events.
 
 First, add a button just below the ```h1``` element:
-```javascript
+```js
 <h1>Recent Posts</h1>
 <button onclick=${AddPost}>Add Post</button>
 ```
@@ -501,7 +501,7 @@ Everything you know about DOM API is still relevant and transferable.
 There's no extra framework-specific events to learn.
 
 Add the action itself. Put it between the state and view declarations:
-```javascript
+```js
 const AddPost = (state) => {
   const newPost = { username: "anonymous", body: "fixed text" };
   return { ...state, posts: [newPost, ...state.posts] };
@@ -564,7 +564,7 @@ Therefore, cognitive overhead from unnecessary language features is minimal.
 You already implemented a button click action. It always adds a post with the same text. 
 
 Add an input field to change the text:
-```javascript
+```js
 <h1>Recent Posts</h1>
 <input type="text" autofocus />
 <button onclick=${AddPost}>Add Post</button>
@@ -577,14 +577,14 @@ View reacting to state changes, and state changes reacting to view actions.
 To make this work, you need some part of your state to model the contents of the input field. 
 
 Create a new state property named ```currentPostText```:
-```javascript
+```js
 const state = {
   currentPostText: "type your text",
   posts: [...]
 };
 ```
 Read the new property in your view:
-```javascript
+```js
 <input type="text" value=${state.currentPostText} autofocus />
 ```
 DOM attribute called ```value``` sets the text of the input field to the ```currentPostText```.
@@ -594,12 +594,12 @@ DOM attribute called ```value``` sets the text of the input field to the ```curr
 Input text reflects ```currentPostText``` from the state object. You want to close the circle with DOM events changing the state.
 
 Add DOM ```oninput``` attribute to trigger ```UpdatePostText``` action on input changes:
-```javascript
+```js
 <input type="text" oninput=${UpdatePostText} value=${state.currentPostText} autofocus />
 ```
 
 Add a new action next to the ```AddPost``` action:
-```javascript
+```js
 const UpdatePostText = (state, event) => ({
     ...state,
     currentPostText: event.target.value
@@ -625,7 +625,7 @@ The following figure shows updated conceptual model of Hyperapp actions with an 
 
 Try to add a new post with some text. It should still not work. You need to copy the ```currentPostText``` to the newly added post.
 
-```javascript
+```js
 const AddPost = (state) => {
   const newPost = { username: "anonymous", body: state.currentPostText };
   return { ...state, posts: [newPost, ...state.posts] };
@@ -643,7 +643,7 @@ With this change, you can start adding custom messages to the list.
 ## Extracting repetitive event data
 
 All event based actions will follow similar pattern:
-```javascript
+```js
 (oldState, event) => {
     const userData = event.target.value;
     ....
@@ -652,13 +652,13 @@ All event based actions will follow similar pattern:
 Action code would be cleaner if it didn't know about DOM Event API.
 
 Create a **selector function** to extract part of the event you care about:
-```javascript
+```js
 const targetValue = event => event.target.value;
 ```
 Eventually, you'll move this code to a library but for now put it somewhere above your view declarations.
 
 Switch ```UpdatePostTest``` to use the new function:
-```javascript
+```js
 const UpdatePostText = (state, event) => ({
     ...state,
     currentPostText: targetValue(event)
@@ -667,21 +667,21 @@ const UpdatePostText = (state, event) => ({
 The code is still dependent on the ```targetValue``` function.
 
 Ideally, you'd like the action to accept only the data it needs:
-```javascript
+```js
 const UpdatePostText = (state, currentPostText) => ({
     ...state,
     currentPostText
 });
 ```
 Shape the second argument of your action inside the input handler. 
-```javascript
+```js
 <input type="text" oninput=${[UpdatePostText, targetValue]} value=${state.currentPostText} autofocus />
 ```
 A two argument array with an action and a selector applies the event selector before the action is invoked. 
 In our case ```targetValue``` is applied to DOM event before invoking ```UpdatePostText```.
 
 If you keep using the ```[action, selector]``` array over and over, consider creating an alias:
-```javascript
+```js
 const UpdatePostTestAction = [UpdatePostText, targetValue];
 ```
 As you don't have a second usage of this pattern yet, withhold this decision for now. 
@@ -700,7 +700,7 @@ But first, try to do it on your own.
 <details>
     <summary id="cleaning_text_input">Solution</summary>
 
-```javascript
+```js
 const AddPost = (state) => {
   const newPost = { username: "anonymous", body: state.currentPostText };
   return { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
@@ -717,7 +717,7 @@ Application should ignore **Add Post** clicks when the text is empty.
 <details>
     <summary id="checking_empty_input">Solution</summary>
 
-```javascript
+```js
 const AddPost = (state) => {
   if(state.currentPostText.trim()) {
       const newPost = { username: "anonymous", body: state.currentPostText };
@@ -737,7 +737,7 @@ However in real-world scenarios your application will probably have to deal with
 A common functional approach to side-effects is to move them to the edges of the system. 
 
 Imagine the following hypothetical code you could write:
-```javascript
+```js
 const SetPosts = (state, posts) => ({
   ...state,
   posts
@@ -750,7 +750,7 @@ Since ```fetch``` causes side effects (going over the wire with HTTP) it makes y
 It only takes one innocent ```fetch``` call to make the code impure.
 
 Another thought experiment is to represent the effect as a data structure:
-```javascript
+```js
 const SetPosts = (state, posts) => ({
   ...state,
   posts
@@ -777,7 +777,7 @@ But how should Hyperapp know how to interpret this object?
 There's no way it can possibly translate arbitrary JS objects to every single side-effect you can imagine. 
 That's why it doesn't even try. Instead, you must pass side-effect definition and the effect data as a two-argument array.
 
-```javascript
+```js
 const LoadLatestPosts = [effectDefinition, {
   url: "https://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
@@ -785,7 +785,7 @@ const LoadLatestPosts = [effectDefinition, {
 ```
 
 Side-effects in Hyperapp are made of effect definition and effect data:
-```javascript
+```js
 [effectDefinition, data]
 ```
 
@@ -804,7 +804,7 @@ In this section you'll use an open source library [hyperapp-fx](https://github.c
 In the next section we'll peek under the hood and build your own effects.
 
 In **App.js** add ```LoadLatestPosts``` effect that invokes ```SetPost``` action on successful response:
-```javascript
+```js
 import { Http } from "./web_modules/hyperapp-fx.js";
 
 const SetPosts = (state, posts) => ({
@@ -837,7 +837,7 @@ Add ```hyperapp-fx``` and let Snowpack bundle it for the browser:
 With HTTP effect defined you must decide when to invoke it. For now, you'll do it on application startup to start fetching posts early.
 
 Modify ```init``` to invoke ```LoadLatestPosts```:
-```javascript
+```js
 app({
   init: [state, LoadLatestPosts],
   ...  
@@ -856,7 +856,7 @@ You may observe a content flip as Hyperapp replaces initial state with the serve
 </figure>
 
 If everything works fine, replace the initial posts with an empty array:
-```javascript
+```js
 const state = {
   posts: []
 };
@@ -869,21 +869,21 @@ Most of the time you don't need to write your own effects. However, to better un
 ```Http``` effect yourself.
 
 Comment out this line of code:
-```javascript
+```js
 // import { Http } from "./web_modules/hyperapp-fx.js";
 ```
 
 Your own implementation of the effect should build an array with the effect definition and effect data.
-```javascript
+```js
 const Http = data => [httpEffect, data];
 ```
 Hyperapp expects two-parameter signature in the effect definition:
-```javascript
+```js
 const httpEffect = (dispatch, data) => {};
 ```
 
 A simple implementation of the HTTP effect may look like this:
-```javascript
+```js
 const httpEffect = (dispatch, data) => {
   return fetch(data.url)
       .then(response => response.json())
@@ -894,7 +894,7 @@ As an effect library author you translate the side-effectful API call (e.g. ```f
 Hyperapp will invoke this effect and inject a ```dispatch``` function. You will never call it directly in the application code.
 
 Our original post-fetch action definition looked like this:
-```javascript
+```js
 const SetPosts = (state, posts) => ({
   ...state,
   posts
@@ -906,7 +906,7 @@ The first parameter will be a regular state object that we used before.
 Test your own implementation of the Http effect. 
 If everything works, uncomment the original ```Http``` effect from the library and delete your implementation.
 
-```javascript
+```js
 import { Http } from "./web_modules/hyperapp-fx.js";
 ```
 
@@ -915,7 +915,7 @@ import { Http } from "./web_modules/hyperapp-fx.js";
 ```LoadLatestPosts``` alias for the ```Http``` effect is invoked on application startup. What if we wanted to trigger ```Http``` effects from regular actions?
 
 Create ```SavePost``` effect:
-```javascript
+```js
 const SavePost = (post) =>
   Http({
     url: "https://hyperapp-api.herokuapp.com/api/post",
@@ -932,7 +932,7 @@ const SavePost = (post) =>
 This effect wraps HTTP POST. The action to be triggered on successful response is not doing anything yet.
 
 To trigger this effect from an action use the following signature: 
-```javascript
+```js
 const EffectfulAction = oldState => [newState, Effect];
 ```
 This is how you create **effecftul actions**.
@@ -941,11 +941,11 @@ Hyperapp applies the new state and schedules the effect almost instantly.
 The return action inside the effect will trigger eventually e.g. when the HTTP response arrives.
 
 If you have more than one effect wrap them in an array:
-```javascript
+```js
 const EffectfulAction = oldState => [newState, [Effect1, Effect2]];
 ```
 Or pass directly comma-separated at the end of the main array:
-```javascript
+```js
 const EffectfulAction = oldState => [newState, Effect1, Effect2];
 ```
 
@@ -962,7 +962,7 @@ Use network tab to verify if the request is sent:
 <details>
     <summary id="making_effectful_action">Solution</summary>
 
-```javascript
+```js
 const AddPost = state => {
   if (state.currentPostText.trim()) {
     const newPost = { username: "anonymous", body: state.currentPostText };
@@ -1000,13 +1000,13 @@ Note: I'll refer to short-live effects as just effects and to long-lived effects
 In this section you will subscribe to the WebSocket stream with post updates.
 
 Import subscription definition:
-```javascript
+```js
 import { Http, WebSocketListen } from "./web_modules/hyperapp-fx.js";
 ```
 ```hyperapp-fx``` uses ```*Listen``` convention to name subscription creating functions.
 
 Write an action for handling incoming WebSocket events:
-```javascript
+```js
 const SetPost = (state, event) => {
   try {
     const post = JSON.parse(event.data);
@@ -1023,7 +1023,7 @@ The event is the underlying ```MessageEvent``` from the WebSocket API. You parse
 If the data is a valid JSON post, you add it to the beginning of the post list. In case of a parsing error you don't change the state of the application.
 
 Plug the subscription and the action into the application:
-```javascript
+```js
 app({
   init: [state, LoadLatestPosts],
   view,
@@ -1078,7 +1078,7 @@ Modify ```AddPost``` action and stop adding ```newPost``` until we receive a con
     <summary id="avoiding_duplicate_posts">Solution</summary>
 
 Inside ```AddPost``` action change this line:
-```javascript
+```js
     const newState = {
       ...state,
       currentPostText: "",
@@ -1086,7 +1086,7 @@ Inside ```AddPost``` action change this line:
     };
 ```
 To this:
-```javascript
+```js
     const newState = {
       ...state,
       currentPostText: ""
@@ -1103,24 +1103,24 @@ Server-Sent Events (SSE) is a lesser known, but much simpler HTTP-native alterna
 SSE also handles network failures more gracefully than plain WebSockets. It can automatically reconnect on failed connections.
 
 In [Writing your own effects](#writing-your-own-effects) section you defined effects as follows:
-```javascript
+```js
 const httpEffect = (dispatch, data) => {};
 ```
 
 Start with the same signature for the subscription definition:
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {};
 ```
 
 The Web API for SSE is called the ```EventSource```:
-```javascript
+```js
 const es = new EventSource("https://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
 ```
 ```EventSource``` is a regular event emitter similar e.g. to a clickable button.
 
 Wrap the API into your subscription definition:
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {
   const es = new EventSource(data.url);
   es.addEventListener("message", (event) => dispatch(data.action, event));
@@ -1130,17 +1130,17 @@ const eventSourceSubscription = (dispatch, data) => {
 We follow the same convention that was used in WebSockets implementation. When SSE notification arrives, dispatch an ```action``` and pass the server ```event```.
 
 In [Writing your own effects](#writing-your-own-effects) section you used the following effect signature:
-```javascript
+```js
 const Http = data => [httpEffect, data];
 ```
 
 Following the same convention create your own subscription:
-```javascript
+```js
 const EventSourceListen = data => [eventSourceSubscription, data];
 ```
 
 Plug the subscription into your application:
-```javascript
+```js
 app({
   init: [state, LoadLatestPosts],
   view,
@@ -1184,7 +1184,7 @@ If your browser [doesn't support SSE](https://caniuse.com/#search=eventsource) u
 
 Looking at our subscription signature it's not much different from any short-live effect. 
 You could event plug the subscription into the init:
-```javascript
+```js
 app({
     init: [state, [LoadLatestPosts, EventSourceListen({action: SetPost, url: 'https://hyperapp-api.herokuapp.com/api/event/post'})]],
     ...
@@ -1198,7 +1198,7 @@ The moment you need to stop listening to the event source they start to differ.
 ## Unsubscribing from subscriptions
 
 Subscriptions are long-lived effects you can unsubscribe from. Return the code to unsubscribe from the subscription definition.
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {
    return () => {
       // unsubscribe here
@@ -1207,7 +1207,7 @@ const eventSourceSubscription = (dispatch, data) => {
 ```
 
 Fill in this template with your ```EventSource``` implementation:
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {
   const es = new EventSource(data.url);
   const listener = (event) => dispatch(data.action, event);
@@ -1233,7 +1233,7 @@ You will add a capability to enable/disable live updates through the UI as shown
 </figure>
 
 Introduce intial state field called ```liveUpdate```:
-```javascript
+```js
 const state = {
   currentPostText: "",
   posts: [],
@@ -1243,12 +1243,12 @@ const state = {
 By default **Live Update** will be enabled.
 
 Add an action to toggle live update:
-```javascript
+```js
 const ToggleLiveUpdate = state => ({...state, liveUpdate: !state.liveUpdate});
 ```
 
 Add UI control for live update just below the **Add Post** button.
-```javascript
+```js
     <input
       type="checkbox"
       id="liveUpdate"
@@ -1261,7 +1261,7 @@ The checkbox reflects ```liveUpdate``` status. Every time the checkbox changes i
 Label for the input field conveniently allows for clicking **Live Update** text to change the settings.
 
 Control your subscription based on the ```liveUpdate``` status.
-```javascript
+```js
 app({
   init: [state, LoadLatestPosts],
   view,
@@ -1286,7 +1286,7 @@ Modify ```ToggleLiveUpdate``` to ```LoadLatestPosts``` when appropriate.
 <details>
     <summary id="fetching_posts_on_toggle">Solution</summary>
 
-```javascript
+```js
 const ToggleLiveUpdate = (state) => {
   const newState = {
     ...state,
@@ -1301,7 +1301,7 @@ const ToggleLiveUpdate = (state) => {
 ## Handling slow API
 
 Switch ```SavePost``` to a new url with the slow API.
-```javascript
+```js
 const SavePost = (post) =>
   Http({
     url: "https://hyperapp-api.herokuapp.com/slow-api/post",
@@ -1313,7 +1313,7 @@ While waiting for the response you can send more requests without getting confir
 Assume you have a requirement to disable the **Add Post** button while the post is saving.
 
 Enhance initial state with the ```isSaving``` property.
-```javascript
+```js
 const state = {
   currentPostText: "",
   posts: [],
@@ -1323,13 +1323,13 @@ const state = {
 ```
 
 Map the property to the button ```disable``` property:
-```javascript
+```js
 <button onclick=${AddPost} disabled=${state.isSaving}>Add Post</button>
 ```
 The button reflects the current state of the saving operation.
 
 ```AddPost``` action disables the button:
-```javascript
+```js
 const AddPost = (state) => {
     ...
     const newState = {
@@ -1343,7 +1343,7 @@ const AddPost = (state) => {
 
 ```SavePost``` effectful action enables the button on a successful response.
 It invokes a newly created ```PostSaved``` action:
-```javascript
+```js
 const PostSaved = (state) => ({ ...state, isSaving: false });
 
 const SavePost = (post) =>
@@ -1364,7 +1364,7 @@ Test your disable button capability.
 ## Handling API errors
 
 Switch ```SavePost``` to a new url with API returning error responses.
-```javascript
+```js
 const SavePost = (post) =>
   Http({
     url: "https://hyperapp-api.herokuapp.com/error-api/post",
@@ -1374,7 +1374,7 @@ const SavePost = (post) =>
 The new API is not only slow, but also returns 500 errors.
 
 Enhance initial state with the ```error``` property:
-```javascript
+```js
 const state = {
   currentPostText: "",
   posts: [],
@@ -1386,14 +1386,14 @@ const state = {
 Eventually you will populate this field with an error value.
 
 Expose the ```error``` in the UI:
-```javascript
+```js
 <div>${state.error}</div>
 <button onclick=${AddPost} disabled="${state.isSaving}">Add Post</button>
 ```
 You should put the error just above the **Add Post** button.
 
 Add ```PostError``` action that will be triggered on HTTP errors. 
-```javascript
+```js
 const PostSaved = state => ({...state, isSaving: false});
 const PostError = state => ({...state, isSaving: false, error: "Post cannot be saved. Please try again."});
 
@@ -1424,7 +1424,7 @@ You can change ```SetPost``` action to remove the error message, but in the next
 ## Modeling only valid states
 
 Take a look at the last 2 fields you added to the state:
-```javascript
+```js
 const state = {
   ...
   isSaving: false,
@@ -1452,7 +1452,7 @@ In the next section you'll implement it.
 ## Implementing only valid states
 
 Introduce 3 valid states we defined in the modeling exercise and set the idle status as the initial one.
-```javascript
+```js
 const idle = { status: "idle" };
 const saving = { status: "saving" };
 const error = {
@@ -1469,7 +1469,7 @@ A common strategy to scale a growing state object is to split it into smaller ob
 Find all the places where you were setting ```isSaving``` and ```error``` properties and replace them with ```requestStatus```. 
 
 ```AddPost``` sets the status to ```saving```:
-```javascript
+```js
 const AddPost = (state) => {
     ...
     const newState = {
@@ -1482,17 +1482,17 @@ const AddPost = (state) => {
 ```
 
 ```PostSaved``` sets the status to ```idle```:
-```javascript
+```js
 const PostSaved = (state) => ({ ...state, requestStatus: idle });
 ```
 
 ```PostError``` sets the status to ```error```:
-```javascript
+```js
 const PostError = (state) => ({ ...state, requestStatus: error });
 ```
 
 Map the request status to ```errorMessage``` view fragment:
-```javascript
+```js
 const errorMessage = ({ status, message }) => {
   if (status === "error") {
     return html` <div>${message}</div> `;
@@ -1501,20 +1501,20 @@ const errorMessage = ({ status, message }) => {
 };
 ```
 Map the request status to the button ```disabled``` status:
-```javascript
+```js
 const addPostButton = ({ status }) => html`
   <button onclick=${AddPost} disabled=${status === "saving"}>Add Post</button>
 `;
 ```
 
 Delete those two lines:
-```javascript
+```js
 <div>${state.error}</div>
 <button onclick=${AddPost} disabled=${state.isSaving}>Add Post</button>
 ```
 
 And replace them with your new view fragments:
-```javascript
+```js
 ${errorMessage(state.requestStatus)}
 ${addPostButton(state.requestStatus)}
 ```
@@ -1527,7 +1527,7 @@ Modify ```UpdatePostText``` action to remove the error when a user starts typing
 <details>
     <summary id="cleaning_text_input">Solution</summary>
 
-```javascript
+```js
 const UpdatePostText = (state, currentPostText) => ({
   ...state,
   currentPostText,
@@ -1549,7 +1549,7 @@ We can wrap them inside effects, but sometimes it's more convenient to use them 
 Our next requirement is to add unique identifiers to the posts.
 
 Put this ```guid``` function based on ```Math.random()``` into your code:
-```javascript
+```js
 const guid = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -1559,7 +1559,7 @@ const guid = () => {
 ```
 
 Modify ```AddPost``` action to generate ```id``` for all new posts:
-```javascript
+```js
     const newPost = {
       id: guid(),
       username: "anonymous",
@@ -1591,7 +1591,7 @@ To maintain a stable list item identity between the renders add a **key** attrib
 With the extra hint from the **key** attribute Hyperapp avoids re-rendering the items that got shifted by one.
 
 Modify ```listItem``` view function to include the ```key``` attribute:
-```javascript
+```js
 const listItem = (post) => html`
   <li key=${post.id}>
     ...
@@ -1602,7 +1602,7 @@ Usually the best candidate for the ```key``` value is a stable identifier (e.g. 
 Don't use post content because it may not be unique. Don't use array index as it's not stable over re-renders.
 
 Since ```key``` attribute is not visible in the generated DOM you can also add ```data-key``` attribute for debugging purposes:
-```javascript
+```js
 const listItem = (post) => html`
   <li key=${post.id} data-key=${post.id}>
     ...
@@ -1614,7 +1614,7 @@ Hyperapp internally uses ```key``` and a developer uses ```data-key```.
 ## Finding runtime performance bottlenecks
 
 Switch ```LoadLatestPosts``` to fetch 1000 items when the application starts:
-```javascript
+```js
 const LoadLatestPosts = Http({
   url: "https://hyperapp-api.herokuapp.com/api/post?limit=1000",
   action: SetPosts,
@@ -1662,7 +1662,7 @@ up with your changes.
 You want to avoid the unnecessary computation of the post list items when typing a new post text. 
 
 Extract ```postList``` view fragment:
-```javascript
+```js
 const postList = ({ posts }) => html`
   <ul>
     ${posts.map(listItem)}
@@ -1670,18 +1670,18 @@ const postList = ({ posts }) => html`
 `;
 ```
 Use it in the ```view``` function:
-```javascript
+```js
 {postList({ posts: state.posts })}
 ```
 
 Import ```Lazy``` function from Hyperapp:
-```javascript
+```js
 import { h, app, Lazy } from "./web_modules/hyperapp.js";
 ```
 ```Lazy``` wraps view fragments that need to be optimized.
 
 Decorate ```postList``` with ```Lazy```:
-```javascript
+```js
 const lazyPostList = ({posts}) => Lazy({view: postList, posts});
 ```
 ```Lazy``` expects a ```view``` to optimize (```postList```) and other properties (```posts```) that will be passed to the ```postList```.
@@ -1690,7 +1690,7 @@ The optimization implemented by ```Lazy``` is  called **memoization**.
 If you call it again with the same input the ```postList``` doesn't compute anything and ```lazyPostList``` returns previously saved result.
 
 Replace ```postList``` with ```lazyPostList```:
-```javascript
+```js
 ${lazyPostList({posts: state.posts})}
 ```
 
@@ -1751,7 +1751,7 @@ In terms of testability functional core allows for simple output-based unit test
 To make the code easier to test separate the ```app``` call from the application building blocks: state, view, actions and subscriptions.
 
 **App.js** should setup Hyperapp:
-```javascript
+```js
 import { app } from "./web_modules/hyperapp.js";
 import {init, view, subscriptions} from "./Posts.js";
 
@@ -1764,7 +1764,7 @@ app({
 ```
 
 **Posts.js** should export application building blocks for **App.js**:
-```javascript
+```js
 export const view = (state) => html`
     ...
 `;
@@ -1820,7 +1820,7 @@ This code:
 * runs ```mocha```
 
 Write your first test in **test/PostsTest.js**:
-```javascript
+```js
 import assert from "assert";
 import { UpdatePostText } from "../src/Posts.js";
 
@@ -1858,7 +1858,7 @@ Run the test:
 The test runner should report that ```UpdatePostText``` is not exported.
 
 Add ```export``` keyword:
-```javascript
+```js
 export const UpdatePostText = (state, currentPostText) => ({
   ...state,
   currentPostText,
@@ -1876,7 +1876,7 @@ Write a unit test verifying ```UpdatePostText``` resets error request status to 
 <details>
     <summary id="testing_actions">Solution</summary>
 
-```javascript
+```js
   it("post status is reset to idle", () => {
     const initState = {
       currentPostText: "",
@@ -1899,14 +1899,14 @@ Write a unit test verifying ```UpdatePostText``` resets error request status to 
 ```AddPost``` action is difficult to unit test because it relies on ```Math.random()``` for guid generation. 
 
 More testable version would take ```id``` as an input parameter:
-```javascript
+```js
 const AddPost = (state, id) => {
   ...
 };
 ```
 
 Find usage of```AddPost``` and replace it with:
-```javascript
+```js
 const addPostButton = ({ status }) => html`
   <button onclick=${WithGuid(AddPost)} disabled=${status === "saving"}>
     Add Post
@@ -1916,7 +1916,7 @@ const addPostButton = ({ status }) => html`
 ```WithGuid``` doesn't exist yet. You're only sketching ideal future API in code.
 
 ```WithGuid``` should tell Hyperapp to generate a new id and pass it to a testable action:
-```javascript
+```js
 const WithGuid = (action) => (state) => [state, Guid(action)];
 const Guid = (action) => [
   (dispatch, action) => {
@@ -1932,7 +1932,7 @@ However the ```Guid``` effect is simple and it only accepts the action to invoke
 ## Testing effectful action
 
 Test ```AddPost``` action.
-```javascript
+```js
   it("add post", () => {
     const initState = {
       currentPostText: "text",
@@ -1962,7 +1962,7 @@ For the effect part ignore ```savePostEffect``` as it's only for the framework.
 On the other hand you can verify if effect got correct data. In our case we only check the ```url```. 
 
 To emphasize that you don't verify the effect definition, name it with ```_``` or leave a blank in the destructured array.
-```javascript
+```js
 const [newState, [_, savePostData]] = AddPost(initState, "1234");
 const [newState, [, savePostData]] = AddPost(initState, "1234");
 ```
@@ -1973,7 +1973,7 @@ Before you start testing effects and subscriptions separate them from the rest o
 Create **src/lib** directory and move SSE and guid related code there. Remember to export appropriate functions.
 
 **src/lib/EventSource.js**
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {
   const es = new EventSource(data.url);
   const listener = (event) => dispatch(data.action, event);
@@ -1988,7 +1988,7 @@ export const EventSourceListen = (data) => [eventSourceSubscription, data];
 ```
 
 **src/lib/Guid.js**
-```javascript
+```js
 const guid = () => {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
@@ -2007,7 +2007,7 @@ export const WithGuid = (action) => (state) => [state, Guid(action)];
 ```
 
 In **Posts.js** you should have those imports:
-```javascript
+```js
 import { EventSourceListen } from "./lib/EventSource.js";
 import { WithGuid } from "./lib/Guid.js";
 ```
@@ -2017,7 +2017,7 @@ import { WithGuid } from "./lib/Guid.js";
 Effects and subscriptions live at the edges of the system and interact with global APIs outside of your control e.g. DOM API or Fetch API. 
 Therefore, effects and subscriptions are more difficult to unit test. It's usually a job of the effect library author.
 
-```javascript
+```js
 import assert from "assert";
 import { EventSourceListen } from "../src/lib/EventSource.js";
 
@@ -2097,7 +2097,7 @@ As a bonus exercise verify if connection was closed.
 <details>
     <summary id="testing_effects">Solution</summary>
 
-```javascript
+```js
   it("ignores events emitted after unsubscribe", () => {
     const { emit, isClosed } = givenEventSource("http://example.com");
     const { dispatch, unsubscribe } = runFx(
@@ -2188,7 +2188,7 @@ We load the scripts from unpkg.com. In real world setup you'd rather load them l
 You app will mount to ```<div id="app"></div>```.
 
 Write a test in **test/App.test.js**:
-```javascript
+```js
 const { assert } = chai;
 const { getAllByTestId, waitFor } = TestingLibraryDom;
 import { start } from "../src/App.js";
@@ -2221,7 +2221,7 @@ Inside a test, start a new instance of the app. Then wait for the 10 items to sh
 * mocha times out
 
 Change **src/App.js**:
-```javascript
+```js
 import { app } from "./web_modules/hyperapp.js";
 import { init, view, subscriptions } from "./Posts.js";
 
@@ -2236,7 +2236,7 @@ export const start = () =>
 It defers app intialization so that it can be started anew in each test.
 
 Add **src/Start.js**:
-```javascript
+```js
 import { start } from "./App.js";
 
 start();
@@ -2247,7 +2247,7 @@ Refer to this file from **src/index.html**:
 ```
 
 Add the test data attribute to the ```listItem``` view fragment in **src/Posts.js**:
-```javascript
+```js
 const listItem = (post) => html`
   <li key=${post.id} data-key=${post.id} data-testid="item">
     ...
@@ -2268,7 +2268,7 @@ Open http://localhost:8080/test/ in your browser. The test should be green.
 ## Testing more advanced browser scenario
 
 Add a test for the post submission and waiting for the SSE notification:
-```javascript
+```js
 const {
   getAllByTestId,
   waitFor,
@@ -2316,7 +2316,7 @@ that wait for DOM elements to appear in the UI.
 * wait for the message to show up at the top of the post list 
 
 Put a test data attribute in **Posts.js**:
-```javascript
+```js
     <input
       data-testid="post-input"
       type="text"
@@ -2338,7 +2338,7 @@ Afterwards it can replay the traffic much faster than the original API. When the
 * inject fake implementation of all effects and subscriptions you want to replace. 
 The trick is to move all effects and subscriptions to the entry point of your application.
 In production you can start your app with real effects/subscriptions:
-```javascript
+```js
 import { start } from "./App.js";
 import { Http } from "./web_modules/hyperapp-fx.js";
 import { EventSourceListen } from "./lib/EventSource.js";
@@ -2380,7 +2380,7 @@ Most JS routers:
 Before you build a new page extract code for binding ```htm``` to ```h```.
 
 Create **src/Html.js**:
-```javascript
+```js
 import { h } from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
 
@@ -2388,7 +2388,7 @@ export const html = htm.bind(h);
 ```
 
 Use the ```html``` template literal in **src/Posts.js**:
-```javascript
+```js
 import { app, Lazy } from "./web_modules/hyperapp.js";
 import {html} from "./Html.js";
 
@@ -2401,7 +2401,7 @@ import {html} from "./Html.js";
 In this section you'll add a global layout with shared navigation.
 
 First write our ideal signature for the layout decorator in **src/App.js**:
-```javascript
+```js
   app({
     view: layout(view),
   });
@@ -2409,12 +2409,12 @@ First write our ideal signature for the layout decorator in **src/App.js**:
 ```layout``` should wrap the original view function and return a new function with a state parameter.
 
 Create **src/Layout.js** with a function matching this specification.
-```javascript
+```js
 export const layout = (view) => (state) => html``;
 ```
 
 Fill in the gaps:
-```javascript
+```js
 import { html } from "./Html.js";
 
 const nav = html`
@@ -2444,7 +2444,7 @@ Then it delegates main content rendering to the ```view``` function.
 
 
 Import the layout in **src/App.js** and test your app:
-```javascript
+```js
 import { layout } from "./Layout.js";
 ```
 
@@ -2478,7 +2478,7 @@ To explore server-side routing create a second HTML page **src/login.html**.
 This is almost the same HTML you wrote for the main page. The only difference is a JS file name.
 
 Create **src/Login.js**:
-```javascript
+```js
 import { app } from "./web_modules/hyperapp.js";
 import { layout } from "./Layout.js";
 import { html } from "./Html.js";
@@ -2542,7 +2542,7 @@ When the user submits a new post use her actual username instead of "anonymous".
 </figure>
 
 To make it easier here's a starter code for reading from storage:
-```javascript
+```js
 import {ReadFromStorage} from "./web_modules/hyperapp-fx.js";
 
 const ReadLogin = ReadFromStorage({key: "hyperposts", action: ({value}) => ...})
@@ -2551,7 +2551,7 @@ const ReadLogin = ReadFromStorage({key: "hyperposts", action: ({value}) => ...})
 <details>
     <summary id="reading_local_storage">Solution</summary>
 
-```javascript
+```js
 import { ReadFromStorage } from "./web_modules/hyperapp-fx.js";
 
 export const state = {
@@ -2593,7 +2593,7 @@ Hints:
 <details>
     <summary id="logged_in_posts">Solution</summary>
 
-```javascript
+```js
   beforeEach(function () {
     container().innerHTML = "";
     localStorage.removeItem("hyperposts");
@@ -2625,7 +2625,7 @@ Display current username in the application header as shown in the following fig
 <details>
     <summary id="displaying_username_in_header">Solution</summary>
 
-```javascript
+```js
 export const layout = (view) => (state) => html`
   <div>
     <header>
@@ -2655,7 +2655,7 @@ With client-side routing you need to track a current page and react to navigatio
 First, expose init action for each of your pages:
 
 **src/Posts.js**
-```javascript
+```js
 export const InitPage = (_, params) => [
   { location: params.location, ...state },
   [LoadLatestPosts, ReadUsername],
@@ -2668,14 +2668,14 @@ You expose a way for the router to inject the current location into the current 
 * fires all init effects for the posts page
 
 Do the same thing in **src/Login.js**:
-```javascript
+```js
 export const InitPage = (_, { location }) => ({ location, ...state });
 ```
 There's not effects to trigger on this page. 
 Make sure to remove the ```app()``` call. You'll moving towards one centralized app setup in the next section.
 
 Finally export the ```view``` from **Login.js**:
-```javascript
+```js
 export const view = (state) => html`
     ...
 `;
@@ -2684,7 +2684,7 @@ export const view = (state) => html`
 ## Setting up the main app
 
 Setup you Single-Page Application in **App.js**:
-```javascript
+```js
 import { app } from "./web_modules/hyperapp.js";
 import {
   view as postsView,
@@ -2731,7 +2731,7 @@ Add ```page.js``` to ```package.json```:
 ```
 
 Looking at ```page.js``` documentation I came up with the following API calls:
-```javascript
+```js
 import page from "./web_modules/page.js";
 
 page("/", fn); // register a route and call fn when a user navigates to the url
@@ -2747,7 +2747,7 @@ Install ```page.js``` and let ```snowpack``` adjust it to the browser environmen
 When wrapping 3rd party libraries you normally put them inside subscriptions or effects.
 
 Create **src/Router.js** with a subscription wrapping ```page.js```:
-```javascript
+```js
 import page from "./web_modules/page.js";
 
 const routeSubscription = (dispatch, data) => {
@@ -2770,7 +2770,7 @@ Start the router when the subscription is created. Stop the router when subscrip
 ## Mapping 3rd party calls to Hyperapp actions
 
 Fill in the page URL change handlers with dispatch calls.
-```javascript
+```js
 import page from "./web_modules/page.js";
 import { InitPage as InitLoginPage } from "./Login.js";
 import { InitPage as InitPostsPage } from "./Posts.js";
@@ -2802,7 +2802,7 @@ This code depends on application specific actions and can be more generic. That'
 ## Driving router design from the outside
 
 Start from **App.js** where you'll use the router.
-```javascript
+```js
 import { app } from "./web_modules/hyperapp.js";
 import {
   InitPage as InitPosts,
@@ -2837,7 +2837,7 @@ export const start = () =>
 Our hypothetical ```RouteListen``` subscription should be configured with ```pageInitActions``` to invoke on page transitions.
 
 From the previous usage we can create the following **Router.js** implementation:
-```javascript
+```js
 import page from "./web_modules/page.js";
 
 const routeSubscription = (dispatch, data) => {
@@ -2876,7 +2876,7 @@ Therefore, you need to create a custom action for the form submission. You'll do
 You can wrap 3rd party libraries not only into subscriptions, but also into one-off effects and effectful actions.
 
 Add the ```Navigate``` action to **Router.js**:
-```javascript
+```js
 const navigateEffect = (location) => [
   (_, location) => {
     page(location);
@@ -2891,7 +2891,7 @@ export const Navigate = (location) => (state) => [
 ```page(location)``` navigates to a given URL. 
 
 Use the action in **Login.js**:
-```javascript
+```js
 import {Navigate} from "./router.js";
 
 export const view = (state) => html`
@@ -2914,7 +2914,7 @@ Add a little helper library ```@hyperapp/events```:
 ```
 
 Use it in **Login.js**
-```javascript
+```js
 import {preventDefault} from "./web_modules/@hyperapp/events.js";
 
 export const view = (state) => html`
@@ -2991,7 +2991,7 @@ So far you've been using Hyperapp to serialize Virtual DOM nodes into DOM nodes.
 However, you can also translate Hyperapp Virtual DOM to HTML string with a help of a library called [hyperapp-render](https://github.com/kriasoft/hyperapp-render).
 
 Create **Server.js** in a root directory of your project (one level above **src**):
-```javascript
+```js
 import render from "hyperapp-render";
 import { state, view } from "./src/Posts.js";
 
@@ -3018,7 +3018,7 @@ Install a popular and minimal Node.js Web application server framework [express]
 ```npm i```
 
 Expose your Hyperapp posts as a resource with HTML representation:
-```javascript
+```js
 import render from "hyperapp-render";
 import express from "express";
 import { state, view } from "./src/Posts.js";
@@ -3071,7 +3071,7 @@ Instead we'll use ```axios``` and handle data in a server specific way.
 ```
 ```npm i```
 
-```javascript
+```js
 import render from "hyperapp-render";
 import express from "express";
 import {state, view, SetPosts} from "./src/app.js";
@@ -3111,7 +3111,7 @@ In other words with hydration you pay the rendering tax twice (HTML rendering an
 Since Hyperapp is really small you may not even notice the hydration penalty.
 
 Move **src/index.html** content into **Server.js** and put it into a template string:
-```javascript
+```js
 const htmlTemplate = (content) => /* HTML */ `
   <!DOCTYPE html>
   <html lang="en">
@@ -3134,7 +3134,7 @@ You'll be replacing ```content``` placeholder with dynamically rendered content.
 Note: ```/* HTML */``` comment is for prettier to auto-format the string as HTML.
 
 Update **Server.js**:  
-```javascript
+```js
 app.get("/", async (req, res) => {
   const response = await axios.get(
     "https://hyperapp-api.herokuapp.com/api/post"
@@ -3165,7 +3165,7 @@ Implement server-side rendering and hydration for the login page. Test your app 
 <details>
     <summary id="ssr_and_hydration">Solution</summary>
 
-```javascript
+```js
 import { state as loginState, view as loginView } from "./src/Login.js";
 
 app.get("/login", async (req, res) => {

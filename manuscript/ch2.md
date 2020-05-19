@@ -36,7 +36,7 @@ Finally, Hyperapp will render its contents into ```<div id="app"></main>```.
 
 
 **App.js**
-```javascript
+```js
 import {h, app} from "https://unpkg.com/hyperapp?module";
 
 const state = {text: "Welcome to Hyperapp!"};
@@ -91,7 +91,7 @@ View function needs to build a Virtual DOM data structure. You have at least 3 o
 
 Currently your application uses built-in **h** function to create Virtual DOM nodes.
 Change your ```view``` function to wrap the text in a ```span``` element:
-```javascript
+```js
 state => h("h1", {id: "my-header"}, [h("span", {}, state.text)])
 ```
 Check the generated HTML:
@@ -137,7 +137,7 @@ Note: Hyperapp is dropping support for ```JSX``` soon.
 [htm](https://github.com/developit/htm) is a tiny library with HTML-like syntax and no build tool requirement. 
 
 Change you **App.js** code to use ```htm```:
-```javascript
+```js
 import {h, app} from "https://unpkg.com/hyperapp?module";
 import htm from 'https://unpkg.com/htm?module';
 
@@ -154,7 +154,7 @@ app({
 ```htm``` connects to Hyperapp via ```bind``` function. Write your HTML inside ```html``` tagged template. Under the hood ```htm``` translates everything to the low-level ```h``` function calls.
 
 ```htm``` works with any Virtual DOM framework matching the signature:
-```javascript
+```js
 function buildVirtualNode(type, props, ...children) {}
 ```
 ```h``` function happens to match the signature.

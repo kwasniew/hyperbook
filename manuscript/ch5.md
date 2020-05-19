@@ -5,7 +5,7 @@
 **Add Post** button always adds a post with the same text. 
 
 Add an input field to change the text:
-```javascript
+```js
 <h1>Recent Posts</h1>
 <input type="text" autofocus />
 <button onclick=${AddPost}>Add Post</button>
@@ -18,14 +18,14 @@ View reacting to state changes, and state changes reacting to view actions.
 To make this work, you need some part of your state to model the contents of the input field. 
 
 Create a new state property named ```currentPostText```:
-```javascript
+```js
 const state = {
   currentPostText: "type your text",
   posts: [...]
 };
 ```
 Read the new property in your view:
-```javascript
+```js
 <input type="text" value=${state.currentPostText} autofocus />
 ```
 DOM attribute called ```value``` sets the text of the input field to the ```currentPostText```.
@@ -35,12 +35,12 @@ DOM attribute called ```value``` sets the text of the input field to the ```curr
 Input text reflects ```currentPostText``` from the state object. You want to close the loop with DOM events changing the state.
 
 Add DOM ```oninput``` attribute to trigger ```UpdatePostText``` action on input changes:
-```javascript
+```js
 <input type="text" oninput=${UpdatePostText} value=${state.currentPostText} autofocus />
 ```
 
 Add a new action next to the ```AddPost``` action:
-```javascript
+```js
 const UpdatePostText = (state, event) => ({
     ...state,
     currentPostText: event.target.value
@@ -63,7 +63,7 @@ The following figure shows updated conceptual model of Hyperapp actions with the
 
 Try to add a new post with some text. It should still not work. You need to copy the ```currentPostText``` to the newly added post.
 
-```javascript
+```js
 const AddPost = (state) => {
   const newPost = { username: "anonymous", body: state.currentPostText };
   return { ...state, posts: [newPost, ...state.posts] };
@@ -77,7 +77,7 @@ With this change, you can start adding custom messages to the list.
 ## Extracting repetitive event data
 
 All event based actions will follow a similar pattern:
-```javascript
+```js
 (oldState, event) => {
     const userData = event.target.value;
     ....
@@ -86,13 +86,13 @@ All event based actions will follow a similar pattern:
 Action code would be cleaner if it didn't know about the DOM Event API.
 
 Create a **selector function** to extract only a part of the event you care about:
-```javascript
+```js
 const targetValue = event => event.target.value;
 ```
 Eventually, you may move this code to a librarym but for now put it somewhere above your view declarations.
 
 Switch ```UpdatePostTest``` to use the new function:
-```javascript
+```js
 const UpdatePostText = (state, event) => ({
     ...state,
     currentPostText: targetValue(event)
@@ -101,21 +101,21 @@ const UpdatePostText = (state, event) => ({
 The code is still dependent on the ```targetValue``` function.
 
 Ideally, you'd like the action to accept only the data it needs:
-```javascript
+```js
 const UpdatePostText = (state, currentPostText) => ({
     ...state,
     currentPostText
 });
 ```
 Shape the second argument of your action inside the input handler. 
-```javascript
+```js
 <input type="text" oninput=${[UpdatePostText, targetValue]} value=${state.currentPostText} autofocus />
 ```
 A two argument array with an action and a selector applies the event selector before the action is invoked. 
 In our case ```targetValue``` is applied to DOM event before invoking ```UpdatePostText```.
 
 If you keep using the ```[action, selector]``` array over and over, consider creating an alias:
-```javascript
+```js
 const UpdatePostTestAction = [UpdatePostText, targetValue];
 ```
 As you don't have a second usage of this pattern yet, withhold this decision for now. 
@@ -134,7 +134,7 @@ But first, try to do it on your own.
 <details>
     <summary id="cleaning_text_input">Solution</summary>
 
-```javascript
+```js
 const AddPost = (state) => {
   const newPost = { username: "anonymous", body: state.currentPostText };
   return { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
@@ -151,7 +151,7 @@ Application should ignore **Add Post** clicks when the text is empty.
 <details>
     <summary id="checking_empty_input">Solution</summary>
 
-```javascript
+```js
 const AddPost = (state) => {
   if(state.currentPostText.trim()) {
       const newPost = { username: "anonymous", body: state.currentPostText };

@@ -7,7 +7,7 @@ However in real-world scenarios your application will probably have to deal with
 A common functional approach to side-effects is to move them to the edges of the system. 
 
 Imagine the following hypothetical code you could write:
-```javascript
+```js
 const SetPosts = (state, posts) => ({
   ...state,
   posts
@@ -20,7 +20,7 @@ Since ```fetch``` causes side effects (going over the wire with HTTP) it makes y
 It only takes one innocent ```fetch``` call to make the code impure.
 
 Another thought experiment is to represent the effect as a data structure:
-```javascript
+```js
 const SetPosts = (state, posts) => ({
   ...state,
   posts
@@ -42,7 +42,7 @@ But how should Hyperapp know how to interpret this object?
 There's no way it can possibly translate arbitrary JS objects to every single side-effect you can imagine. 
 That's why it doesn't even try. Instead, you must pass side-effect definition and the effect data as a two-argument array.
 
-```javascript
+```js
 const LoadLatestPosts = [effectDefinition, {
   url: "https://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
@@ -50,7 +50,7 @@ const LoadLatestPosts = [effectDefinition, {
 ```
 
 Side-effects in Hyperapp are made of the effect definition and the effect data:
-```javascript
+```js
 [effectDefinition, data]
 ```
 
@@ -65,7 +65,7 @@ In this section you'll use an open source library [hyperapp-fx](https://github.c
 In one of the next sections you'll peek under the hood and build your own effects.
 
 In **App.js** add ```LoadLatestPosts``` effect that invokes ```SetPost``` action on successful response:
-```javascript
+```js
 import { Http } from "./web_modules/hyperapp-fx.js";
 
 const SetPosts = (state, posts) => ({
@@ -98,7 +98,7 @@ Add ```hyperapp-fx``` and let Snowpack bundle it for the browser:
 With HTTP effect defined you must decide when to invoke it. For now, you'll do it on application startup to start fetching posts early.
 
 Modify ```init``` to invoke ```LoadLatestPosts```:
-```javascript
+```js
 app({
   init: [state, LoadLatestPosts],
   ...  
@@ -112,7 +112,7 @@ You may observe a content flip as Hyperapp replaces initial state with the serve
 ![Figure: Loading initial posts](images/initial-posts.png)
 
 If everything works fine, replace the initial posts with an empty array:
-```javascript
+```js
 const state = {
   currentPostText: "",
   posts: []
@@ -126,21 +126,21 @@ Most of the time you don't need to write your own effects. However, to better un
 ```Http``` effect yourself.
 
 Comment out this line of code:
-```javascript
+```js
 // import { Http } from "./web_modules/hyperapp-fx.js";
 ```
 
 Your own implementation of the effect should build an array with the effect definition and the effect data.
-```javascript
+```js
 const Http = data => [httpEffect, data];
 ```
 Hyperapp expects two-parameter signature in the effect definition:
-```javascript
+```js
 const httpEffect = (dispatch, data) => {};
 ```
 
 A simple implementation of the HTTP effect may look like this:
-```javascript
+```js
 const httpEffect = (dispatch, data) => {
   return fetch(data.url)
       .then(response => response.json())
@@ -151,7 +151,7 @@ As an effect library author you translate the side-effectful API call (e.g. ```f
 Hyperapp will invoke this effect and inject a ```dispatch``` function. You will never call it directly in the application code.
 
 Our original post-fetch action definition looked like this:
-```javascript
+```js
 const SetPosts = (state, posts) => ({
   ...state,
   posts
@@ -163,7 +163,7 @@ The first parameter will be a regular state object that you used before.
 Test your own implementation of the ```Http``` effect. 
 If everything works, uncomment the original ```Http``` effect from the library and delete your implementation.
 
-```javascript
+```js
 import { Http } from "./web_modules/hyperapp-fx.js";
 ```
 
@@ -172,7 +172,7 @@ import { Http } from "./web_modules/hyperapp-fx.js";
 ```LoadLatestPosts``` alias for the ```Http``` effect is invoked on application startup. What if we wanted to trigger ```Http``` effects from regular actions?
 
 Create ```SavePost``` effect:
-```javascript
+```js
 const SavePost = (post) =>
   Http({
     url: "https://hyperapp-api.herokuapp.com/api/post",
@@ -189,7 +189,7 @@ const SavePost = (post) =>
 This effect wraps HTTP POST. The ```action``` to be triggered on successful response is not doing anything yet.
 
 To trigger this effect from an action use the following signature: 
-```javascript
+```js
 const EffectfulAction = oldState => [newState, Effect];
 ```
 This is how you create **effecftul actions**. The return type is the same as the value of the ```init``` function.
@@ -199,11 +199,11 @@ Hyperapp applies the new state and schedules the effect almost instantly.
 The return action inside the effect will trigger eventually e.g. when the HTTP response arrives.
 
 If you have more than one effect wrap them in an array:
-```javascript
+```js
 const EffectfulAction = oldState => [newState, [Effect1, Effect2]];
 ```
 Or pass them comma-separated at the end of the main array:
-```javascript
+```js
 const EffectfulAction = oldState => [newState, Effect1, Effect2];
 ```
 
@@ -217,7 +217,7 @@ Use network tab to verify if the request is sent:
 <details>
     <summary id="making_effectful_action">Solution</summary>
 
-```javascript
+```js
 const AddPost = state => {
   if (state.currentPostText.trim()) {
     const newPost = { username: "anonymous", body: state.currentPostText };

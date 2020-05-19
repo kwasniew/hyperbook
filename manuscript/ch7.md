@@ -24,13 +24,13 @@ Note: I'll refer to short-live effects as just effects and to long-lived effects
 In this section you will subscribe to the WebSocket stream with post updates.
 
 Import subscription definition:
-```javascript
+```js
 import { Http, WebSocketListen } from "./web_modules/hyperapp-fx.js";
 ```
 ```hyperapp-fx``` uses ```*Listen``` convention to name subscription creating functions.
 
 Write an action for handling incoming WebSocket events:
-```javascript
+```js
 const SetPost = (state, event) => {
   try {
     const post = JSON.parse(event.data);
@@ -47,7 +47,7 @@ The event is the underlying ```MessageEvent``` from the WebSocket API. You parse
 If the data is a valid JSON post, you add it to the beginning of the post list. In case of a parsing error you don't change the state of the application.
 
 Plug the subscription and the action into the application:
-```javascript
+```js
 app({
   init: [state, LoadLatestPosts],
   view,
@@ -90,7 +90,7 @@ Modify the ```AddPost``` action and stop adding ```newPost``` until we receive a
     <summary id="avoiding_duplicate_posts">Solution</summary>
 
 Inside ```AddPost``` action change this code:
-```javascript
+```js
     const newState = {
       ...state,
       currentPostText: "",
@@ -98,7 +98,7 @@ Inside ```AddPost``` action change this code:
     };
 ```
 To this:
-```javascript
+```js
     const newState = {
       ...state,
       currentPostText: ""
@@ -115,24 +115,24 @@ Server-Sent Events (SSE) is a lesser known, but much simpler HTTP-native alterna
 SSE also handles network failures more gracefully than plain WebSockets. It can automatically reconnect on failed connections.
 
 In [Writing your own effects](ch6.md#writing-your-own-effects) section you defined effects as follows:
-```javascript
+```js
 const httpEffect = (dispatch, data) => {};
 ```
 
 Start with the same signature for the subscription definition:
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {};
 ```
 
 The browser API for SSE is called the ```EventSource```:
-```javascript
+```js
 const es = new EventSource("https://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
 ```
 ```EventSource``` is a regular event emitter similar e.g. to a clickable button.
 
 Wrap the API into your subscription definition:
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {
   const es = new EventSource(data.url);
   es.addEventListener("message", (event) => dispatch(data.action, event));
@@ -142,17 +142,17 @@ const eventSourceSubscription = (dispatch, data) => {
 We follow the same convention that was used in the WebSockets implementation. When SSE notification arrives, dispatch an ```action``` and pass the server ```event```.
 
 In [Writing your own effects](ch6.md#writing-your-own-effects) section you used the following effect signature:
-```javascript
+```js
 const Http = data => [httpEffect, data];
 ```
 
 Following the same convention create your own subscription:
-```javascript
+```js
 const EventSourceListen = data => [eventSourceSubscription, data];
 ```
 
 Plug the subscription into your application:
-```javascript
+```js
 app({
   init: [state, LoadLatestPosts],
   view,
@@ -188,7 +188,7 @@ If your browser [doesn't support SSE](https://caniuse.com/#search=eventsource) u
 
 Looking at your subscription signature it's not much different from any short-live effect. 
 You could event plug the subscription into the init:
-```javascript
+```js
 app({
     init: [state, [LoadLatestPosts, EventSourceListen({action: SetPost, url: 'https://hyperapp-api.herokuapp.com/api/event/post'})]],
     ...
@@ -203,7 +203,7 @@ The moment you need to stop listening to the event source they start to differ.
 
 Subscriptions are long-lived effects you can unsubscribe from. 
 Return the code to unsubscribe in the subscription definition.
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {
    return () => {
       // unsubscribe here
@@ -212,7 +212,7 @@ const eventSourceSubscription = (dispatch, data) => {
 ```
 
 Fill in this template with your ```EventSource``` implementation:
-```javascript
+```js
 const eventSourceSubscription = (dispatch, data) => {
   const es = new EventSource(data.url);
   const listener = (event) => dispatch(data.action, event);
@@ -234,7 +234,7 @@ You will add a capability to enable/disable live updates through the UI as shown
 ![Figure: Live Update control](images/liveupdate.png)
 
 Introduce intial state field called ```liveUpdate```:
-```javascript
+```js
 const state = {
   currentPostText: "",
   posts: [],
@@ -244,12 +244,12 @@ const state = {
 By default **Live Update** will be enabled.
 
 Add an action to toggle live update:
-```javascript
+```js
 const ToggleLiveUpdate = state => ({...state, liveUpdate: !state.liveUpdate});
 ```
 
 Add a UI control for live update just below the **Add Post** button.
-```javascript
+```js
     <input
       type="checkbox"
       id="liveUpdate"
@@ -262,7 +262,7 @@ This checkbox reflects the ```liveUpdate``` status. Every time the checkbox chan
 Label for the input field conveniently allows for clicking **Live Update** text to change the settings.
 
 Control your subscription based on the ```liveUpdate``` status.
-```javascript
+```js
 app({
   init: [state, LoadLatestPosts],
   view,
@@ -287,7 +287,7 @@ Modify ```ToggleLiveUpdate``` to ```LoadLatestPosts``` when appropriate.
 <details>
     <summary id="fetching_posts_on_toggle">Solution</summary>
 
-```javascript
+```js
 const ToggleLiveUpdate = (state) => {
   const newState = {
     ...state,

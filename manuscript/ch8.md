@@ -3,7 +3,7 @@
 ## Handling slow API
 
 Switch ```SavePost``` to a new url with the slow API.
-```javascript
+```js
 const SavePost = (post) =>
   Http({
     url: "https://hyperapp-api.herokuapp.com/slow-api/post",
@@ -15,7 +15,7 @@ While waiting for the response you can send more requests without getting confir
 Assume you have a requirement to disable the **Add Post** button while the post is saving.
 
 Enhance initial state with the ```isSaving``` property.
-```javascript
+```js
 const state = {
   currentPostText: "",
   posts: [],
@@ -25,13 +25,13 @@ const state = {
 ```
 
 Map the property to the button ```disable``` property:
-```javascript
+```js
 <button onclick=${AddPost} disabled=${state.isSaving}>Add Post</button>
 ```
 The button reflects the current state of the saving operation.
 
 ```AddPost``` action disables the button:
-```javascript
+```js
 const AddPost = (state) => {
     ...
     const newState = {
@@ -45,7 +45,7 @@ const AddPost = (state) => {
 
 ```SavePost``` effectful action enables the button on a successful response.
 It invokes a newly created ```PostSaved``` action:
-```javascript
+```js
 const PostSaved = (state) => ({ ...state, isSaving: false });
 
 const SavePost = (post) =>
@@ -62,7 +62,7 @@ Test your disable button capability.
 ## Handling API errors
 
 Switch ```SavePost``` to a new url with API returning error responses.
-```javascript
+```js
 const SavePost = (post) =>
   Http({
     url: "https://hyperapp-api.herokuapp.com/error-api/post",
@@ -72,7 +72,7 @@ const SavePost = (post) =>
 The new API is not only slow, but also returns 500 errors.
 
 Enhance initial state with the ```error``` property:
-```javascript
+```js
 const state = {
   currentPostText: "",
   posts: [],
@@ -84,14 +84,14 @@ const state = {
 Eventually you will populate this field with an error value.
 
 Expose the ```error``` in the UI:
-```javascript
+```js
 <div>${state.error}</div>
 <button onclick=${AddPost} disabled="${state.isSaving}">Add Post</button>
 ```
 You should put the error just above the **Add Post** button.
 
 Add ```PostError``` action that will be triggered on HTTP errors. 
-```javascript
+```js
 const PostSaved = state => ({...state, isSaving: false});
 const PostError = state => ({...state, isSaving: false, error: "Post cannot be saved. Please try again."});
 
@@ -117,7 +117,7 @@ You can change ```SetPost``` action to remove the error message, but in the next
 ## Modeling only valid states
 
 Take a look at the last 2 fields you added to the state:
-```javascript
+```js
 const state = {
   ...
   isSaving: false,
@@ -145,7 +145,7 @@ In the next section you'll implement it.
 ## Implementing only valid states
 
 Introduce 3 valid states we defined in the modeling exercise and set the ```idle``` status as the initial one.
-```javascript
+```js
 const idle = { status: "idle" };
 const saving = { status: "saving" };
 const error = {
@@ -164,7 +164,7 @@ A common strategy to scale a growing state object is to split it into smaller ob
 Find all the places where you were setting ```isSaving``` and ```error``` properties and replace them with ```requestStatus```. 
 
 ```AddPost``` sets the status to ```saving```:
-```javascript
+```js
 const AddPost = (state) => {
     ...
     const newState = {
@@ -177,17 +177,17 @@ const AddPost = (state) => {
 ```
 
 ```PostSaved``` sets the status to ```idle```:
-```javascript
+```js
 const PostSaved = (state) => ({ ...state, requestStatus: idle });
 ```
 
 ```PostError``` sets the status to ```error```:
-```javascript
+```js
 const PostError = (state) => ({ ...state, requestStatus: error });
 ```
 
 Map request status to the ```errorMessage``` view fragment:
-```javascript
+```js
 const errorMessage = ({ status, message }) => {
   if (status === "error") {
     return html` <div>${message}</div> `;
@@ -196,20 +196,20 @@ const errorMessage = ({ status, message }) => {
 };
 ```
 Map request status to the button ```disabled``` status:
-```javascript
+```js
 const addPostButton = ({ status }) => html`
   <button onclick=${AddPost} disabled=${status === "saving"}>Add Post</button>
 `;
 ```
 
 Delete those two lines:
-```javascript
+```js
 <div>${state.error}</div>
 <button onclick=${AddPost} disabled=${state.isSaving}>Add Post</button>
 ```
 
 And replace them with your new view fragments:
-```javascript
+```js
 ${errorMessage(state.requestStatus)}
 ${addPostButton(state.requestStatus)}
 ```
@@ -222,7 +222,7 @@ Modify the ```UpdatePostText``` action to remove the error message when a user s
 <details>
     <summary id="cleaning_text_input">Solution</summary>
 
-```javascript
+```js
 const UpdatePostText = (state, currentPostText) => ({
   ...state,
   currentPostText,

@@ -31,14 +31,14 @@ On quick inspection of **node_modules** you'll find no transitive dependencies. 
 to the party.
 
 You can try to reference npm dependencies from **App.js**:
-```javascript
+```js
 import {h, app} from "hyperapp";
 import htm from "htm";
 ```
 But unfortunately browsers can't resolve those.
 
 Since both ```hyperapp``` and ```htm``` are zero-dependency libraries you can load them using **node_modules** paths:
-```javascript
+```js
 import {h, app} from "../node_modules/hyperapp/src/index.js";
 import htm from "../node_modules/htm/dist/htm.mjs";
 ```
@@ -121,7 +121,7 @@ With the ```--write``` option ```prettier``` will re-write the formatted files i
 ```npm i```
 
 Copy this malformed code to **App.js**:
-```javascript
+```js
 import { h, app } from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
 
