@@ -10,7 +10,7 @@ Modern frontend development is very complicated:
 * frameworks with 10000k+ LOC, impenetrable at source code level to non-core developers
 * libraries with huge API surface area and tens of methods/operators to learn
 * more and more JS "the bad parts" to learn coming mostly from the class based programming
-* complex tooling to make everything work and taking away all the fun of development
+* complex tooling to make everything work and taking away all the fun
 * layers upon layers of proprietary abstractions on top of the browser APIs
 * elaborate performance tricks to improve performance
 * code mixing side-effects and application logic 
@@ -42,10 +42,10 @@ By the end of this book you will learn to:
 * describe all side effects (e.g. random number generation) as data structures
 * optimize load time and runtime performance 
 * test your application at the unit and integration level
-* deploy your code to production
-* render frontend views on the server
 * route between different pages
 * integrate with 3rd party libraries
+* render frontend views on the server
+* deploy your code to production
 * appreciate the benefits of minimalist approach to software development
 
 ## Introducing the problem
@@ -59,7 +59,9 @@ You will find source code on Github: https://github.com/kwasniew/hyperbook-tutor
 
 The following two figures show 2 screens you'll be building:
 * main screen with a post submit form and a list of posts streamed from the server
-* login screen to set your username
 
 ![Figure: Hyperposts main screen](images/main.png)
+
+* login screen to set your username
+
 ![Figure: Hyperposts login screen](images/login.png)
