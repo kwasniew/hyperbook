@@ -7,12 +7,12 @@
 
 > We have lost our ability of achieving more with less. We do more with more. Or, in certain cases, we do less with more.
 
-Modern frontend development is too complicated:
-* frameworks with 10000k+ LOC, impenetrable to non-core developers
-* libraries with huge API surface area
-* more and more JS "the bad parts" to learn
-* complex tooling to make everything work
-* layers upon layers of abstraction on top of the browser
+Modern frontend development is very complicated:
+* frameworks with 10000k+ LOC, impenetrable at source code level to non-core developers
+* libraries with huge API surface area and tens of methods/operators to learn
+* more and more JS "the bad parts" to learn coming mostly from the class based programming
+* complex tooling to make everything work and taking away all the fun of development
+* layers upon layers of proprietary abstractions on top of the browser APIs
 * elaborate performance tricks to improve performance
 * code mixing side-effects and application logic 
 * testing techniques with mock imports encouraging untestable code
