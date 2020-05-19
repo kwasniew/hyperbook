@@ -37,7 +37,7 @@ import htm from "htm";
 ```
 But unfortunately browsers can't resolve those.
 
-Since both ```hyperapp``` and ```htm``` are zero-dependency libraries you can load them using **node_modules** path:
+Since both ```hyperapp``` and ```htm``` are zero-dependency libraries you can load them using **node_modules** paths:
 ```javascript
 import {h, app} from "../node_modules/hyperapp/src/index.js";
 import htm from "../node_modules/htm/dist/htm.mjs";
@@ -54,9 +54,9 @@ It certainly works, but I had to inspect the contents of both libraries to provi
 
 [Snowpack](https://www.snowpack.dev/) is a tool to translate selected ```node_modules``` into browser friendly bundles at dependency installation time.
 It puts all dependencies as single file bundles in a predictable location called ```web_modules```. 
-It also has experimental support for deep imports so all transitive dependencies are resolved as a single browser-friendly file. 
+It also has experimental support for deep imports so all transitive dependencies are resolved as single browser-friendly files. 
 Deep imports work for libraries using ```require``` and [Node.js ESM modules](https://nodejs.org/api/esm.html). The latter means your dependency needs
-to use ```.js``` extension in import statements.  
+to use ```.js``` extension in the import statements.  
 In essence Snowpack makes bundling JS optional at development time.
 
 Update **package.json** with this ```snowpack``` setup:
@@ -71,13 +71,13 @@ Update **package.json** with this ```snowpack``` setup:
     "hyperapp": "2.0.4"
   },
   "devDependencies": {
-    "snowpack": "2.0.0-beta.20"
+    "snowpack": "2.0.0-rc.1"
   }
 }
 ```
 Snowpack is our development dependency. It provides ```snowpack install``` command that will run after ```npm i``` from the ```postinstall``` script. 
 You tell snowpack to put the browser friendly bundles in ```src/web_modules```. Without ```--dest```  it would put everything in the root-level
-```web_modules```. Since we serve the whole ```src``` directory everything needs to be inside.
+```web_modules```. I want to HTTP serve the whole ```src``` directory, therefore everything needs to be inside.
 
 Rewrite your imports to use ```web_modules```:
 ```
@@ -97,7 +97,7 @@ If you track your code in git add **src/web_modules** to **.gitignore**.
 [Prettier](https://prettier.io/) is an opinionated code formatter saving your code review time for things that really matter. 
 The days of spaces vs tabs wars are over.
 
-Add ```format``` command and ```prettier``` ```devDependency``` to **package.json**:
+Add ```format``` command and prettier ```devDependency``` to **package.json**:
 ```json
 {
   "scripts": {
@@ -111,13 +111,14 @@ Add ```format``` command and ```prettier``` ```devDependency``` to **package.jso
   },
   "devDependencies": {
     "prettier": "2.0.5",
-    "snowpack": "2.0.0-beta.20"
+    "snowpack": "2.0.0-rc.1"
   }
 }
 ```
 ```format``` command willl format your JS files except from the ```web_modules``` (excluded explicitly) and ```node_modules``` (excluded by default).
 With the ```--write``` option it will re-write the formatted files in place.
 
+```npm i```
 
 Copy this malformed code to **App.js**:
 ```javascript
