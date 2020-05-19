@@ -9,7 +9,7 @@ probably the most capable 500 LOC you will on Github.
 
 ## How to use it
 
-To benefit the most, read sections in order. I will explain every single concept with code, images and words. 
+To benefit the most, read chapters in order. I will explain every single concept with code, images and words. 
 Later sections will build upon the previous ones, so don't skip anything.
 The book was designed to be a hands-on tutorial so have your code editor
 open all the time and code along with me. It's gonna be fun!
