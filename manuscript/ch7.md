@@ -114,7 +114,7 @@ In this section you'll write your own subscription for [Server-Sent Events](http
 Server-Sent Events (SSE) is a lesser known, but much simpler HTTP-native alternative to WebSockets. 
 SSE also handles network failures more gracefully than plain WebSockets. It can automatically reconnect on failed connections.
 
-In [Writing your own effects](/ch6.md#writing-your-own-effects) section you defined effects as follows:
+In [Writing your own effects](ch6.md#writing-your-own-effects) section you defined effects as follows:
 ```javascript
 const httpEffect = (dispatch, data) => {};
 ```
