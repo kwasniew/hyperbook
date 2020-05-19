@@ -97,7 +97,7 @@ If you track your code in git add **src/web_modules** to **.gitignore**.
 [Prettier](https://prettier.io/) is an opinionated code formatter saving your code review time for things that really matter. 
 The days of spaces vs tabs wars are over.
 
-Add ```format``` command and prettier ```devDependency``` to **package.json**:
+Add ```format``` command and ```prettier``` dev dependency to **package.json**:
 ```json
 {
   "scripts": {
@@ -116,7 +116,7 @@ Add ```format``` command and prettier ```devDependency``` to **package.json**:
 }
 ```
 ```format``` command willl format your JS files except from the ```web_modules``` (excluded explicitly) and ```node_modules``` (excluded by default).
-With the ```--write``` option it will re-write the formatted files in place.
+With the ```--write``` option ```prettier``` will re-write the formatted files in place.
 
 ```npm i```
 
@@ -157,7 +157,7 @@ npm run format
 ```
 The ```view``` code should get nicely aligned.
 
-You can connect prettier to your IDE/text editor to format on save, but it's beyond the scope of this book.
+You can connect ```prettier``` to your IDE/text editor to format on save, but it's beyond the scope of this book.
 
 You took a detour to learn about some tools that play nicely with Hyperapp:
 * ```htm``` for HTML-like syntactic sugar
