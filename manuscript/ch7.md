@@ -124,7 +124,7 @@ Start with the same signature for the subscription definition:
 const eventSourceSubscription = (dispatch, data) => {};
 ```
 
-The Web API for SSE is called the ```EventSource```:
+The browser API for SSE is called the ```EventSource```:
 ```javascript
 const es = new EventSource("https://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
@@ -139,9 +139,9 @@ const eventSourceSubscription = (dispatch, data) => {
 };
 ```
 ```data``` parameter will hold two configuration options: ```url``` and ```action```. 
-We follow the same convention that was used in WebSockets implementation. When SSE notification arrives, dispatch an ```action``` and pass the server ```event```.
+We follow the same convention that was used in the WebSockets implementation. When SSE notification arrives, dispatch an ```action``` and pass the server ```event```.
 
-In [Writing your own effects](#writing-your-own-effects) section you used the following effect signature:
+In [Writing your own effects](ch6.md#writing-your-own-effects) section you used the following effect signature:
 ```javascript
 const Http = data => [httpEffect, data];
 ```
