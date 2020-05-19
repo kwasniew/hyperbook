@@ -18,8 +18,9 @@ const guid = () => {
     });
 }
 ```
+Don't worry about a growing size of the file. We'll solve this problem in the later chapters. 
 
-Modify ```AddPost``` action to generate ```id``` for all new posts:
+Modify the ```AddPost``` action to generate ```id``` for all new posts:
 ```javascript
     const newPost = {
       id: guid(),
@@ -43,7 +44,7 @@ To maintain a stable list item identity between the renders add a **key** attrib
 
 With the extra hint from the **key** attribute Hyperapp avoids re-rendering the items that got shifted by one.
 
-Modify ```listItem``` view function to include the ```key``` attribute:
+Modify the ```listItem``` view function to include the ```key``` attribute:
 ```javascript
 const listItem = (post) => html`
   <li key=${post.id}>
@@ -54,7 +55,7 @@ const listItem = (post) => html`
 Usually the best candidate for the ```key``` value is a stable identifier (e.g. guid). 
 Don't use post content because it may not be unique. Don't use array index as it's not stable over re-renders.
 
-Since ```key``` attribute is not visible in the generated DOM you can also add ```data-key``` attribute for debugging purposes:
+Since the ```key``` attribute is not visible in the generated DOM you can also add ```data-key``` attribute for debugging purposes:
 ```javascript
 const listItem = (post) => html`
   <li key=${post.id} data-key=${post.id}>
@@ -75,7 +76,7 @@ const LoadLatestPosts = Http({
 ```
 
 Start typing a new post. 
-On every typed charater Hyperapp has to do a Virtual DOM diffing of the entire page it controls. 
+On every typed charater Hyperapp has to do the Virtual DOM diffing of the entire page it controls. 
 With a fast machine the typing delay may not even be noticeable. Hyperapp is often fast enough without extra optimisation. 
 
 Go to your DevTools and slow down your CPU to make the impact of large DOM tree updates noticeable.
@@ -102,7 +103,7 @@ up with your changes.
 
 You want to avoid the unnecessary computation of the post list items when typing a new post text. 
 
-Extract ```postList``` view fragment:
+Extract the ```postList``` view fragment:
 ```javascript
 const postList = ({ posts }) => html`
   <ul>
@@ -112,7 +113,7 @@ const postList = ({ posts }) => html`
 ```
 Use it in the ```view``` function:
 ```javascript
-{postList({ posts: state.posts })}
+${postList({ posts: state.posts })}
 ```
 
 Import ```Lazy``` function from Hyperapp:
@@ -142,7 +143,8 @@ Verify performance profile again.
 Most key presses should generate a performance profile with much shorter JS blocking time.
 
 ```Lazy``` is the last part of Hyperapp API you need to learn.  There's nothing more. Congratulations!
-After this section remove the ```limit``` query param from the API url.
+
+After this section remove the ```limit``` query param from the API ```url```.
 
 In the remaining chapters I'll cover extra topics that are not part of Hyperapp core, but are still useful for day to day development.
 You will learn about:
