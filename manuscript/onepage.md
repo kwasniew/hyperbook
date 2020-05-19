@@ -635,7 +635,7 @@ const AddPost = (state) => {
 With this change, you can start adding custom messages to the list.
 
 <figure>
-    <img src="images/custom_messages.png" width="650" alt="Adding custom messages to the list" align="center">
+    <img src="images/custom-messages.png" width="650" alt="Adding custom messages to the list" align="center">
     <figcaption><em>Figure: Adding custom messages to the list</em></figcaption>
     <br><br>
 </figure>
