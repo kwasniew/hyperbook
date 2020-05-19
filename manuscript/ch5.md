@@ -76,20 +76,20 @@ With this change, you can start adding custom messages to the list.
 
 ## Extracting repetitive event data
 
-All event based actions will follow similar pattern:
+All event based actions will follow a similar pattern:
 ```javascript
 (oldState, event) => {
     const userData = event.target.value;
     ....
 }
 ```
-Action code would be cleaner if it didn't know about DOM Event API.
+Action code would be cleaner if it didn't know about the DOM Event API.
 
-Create a **selector function** to extract part of the event you care about:
+Create a **selector function** to extract only a part of the event you care about:
 ```javascript
 const targetValue = event => event.target.value;
 ```
-Eventually, you'll move this code to a library but for now put it somewhere above your view declarations.
+Eventually, you may move this code to a librarym but for now put it somewhere above your view declarations.
 
 Switch ```UpdatePostTest``` to use the new function:
 ```javascript
