@@ -57,7 +57,8 @@ You will find a deployed version of this app on Netlify: https://hyperposts.netl
 
 You will find source code on Github: https://github.com/kwasniew/hyperbook-tutorial
 
-The following two figures show 2 screens you'll be building:
+Throughout the book you'll be building 2 application screens:
+
 * main screen with a post submit form and a list of posts streamed from the server
 
 ![Figure: Hyperposts main screen](images/main.png)
