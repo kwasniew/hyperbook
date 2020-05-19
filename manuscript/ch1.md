@@ -46,7 +46,7 @@ By the end of this book you will learn to:
 * integrate with 3rd party libraries
 * render frontend views on the server
 * deploy your code to production
-* appreciate the benefits of minimalist approach to software development
+* appreciate the benefits of minimalist approach to software development that lands you in a "pit of success"
 
 ## Introducing the problem
 

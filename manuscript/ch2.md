@@ -3,12 +3,13 @@
 ## Getting started
 
 When learning a new framework it's important to understand every single step you take and every single line of code you write. 
-Instead of generating boilerplate, you'll write everything yourself. 
+Instead of generating boilerplate, you'll be writing everything yourself. 
 
 With more Hyperapp experience, you may formalize the setup into your own starter kit. 
 However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
 
-Create empty **src** directory with **index.html** and **App.js**. You will name JS files with first uppercase letter. 
+Create empty **src** directory with **index.html** and **App.js**. This book follows a convention with 
+first uppercase letter in JS file names. 
 
 **index.html**
 ```html
@@ -28,8 +29,10 @@ Create empty **src** directory with **index.html** and **App.js**. You will name
 </body>
 </html>
 ```
-HTML links to **App.js** as ES6 module (```type="module"```), therefore you can use ES6 imports in JS code. 
-Hyperapp will render its content into ```<div id="app"></main>```.
+You'll be using a prototype friendly [mvp.css](https://andybrewer.github.io/mvp/) stylesheet to get
+out-of-the box styling for semantic HTML. 
+Our HTML links to **App.js** as ES6 module (```type="module"```), therefore you can use ES6 imports in your JS code. 
+Finally, Hyperapp will render its contents into ```<div id="app"></main>```. 
 
 
 **App.js**
@@ -44,7 +47,7 @@ app({
     node: document.getElementById("app")
 });
 ```
-To start experimenting, you can fetch Hyperapp directly from CDN (e.g. unpkg.com). 
+To start experimenting, import Hyperapp as ES6 module directly from CDN (e.g. unpkg.com). 
 The exported module provides two functions: ```h``` and ```app```.
 
 The **app** function is your main integration point with the framework. 
