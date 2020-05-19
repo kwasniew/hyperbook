@@ -145,7 +145,7 @@ const AddPost = (state) => {
 
 ## Exercise: checking empty input
 
-After we clean the input, users may be tempted to submit empty text. Your task is to prevent them from doing so.
+After we clean the input, users may be tempted to submit the empty text. Your task is to prevent them from doing so.
 Application should ignore **Add Post** clicks when the text is empty.
 
 <details>
