@@ -1,4 +1,3 @@
-# Hyperapp: functional programming in your browser with 500 lines of code
 # Chapter 7: Subscriptions
 
 ## Understanding long running effects (subscriptions)

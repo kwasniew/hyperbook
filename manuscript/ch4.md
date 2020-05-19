@@ -1,4 +1,3 @@
-# Hyperapp: functional programming in your browser with 500 lines of code
 # Chapter 4: Functional data flow
 
 ## Splitting view into smaller functions

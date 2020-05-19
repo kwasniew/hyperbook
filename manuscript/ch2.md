@@ -1,4 +1,3 @@
-# Hyperapp: functional programming in your browser with 500 lines of code
 # Chapter 2: View as a function of state
 
 ## Getting started

@@ -1,4 +1,3 @@
-# Hyperapp: functional programming in your browser with 500 lines of code
 # Chapter 1: Elevator Pitch
 
 ## Why do we need another framework?

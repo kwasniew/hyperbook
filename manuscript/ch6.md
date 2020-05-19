@@ -1,4 +1,3 @@
-# Hyperapp: functional programming in your browser with 500 lines of code
 # Chapter 6: Effects as data
 
 ## Understanding "effects as data"

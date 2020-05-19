@@ -1,4 +1,3 @@
-# Hyperapp: functional programming in your browser with 500 lines of code
 # Chapter 9: Runtime optimisation
 
 ## Breaking from purity

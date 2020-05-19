@@ -1,4 +1,3 @@
-# Hyperapp: functional programming in your browser with 500 lines of code
 # Preface
 
 This book gives you full coverage of Hyperapp - a tiny framework for building web interfaces.
