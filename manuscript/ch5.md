@@ -59,11 +59,8 @@ The ```event``` is a regular DOM event, therefore we can access ```event.target.
 As mentioned before, it's all about transferable skills. 
 
 The following figure shows updated conceptual model of Hyperapp actions with an extra event parameter:
-<figure>
-    <img src="images/action-with-event.jpg" width="650" alt="Action is a pure function of state and event" align="center">
-    <figcaption><em>Figure: Action is a pure function of state and event</em></figcaption>
-    <br><br>
-</figure>
+
+![Figure: Action is a pure function of state and event](images/action-with-event.jpg)
 
 Try to add a new post with some text. It should still not work. You need to copy the ```currentPostText``` to the newly added post.
 
@@ -76,11 +73,7 @@ const AddPost = (state) => {
 
 With this change, you can start adding custom messages to the list.
 
-<figure>
-    <img src="images/custom-messages.png" width="650" alt="Adding custom messages to the list" align="center">
-    <figcaption><em>Figure: Adding custom messages to the list</em></figcaption>
-    <br><br>
-</figure>
+![Figure: Adding custom messages to the list](images/custom-messages.png)
 
 ## Extracting repetitive event data
 
