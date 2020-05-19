@@ -2,8 +2,8 @@
 
 ## Getting started
 
-When learning a new framework it's important to understand every single step you take and every single line of code you write. 
-Instead of generating boilerplate, you'll be writing everything yourself. 
+When learning a new framework I like to understand every single step I take and every single line of code I write. 
+Therefore, instead of generating boilerplate, you'll be writing everything yourself. 
 
 With more Hyperapp experience, you may formalize the setup into your own starter kit. 
 However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
@@ -56,7 +56,7 @@ Pass an object with 3 parameters:
 * **view** - view function rendering current state
 * **node** - DOM node to mount the application to
 
-Expose your **src** directory using any static HTTP server. I'm using https://www.npmjs.com/package/http-server 
+Serve your **src** directory with any static HTTP server. I'm using https://www.npmjs.com/package/http-server 
 ```
 npm i http-server -G
 http-server src
@@ -64,7 +64,8 @@ http-server src
 
 By default ```http-server``` starts on http://127.0.0.1:8080
 
-Check if you browser renders the same HTML as shown in the figure:
+Check if you browser renders the following HTML:
+
 ![Figure: Getting started HTML](images/getting-started.png)
 
 ## Understanding view function
