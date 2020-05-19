@@ -4,7 +4,8 @@
 >
 > -- Mark Twain
 
-This book gives you full coverage of Hyperapp - a tiny framework for building JS web interfaces.
+This book gives you full coverage of Hyperapp - a tiny framework for building rich web interfaces and 
+probably the most capable 500 LOC you will on Github.
 
 ## How to use it
 
@@ -25,7 +26,7 @@ You will need about 4 hours because this book is 7 times longer than Hyperapp [s
     * higher-order functions
     * currying
     * immutability
-* Some familiarity with browser DevTools (HTML elements tab, network tab, performance tab)  will be beneficial   
+* Some familiarity with browser DevTools will be beneficial   
 * Some familiarity with other JS frameworks will be beneficial    
 
 No prior experience with Hyperapp is needed.
