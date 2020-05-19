@@ -1,8 +1,8 @@
 # Chapter 5: Actions and DOM events
 
-## Modelling state
+## Modeling state
 
-You already implemented a button click action. It always adds a post with the same text. 
+**Add Post** button always adds a post with the same text. 
 
 Add an input field to change the text:
 ```javascript
@@ -11,8 +11,8 @@ Add an input field to change the text:
 <button onclick=${AddPost}>Add Post</button>
 ```
 
-When you start typing some text, your state and view will get out of sync. What you're typing is not
-reflected in the state change.
+When you start typing text into the input, your state and view will get out of sync. What you're typing is not
+reflected in the state object.
 One of the tenets of functional UI architecture is continuous synchronization of state and view. 
 View reacting to state changes, and state changes reacting to view actions. 
 To make this work, you need some part of your state to model the contents of the input field. 
@@ -32,7 +32,7 @@ DOM attribute called ```value``` sets the text of the input field to the ```curr
 
 ## Accessing DOM events
 
-Input text reflects ```currentPostText``` from the state object. You want to close the circle with DOM events changing the state.
+Input text reflects ```currentPostText``` from the state object. You want to close the loop with DOM events changing the state.
 
 Add DOM ```oninput``` attribute to trigger ```UpdatePostText``` action on input changes:
 ```javascript
@@ -46,7 +46,7 @@ const UpdatePostText = (state, event) => ({
     currentPostText: event.target.value
 });
 ```
-Compare ```UpdatePostText``` signature with ```AddPost``` signature.
+Compare the ```UpdatePostText``` signature with `the ``AddPost``` signature.
 
 ```
 (oldState) => newState
@@ -54,10 +54,10 @@ Compare ```UpdatePostText``` signature with ```AddPost``` signature.
 ```
 Hyperapp actions accept either ```(oldState)``` or ```(oldState, event)```. 
 With a second attribute provided, Hyperapp will inject both sources of information to your action.
-The ```event``` is a regular DOM event, therefore we can access ```event.target.value``` from DOM Event API. 
+The ```event``` is a regular DOM event, therefore we can access ```event.target.value``` from the DOM Event API. 
 As mentioned before, it's all about transferable skills. 
 
-The following figure shows updated conceptual model of Hyperapp actions with an extra event parameter:
+The following figure shows updated conceptual model of Hyperapp actions with the extra event attribute:
 
 ![Figure: Action is a pure function of state and event](images/action-with-event.jpg)
 
