@@ -167,7 +167,7 @@ npm i http-server -G
 http-server src
 ```
 
-By default ```http-server``` starts on http://127.0.0.1:8080
+By default ```http-server``` starts on http://localhost:8080
 
 Check if you browser renders the same HTML as shown in the figure:
 <figure>

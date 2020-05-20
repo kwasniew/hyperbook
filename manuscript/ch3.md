@@ -46,7 +46,7 @@ import htm from "../node_modules/htm/dist/htm.mjs";
 Start HTTP server from the root:
 ```http-server .```
 
-Open http://127.0.0.1:8080/src and test your app.
+Open http://localhost:8080/src and test your app.
 
 It certainly works, but I had to inspect the contents of both libraries to provide correct paths.
 
