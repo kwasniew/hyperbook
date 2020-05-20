@@ -139,7 +139,7 @@ Note: Hyperapp is dropping support for ```JSX``` soon.
 Change you **App.js** code to use ```htm```:
 ```js
 import {h, app} from "https://unpkg.com/hyperapp?module";
-import htm from 'https://unpkg.com/htm?module';
+import htm from 'https://unpkg.com/htm/mini?module';
 
 const html = htm.bind(h);
 
