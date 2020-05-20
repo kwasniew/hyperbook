@@ -27,7 +27,7 @@ Import subscription definition:
 ```js
 import { Http, WebSocketListen } from "./web_modules/hyperapp-fx.js";
 ```
-```hyperapp-fx``` uses ```*Listen``` convention to name subscription creating functions.
+hyperapp-fx uses ```*Listen``` convention to name subscription creating functions.
 
 Write an action for handling incoming WebSocket events:
 ```js

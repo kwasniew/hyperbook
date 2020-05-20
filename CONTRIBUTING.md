@@ -13,6 +13,6 @@
 * avoid jargon: explain ideas with simple words
 * prefer task-based section headings: implementing, learning, testing, deploying etc.
 * reveal information progressively in small chunks
-* put UI elements and file names in **bold**, ```code``` and ```library names``` in triple quotes
+* put UI elements, file names in **bold**, ```code``` in triple quotes
 
 I created this checklist based on  https://developers.google.com/tech-writing/overview

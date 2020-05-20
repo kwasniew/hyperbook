@@ -80,7 +80,7 @@ const LoadLatestPosts = Http({
 ```
 ```Http``` function takes your effect data and builds a two-argument array with ```[httpEffectDefinition, effectData]```.
 
-Add ```hyperapp-fx``` and let Snowpack bundle it for the browser:
+Add hyperapp-fx and let Snowpack bundle it for the browser:
 ```
 {
   "dependencies": {

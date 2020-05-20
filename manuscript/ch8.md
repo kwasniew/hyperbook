@@ -102,7 +102,7 @@ const SavePost = (post) =>
     error: PostError
   });
 ```
-```hyperapp-fx``` ```Http``` effect has a special error field for the error handling action.
+hyperapp-fx ```Http``` effect has a special error field for the error handling action.
 ```PostError``` should enable the **Add Post** button and set the UI friendly error message. 
 
 Test your application. 
