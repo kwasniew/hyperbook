@@ -9,7 +9,7 @@
 Modern frontend development is very complicated:
 * frameworks with 10000k+ LOC, impenetrable at source code level to non-core developers
 * libraries with huge API surface area and tens of methods/operators to learn
-* more and more JS "the bad parts" to learn coming mostly from the class based programming
+* more and more JS "the bad parts", mostly from the class based programming
 * complex tooling to make everything work and taking away all the fun
 * layers upon layers of proprietary abstractions on top of the browser APIs
 * elaborate performance tricks to improve performance
