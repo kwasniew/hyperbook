@@ -122,7 +122,7 @@ As you don't have a second usage of this pattern yet, withhold this decision for
 
 ## Exercise: cleaning text input
 
-According to [modern reaserch](https://en.wikipedia.org/wiki/Desirable_difficulty), testing your knowledge is essential for learning. 
+According to [modern research](https://en.wikipedia.org/wiki/Desirable_difficulty), testing your knowledge is essential for learning. 
 If you want to get the most out of this book please do the exercises. They are not optional.
 
 Your application doesn't clear the input text after adding a new post.
