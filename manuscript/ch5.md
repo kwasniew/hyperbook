@@ -89,7 +89,7 @@ Create a **selector function** to extract only a part of the event you care abou
 ```js
 const targetValue = event => event.target.value;
 ```
-Eventually, you may move this code to a librarym but for now put it somewhere above your view declarations.
+Eventually, you may move this code to a library but for now put it somewhere above your view declarations.
 
 Switch ```UpdatePostTest``` to use the new function:
 ```js
@@ -116,18 +116,25 @@ In our case ```targetValue``` is applied to DOM event before invoking ```UpdateP
 
 If you keep using the ```[action, selector]``` array over and over, consider creating an alias:
 ```js
-const UpdatePostTestAction = [UpdatePostText, targetValue];
+const UpdatePostTextAction = [UpdatePostText, targetValue];
 ```
-As you don't have a second usage of this pattern yet, withhold this decision for now. 
+```js
+<input type="text" oninput=${UpdatePostTextAction} value=${state.currentPostText} autofocus />
+```
 
-## Exercise: cleaning text input
+## Exercises
+
+
 
 According to [modern research](https://en.wikipedia.org/wiki/Desirable_difficulty), testing your knowledge is essential for learning. 
 If you want to get the most out of this book please do the exercises. They are not optional.
 
+### Exercise: cleaning text input
+
 Your application doesn't clear the input text after adding a new post.
-Modify the ```AddPost``` action to reset ```currentPostText```. 
-Also make sure the initial text is empty.
+1. Modify the ```AddPost``` action to reset ```currentPostText```. 
+2. Make sure the initial text is empty.
+
 When you're done compare with the solution below.
 But first, try to do it on your own. 
 
@@ -143,7 +150,7 @@ const AddPost = (state) => {
 
 </details>
 
-## Exercise: checking empty input
+### Exercise: checking empty input
 
 After we clean the input, users may be tempted to submit the empty text. Your task is to prevent them from doing so.
 Application should ignore **Add Post** clicks when the text is empty.
