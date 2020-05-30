@@ -232,4 +232,4 @@ const UpdatePostText = (state, currentPostText) => ({
 
 </details>
 
-After this part revert your API ```url`` in ```SavePost``` to: https://hyperapp-api.herokuapp.com/api/post
+After this part revert your API ```url``` in ```SavePost``` to: https://hyperapp-api.herokuapp.com/api/post
