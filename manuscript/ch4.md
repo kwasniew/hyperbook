@@ -94,8 +94,8 @@ Test your app in the browser and click the **Add Post** button several times. Ne
 
 Hyperapp **data flow** is inspired by the [Elm Architecture](https://guide.elm-lang.org/architecture/):
 * view **V** interaction (e.g. click) triggers some action **A** 
-* action **A** changes state **S**
-* state **S** change re-renders the view **V**
+* action **A** creates a new state **S**
+* new state **S** causes re-render of the view **V** 
 
 ![Figure: Functional data flow](images/data-flow.jpg)
 
