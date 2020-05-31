@@ -13,7 +13,7 @@ Add an input field to change the text:
 
 When you start typing text into the input, your state and view will get out of sync. What you're typing is not
 reflected in the state object.
-One of the tenets of functional UI architecture is continuous synchronization of state and view. 
+One of the tenets of functional UI architecture is the continuous synchronization of state and view. 
 View reacting to state changes, and state changes reacting to view actions. 
 To make this work, you need some part of your state to model the contents of the input field. 
 
@@ -54,10 +54,10 @@ Compare the ```UpdatePostText``` signature with `the ``AddPost``` signature.
 ```
 Hyperapp actions accept either ```(oldState)``` or ```(oldState, event)```. 
 With a second attribute provided, Hyperapp will inject both sources of information to your action.
-The ```event``` is a regular DOM event, therefore we can access ```event.target.value``` from the DOM Event API. 
+The ```event``` is a regular DOM event. Therefore we can access ```event.target.value``` from the DOM Event API. 
 As mentioned before, it's all about transferable skills. 
 
-The following figure shows updated conceptual model of Hyperapp actions with the extra event attribute:
+The following figure shows the updated conceptual model of Hyperapp actions with the extra event attribute:
 
 ![Figure: Action is a pure function of state and event](images/action-with-event.jpg)
 
@@ -89,7 +89,7 @@ Create a **selector function** to extract only a part of the event you care abou
 ```js
 const targetValue = event => event.target.value;
 ```
-Eventually, you may move this code to a library but for now put it somewhere above your view declarations.
+Eventually, you may move this code to a library but for now, put it somewhere above your view declarations.
 
 Switch ```UpdatePostTest``` to use the new function:
 ```js
@@ -111,13 +111,14 @@ Shape the second argument of your action inside the input handler.
 ```js
 <input type="text" oninput=${[UpdatePostText, targetValue]} value=${state.currentPostText} autofocus />
 ```
-A two argument array with an action and a selector applies the event selector before the action is invoked. 
-In our case ```targetValue``` is applied to DOM event before invoking ```UpdatePostText```.
+Hyperapp will apply the selector from the two-argument array before invoking your action with its result.
+In our case ```targetValue``` is applied to DOM event before ```UpdatePostText``` is called.
 
 If you keep using the ```[action, selector]``` array over and over, consider creating an alias:
 ```js
 const UpdatePostTextAction = [UpdatePostText, targetValue];
 ```
+That you can pass directly:
 ```js
 <input type="text" oninput=${UpdatePostTextAction} value=${state.currentPostText} autofocus />
 ```
@@ -127,7 +128,7 @@ const UpdatePostTextAction = [UpdatePostText, targetValue];
 
 
 According to [modern research](https://en.wikipedia.org/wiki/Desirable_difficulty), testing your knowledge is essential for learning. 
-If you want to get the most out of this book please do the exercises. They are not optional.
+If you want to get the most out of this book, please do the exercises. They are not optional.
 
 ### Exercise: cleaning text input
 
@@ -135,7 +136,7 @@ Your application doesn't clear the input text after adding a new post.
 1. Modify the ```AddPost``` action to reset ```currentPostText```. 
 2. Make sure the initial text is empty.
 
-When you're done compare with the solution below.
+When you're done, compare with the solution below.
 But first, try to do it on your own. 
 
 <details>
@@ -152,8 +153,8 @@ const AddPost = (state) => {
 
 ### Exercise: checking empty input
 
-After we clean the input, users may be tempted to submit the empty text. Your task is to prevent them from doing so.
-Application should ignore **Add Post** clicks when the text is empty.
+After we clean the input, users may accidentally submit the empty text. Your task is to prevent them from doing so.
+The application should ignore **Add Post** clicks when the text is empty.
 
 <details>
     <summary id="checking_empty_input">Solution</summary>
