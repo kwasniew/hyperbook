@@ -5,6 +5,7 @@
 In the previous chapters you rendered static HTML with hardcoded nodes. 
 The next code snippet shows how to render a dynamic view with a list of posts.
 
+Change you **App.js** to the following code:
 ```js
 import { h, app } from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
