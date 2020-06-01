@@ -1,6 +1,6 @@
 [![License: CC BY-NC-ND 4.0](https://img.shields.io/badge/License-CC%20BY--NC--ND%204.0-blue.svg)](http://creativecommons.org/licenses/by-nc-nd/4.0/)
 
-# Hyperapp: Functional Front-Ends for Pure Happiness
+# Hyperapp: Functional Front-ends for Pure Happiness
 
 ## Table of Contents
 
