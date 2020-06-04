@@ -6,7 +6,7 @@ When learning a new framework I like to understand every single step I take and 
 Therefore, instead of generating boilerplate, you'll be writing everything yourself. 
 
 With more Hyperapp experience, you may formalize the setup into your own starter kit. 
-However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
+However, the starter kit is no longer necessary when the tools you use aren't so complicated.
 
 Create empty **src** directory with **index.html** and **App.js**. This book follows a convention with 
 first uppercase letter in JS file names. 
