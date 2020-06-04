@@ -5,9 +5,7 @@
 When learning a new framework I like to understand every single step I take and every single line of code I write.
 Therefore, instead of generating boilerplate, you'll be writing everything yourself.
 
-With more Hyperapp experience, you may formalize the setup into your own starter kit.
-However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
-
+When working with Hypearapp you don’t need a boilerplate starter project. Without complicated build tools there is no need for complicated configuration files that those tools provide.
 
 Create empty **src** directory with **index.html** and **App.js**. This book convention is to 
 uppercase the first letter of the JS file names.
