@@ -117,7 +117,7 @@ With the `--write` option `prettier` will re-write the formatted files in place.
 Install prettier bu running:
 `npm install`
 
-To test if `prettier` is working paset this malformed code into **App.js**:
+To test if `prettier` is working paste this malformed code into **App.js**:
 ```js
 import { h, app } from "./web_modules/hyperapp.js";
 import htm from "./web_modules/htm.js";
