@@ -25,7 +25,7 @@ Use the same versions of dependencies as this book to avoid surprises.
 
 Install dependencies:
 ```
-npm i
+npm install
 ```
 Look inside of **node_modules** directory. You'll find no transitive dependencies. Both `htm` and `hyperapp` bring no extra guests
 to the party.
@@ -37,7 +37,7 @@ import htm from "htm";
 ```
 Because browsers can't resolve those.
 
-Since both ```hyperapp``` and ```htm``` are zero-dependency libraries you can load them using **node_modules** paths. You have to look for the main JavaScript files. If you've used recommended versions then you can use:
+Since both `hyperapp` and `htm` are zero-dependency libraries you can load them using **node_modules** paths. You have to look for the main JavaScript files. If you've used recommended versions then you can use:
 ```js
 import {h, app} from "../node_modules/hyperapp/src/index.js";
 import htm from "../node_modules/htm/dist/htm.mjs";
@@ -52,10 +52,10 @@ It certainly works, but you had to inspect the contents of both libraries to pro
 
 ## Integrating Hyperapp with Snowpack 
 
-[Snowpack](https://www.snowpack.dev/) is a tool to translate selected ```node_modules``` into browser-friendly bundles at dependency installation time.
-It puts dependencies as files in a predictable location called ```web_modules```. 
+[Snowpack](https://www.snowpack.dev/) is a tool to translate selected `node_modules` into browser-friendly bundles at dependency installation time.
+It puts dependencies as files in a predictable location called `web_modules`. 
 It also has experimental support for deep imports, so all transitive dependencies are resolved as single browser-friendly files. 
-Deep imports work for libraries using ```require``` and [Node.js ESM modules](https://nodejs.org/api/esm.html). The latter means your dependency needs to use `.js` extension in the import statements.  
+Deep imports work for libraries using `require` and [Node.js ESM modules](https://nodejs.org/api/esm.html). The latter means your dependency needs to use `.js` extension in the import statements.  
 In essence, Snowpack makes bundling JS optional at development time.
 
 Update **package.json** with this `snowpack` setup:
