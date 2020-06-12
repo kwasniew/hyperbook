@@ -17,7 +17,7 @@ One of the tenets of functional UI architecture is the continuous synchronizatio
 View reacting to state changes, and state changes reacting to view actions. 
 To make this work, you need some part of your state to model the contents of the input field. 
 
-Create a new state property named ```currentPostText```:
+Create a new state property named `currentPostText`:
 ```js
 const state = {
   currentPostText: "type your text",
@@ -28,40 +28,40 @@ Read the new property in your view:
 ```js
 <input type="text" value=${state.currentPostText} autofocus />
 ```
-DOM attribute called ```value``` sets the text of the input field to the ```currentPostText```.
+DOM attribute called `value` sets the text of the input field to the `currentPostText`.
 
 ## Accessing DOM events
 
-Input text reflects ```currentPostText``` from the state object. You want to close the loop with DOM events changing the state.
+Input text reflects `currentPostText` from the state object. You want to close the loop with DOM events changing the state.
 
-Add DOM ```oninput``` attribute to trigger ```UpdatePostText``` action on input changes:
+Add DOM `oninput` attribute to trigger `UpdatePostText` action on input changes:
 ```js
 <input type="text" oninput=${UpdatePostText} value=${state.currentPostText} autofocus />
 ```
 
-Add a new action next to the ```AddPost``` action:
+Add a new action next to the `AddPost` action:
 ```js
 const UpdatePostText = (state, event) => ({
     ...state,
     currentPostText: event.target.value
 });
 ```
-Compare the ```UpdatePostText``` signature with `the ``AddPost``` signature.
+Compare the `UpdatePostText` signature with the `AddPost` signature.
 
 ```
 (oldState) => newState
 (oldState, event) => newState
 ```
-Hyperapp actions accept either ```(oldState)``` or ```(oldState, event)```. 
+Hyperapp actions accept either `(oldState)` or `(oldState, event)`. 
 With a second attribute provided, Hyperapp will inject both sources of information to your action.
-The ```event``` is a regular DOM event. Therefore we can access ```event.target.value``` from the DOM Event API. 
+The `event` is a regular DOM event. Therefore we can access `event.target.value` from the DOM Event API. 
 As mentioned before, it's all about transferable skills. 
 
 The following figure shows the updated conceptual model of Hyperapp actions with the extra event attribute:
 
 ![Figure: Action is a pure function of state and event](images/action-with-event.jpg)
 
-Try to add a new post with some text. It should still not work. You need to copy the ```currentPostText``` to the newly added post.
+Try to add a new post with some text. It should still not work. You need to copy the `currentPostText` to the newly added post.
 
 ```js
 const AddPost = (state) => {
@@ -91,14 +91,14 @@ const targetValue = event => event.target.value;
 ```
 Eventually, you may move this code to a library but for now, put it somewhere above your view declarations.
 
-Switch ```UpdatePostTest``` to use the new function:
+Switch `UpdatePostTest` to use the new function:
 ```js
 const UpdatePostText = (state, event) => ({
     ...state,
     currentPostText: targetValue(event)
 });
 ```
-The code is still dependent on the ```targetValue``` function.
+The code is still dependent on the `targetValue` function.
 
 Ideally, you'd like the action to accept only the data it needs:
 ```js
@@ -112,9 +112,9 @@ Shape the second argument of your action inside the input handler.
 <input type="text" oninput=${[UpdatePostText, targetValue]} value=${state.currentPostText} autofocus />
 ```
 Hyperapp will apply the selector from the two-argument array before invoking your action with its result.
-In our case ```targetValue``` is applied to DOM event before ```UpdatePostText``` is called.
+In our case `targetValue` is applied to DOM event before `UpdatePostText` is called.
 
-If you keep using the ```[action, selector]``` array over and over, consider creating an alias:
+If you keep using the `[action, selector]` array over and over, consider creating an alias:
 ```js
 const UpdatePostTextAction = [UpdatePostText, targetValue];
 ```
@@ -133,7 +133,7 @@ If you want to get the most out of this book, please do the exercises. They are 
 ### Exercise: cleaning text input
 
 Your application doesn't clear the input text after adding a new post.
-1. Modify the ```AddPost``` action to reset ```currentPostText```. 
+1. Modify the `AddPost` action to reset `currentPostText`. 
 2. Make sure the initial text is empty.
 
 When you're done, compare with the solution below.
