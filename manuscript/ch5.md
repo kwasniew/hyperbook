@@ -136,8 +136,8 @@ Your application doesn't clear the input text after adding a new post.
 1. Modify the `AddPost` action to reset `currentPostText`. 
 2. Make sure the initial text is empty.
 
+Try to do it on your own first. 
 When you're done, compare with the solution below.
-But first, try to do it on your own. 
 
 <details>
     <summary id="cleaning_text_input">Solution</summary>
