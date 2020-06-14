@@ -27,7 +27,7 @@ Import subscription definition:
 ```js
 import { Http, WebSocketListen } from "./web_modules/hyperapp-fx.js";
 ```
-hyperapp-fx uses ```*Listen``` convention to name subscription creating functions.
+hyperapp-fx uses `*Listen` convention to name subscription creating functions.
 
 Write an action for handling incoming WebSocket events:
 ```js
@@ -43,7 +43,7 @@ const SetPost = (state, event) => {
   }
 };
 ```
-The event is the underlying ```MessageEvent``` from the WebSocket API. You parse the ```data``` property of the event. 
+The event is the underlying `MessageEvent` from the WebSocket API. You parse the `data` property of the event. 
 If the data is a valid JSON post, you add it to the beginning of the post list. In case of a parsing error you don't change the state of the application.
 
 Plug the subscription and the action into the application:
@@ -60,8 +60,8 @@ app({
   node: document.getElementById("app"),
 });
 ```
-```WebSocketListen``` function expects an object with ```action``` and ```url```.
-Since WebSockets is a different protocol from HTTP, the URL scheme is ```ws://``` not ```http://```.
+`WebSocketListen` function expects an object with `action` and `url`.
+Since WebSockets is a different protocol from HTTP, the URL scheme is `ws://` not `http://`.
 
 Test your application. Add a new post. 
 
@@ -84,12 +84,12 @@ Diagnosing problems with WebSockets:
 ## Exercise: avoiding duplicate posts
 
 Your task is to change the code, so that it only adds a post from the WebSocket. 
-Modify the ```AddPost``` action and stop adding ```newPost``` until we receive a confirmation from the server.
+Modify the `AddPost` action and stop adding `newPost` until we receive a confirmation from the server.
 
 <details>
     <summary id="avoiding_duplicate_posts">Solution</summary>
 
-Inside ```AddPost``` action change this code:
+Inside `AddPost` action change this code:
 ```js
     const newState = {
       ...state,
@@ -124,12 +124,12 @@ Start with the same signature for the subscription definition:
 const eventSourceSubscription = (dispatch, data) => {};
 ```
 
-The browser API for SSE is called the ```EventSource```:
+The browser API for SSE is called the `EventSource`:
 ```js
 const es = new EventSource("https://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
 ```
-```EventSource``` is a regular event emitter similar e.g. to a clickable button.
+`EventSource` is a regular event emitter similar e.g. to a clickable button.
 
 Wrap the API into your subscription definition:
 ```js
@@ -138,8 +138,8 @@ const eventSourceSubscription = (dispatch, data) => {
   es.addEventListener("message", (event) => dispatch(data.action, event));
 };
 ```
-```data``` parameter will hold two configuration options: ```url``` and ```action```. 
-We follow the same convention that was used in the WebSockets implementation. When SSE notification arrives, dispatch an ```action``` and pass the server ```event```.
+`data` parameter will hold two configuration options: `url` and `action`. 
+We follow the same convention that was used in the WebSockets implementation. When SSE notification arrives, dispatch an `action` and pass the server `event`.
 
 In [Writing your own effects](ch6.md#writing-your-own-effects) section you used the following effect signature:
 ```js
@@ -166,12 +166,12 @@ app({
   node: document.getElementById("app"),
 });
 ```
-Because you followed the same naming convention for ```action``` and ```url``` it should be just a matter of switching ```url``` and ```WebSocketListen``` to ```EventSourceListen```.
+Because you followed the same naming convention for `action` and `url` it should be just a matter of switching `url` and `WebSocketListen` to `EventSourceListen`.
 
 Test your application. It should work the same way as the WebSocket version, but without switching to a different protocol. 
 
 Diagnosing problems with SSE:
-* make sure the ```eventsource``` connection-type was established
+* make sure the `EventSource` connection-type was established
 
 ![Figure: Establishing SSE connection](images/sse.png)
 
@@ -194,7 +194,7 @@ app({
     ...
 });
 ```
-Both the short-lived ```LoadLatestPosts``` action and long-lived ```EventSourceListen``` subscription are invoked on startup.
+Both the short-lived `LoadLatestPosts` action and long-lived `EventSourceListen` subscription are invoked on startup.
 
 If you never need to stop listening to the long-running event source, the subscription is effectively the same as the init action.
 The moment you need to stop listening to the event source they start to differ.
@@ -211,7 +211,7 @@ const eventSourceSubscription = (dispatch, data) => {
 };
 ```
 
-Fill in this template with your ```EventSource``` implementation:
+Fill in this template with your `EventSource` implementation:
 ```js
 const eventSourceSubscription = (dispatch, data) => {
   const es = new EventSource(data.url);
@@ -224,8 +224,8 @@ const eventSourceSubscription = (dispatch, data) => {
   };
 };
 ```
-The unsubscribe function removes a listener from the ```EventSource``` and closes the connection. 
-```addEventListener``` and ```removeEventListener``` need a reference to the same listener instance. Therefore, put the listener in a shared variable.
+The unsubscribe function removes a listener from the `EventSource` and closes the connection. 
+`addEventListener` and `removeEventListener` need a reference to the same listener instance. Therefore, put the listener in a shared variable.
 
 ## Controlling subscription status
 
@@ -233,7 +233,7 @@ You will add a capability to enable/disable live updates through the UI as shown
 
 ![Figure: Live Update control](images/liveupdate.png)
 
-Introduce intial state field called ```liveUpdate```:
+Introduce intial state field called `liveUpdate`:
 ```js
 const state = {
   currentPostText: "",
@@ -258,10 +258,10 @@ Add a UI control for live update just below the **Add Post** button.
     />
     <label for="liveUpdate">Live Update</label>
 ```
-This checkbox reflects the ```liveUpdate``` status. Every time the checkbox changes it toggles the status.
+This checkbox reflects the `liveUpdate` status. Every time the checkbox changes it toggles the status.
 Label for the input field conveniently allows for clicking **Live Update** text to change the settings.
 
-Control your subscription based on the ```liveUpdate``` status.
+Control your subscription based on the `liveUpdate` status.
 ```js
 app({
   init: [state, LoadLatestPosts],
@@ -277,12 +277,12 @@ app({
   node: document.getElementById("app")
 });
 ```
-When ```state.liveUpdate``` is ```true``` a new subscription gets created. When ```state.liveUpdate``` is ```false```  you unsubscribe and close the connection.
+When `state.liveUpdate` is `true` a new subscription gets created. When `state.liveUpdate` is `false`  you unsubscribe and close the connection.
 
 ## Exercise: fetching latest posts on toggle
 
 When the **Live Update** is off you may loose some posts. Therefore, when a user enables the update, load the latest posts.
-Modify ```ToggleLiveUpdate``` to ```LoadLatestPosts``` when appropriate.
+Modify `ToggleLiveUpdate` to `LoadLatestPosts` when appropriate.
 
 <details>
     <summary id="fetching_posts_on_toggle">Solution</summary>
