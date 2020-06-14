@@ -129,7 +129,7 @@ The browser API for SSE is called the `EventSource`:
 const es = new EventSource("https://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
 ```
-`EventSource` is a regular event emitter similar, e.g. to a clickable button.
+`EventSource` is a regular event emitter similar to a clickable button.
 
 Wrap the API into your subscription definition:
 ```js
