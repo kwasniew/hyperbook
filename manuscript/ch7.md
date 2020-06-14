@@ -17,7 +17,7 @@ To build intuition about subscriptions, look at even different sources that fit 
 
 What they have in common is a long-lived nature of the underlying event source. 
 
-Note: I'll refer to short-lived effects as just effects and too long-lived effects as subscriptions.
+Note: I'll refer to short-lived effects as just effects and the long-lived effects as subscriptions.
 
 ## Implementing subscriptions
 
@@ -171,7 +171,7 @@ Because you followed the same naming convention for `action` and `url`, it shoul
 Test your application. It should work the same way as the WebSocket version, but without switching to a different protocol. 
 
 Diagnosing problems with SSE:
-* make sure the `EventSource` connection-type was established
+* make sure the `eventsource` connection-type was established
 
 ![Figure: Establishing SSE connection](images/sse.png)
 
