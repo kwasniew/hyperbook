@@ -1,14 +1,14 @@
 # Chapter 7: Subscriptions
 
-## Understanding long running effects (subscriptions)
+## Understanding long-running effects (subscriptions)
 
-The HTTP effect you've been using so far was **short-lived**. A request is sent, a response arrives and the effect is over.
+The HTTP effect you've been using so far was **short-lived**. A request is sent, a response arrives, and the effect is over.
 Not all effects follow this pattern. E.g. if you open a connection to a WebSocket it will be running for a long time.
-It doesn't fit the the short-lived HTTP request-response model. 
+It doesn't fit the short-lived HTTP request-response model. 
 
 In Hyperapp you use **subscriptions** to handle those **long-lived** effects. 
 
-To build intuition about subscriptions look at different even sources that fit this model:
+To build intuition about subscriptions, look at even different sources that fit this model:
 * WebSockets
 * setInterval
 * mouse moves
@@ -17,11 +17,11 @@ To build intuition about subscriptions look at different even sources that fit t
 
 What they have in common is a long-lived nature of the underlying event source. 
 
-Note: I'll refer to short-live effects as just effects and to long-lived effects as subscriptions.
+Note: I'll refer to short-lived effects as just effects and too long-lived effects as subscriptions.
 
 ## Implementing subscriptions
 
-In this section you will subscribe to the WebSocket stream with post updates.
+In this section, you will subscribe to the WebSocket stream with post updates.
 
 Import subscription definition:
 ```js
@@ -44,7 +44,7 @@ const SetPost = (state, event) => {
 };
 ```
 The event is the underlying `MessageEvent` from the WebSocket API. You parse the `data` property of the event. 
-If the data is a valid JSON post, you add it to the beginning of the post list. In case of a parsing error you don't change the state of the application.
+If the data is a valid JSON post, you add it to the beginning of the post list. In case of a parsing error, you don't change the state of the application.
 
 Plug the subscription and the action into the application:
 ```js
@@ -69,7 +69,7 @@ Test your application. Add a new post.
 
 The post should be added to the list twice. 
 Directly from the local state update and a few milliseconds later from a WebSocket success action. 
-You'll fix this behavior in the next exercise. 
+You'll fix this behaviour in the next exercise. 
 For now, test your WebSocket connection in two different browser windows. See if the messages are propagated correctly.
 
 Diagnosing problems with WebSockets:
@@ -83,7 +83,7 @@ Diagnosing problems with WebSockets:
 
 ## Exercise: avoiding duplicate posts
 
-Your task is to change the code, so that it only adds a post from the WebSocket. 
+Your task is to change the code so that it only adds a post from the WebSocket. 
 Modify the `AddPost` action and stop adding `newPost` until we receive a confirmation from the server.
 
 <details>
@@ -109,9 +109,9 @@ To this:
 
 ## Writing your own subscription
 
-In this section you'll write your own subscription for [Server-Sent Events](https://www.smashingmagazine.com/2018/02/sse-websockets-data-flow-http2/).
+In this section, you'll write your subscription for [Server-Sent Events](https://www.smashingmagazine.com/2018/02/sse-websockets-data-flow-http2/).
 
-Server-Sent Events (SSE) is a lesser known, but much simpler HTTP-native alternative to WebSockets. 
+Server-Sent Events (SSE) is a lesser-known, but much simpler HTTP-native alternative to WebSockets. 
 SSE also handles network failures more gracefully than plain WebSockets. It can automatically reconnect on failed connections.
 
 In [Writing your own effects](ch6.md#writing-your-own-effects) section you defined effects as follows:
@@ -129,7 +129,7 @@ The browser API for SSE is called the `EventSource`:
 const es = new EventSource("https://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
 ```
-`EventSource` is a regular event emitter similar e.g. to a clickable button.
+`EventSource` is a regular event emitter similar, e.g. to a clickable button.
 
 Wrap the API into your subscription definition:
 ```js
@@ -166,7 +166,7 @@ app({
   node: document.getElementById("app"),
 });
 ```
-Because you followed the same naming convention for `action` and `url` it should be just a matter of switching `url` and `WebSocketListen` to `EventSourceListen`.
+Because you followed the same naming convention for `action` and `url`, it should be just a matter of switching `url` and `WebSocketListen` to `EventSourceListen`.
 
 Test your application. It should work the same way as the WebSocket version, but without switching to a different protocol. 
 
@@ -186,7 +186,7 @@ If your browser [doesn't support SSE](https://caniuse.com/#search=eventsource) u
 
 ## Understanding differences between init effect and subscription
 
-Looking at your subscription signature it's not much different from any short-live effect. 
+Looking at your subscription signature, it's not much different from any short-live effect. 
 You could event plug the subscription into the init:
 ```js
 app({
@@ -197,7 +197,7 @@ app({
 Both the short-lived `LoadLatestPosts` action and long-lived `EventSourceListen` subscription are invoked on startup.
 
 If you never need to stop listening to the long-running event source, the subscription is effectively the same as the init action.
-The moment you need to stop listening to the event source they start to differ.
+The moment you need to stop listening to the event source, they start to differ.
 
 ## Unsubscribing from subscriptions
 
@@ -229,7 +229,7 @@ The unsubscribe function removes a listener from the `EventSource` and closes th
 
 ## Controlling subscription status
 
-You will add a capability to enable/disable live updates through the UI as shown in the following figure:
+You will add a capability to enable/disable live updates through the UI, as shown in the following figure:
 
 ![Figure: Live Update control](images/liveupdate.png)
 
@@ -258,7 +258,7 @@ Add a UI control for live update just below the **Add Post** button.
     />
     <label for="liveUpdate">Live Update</label>
 ```
-This checkbox reflects the `liveUpdate` status. Every time the checkbox changes it toggles the status.
+This checkbox reflects the `liveUpdate` status. Every time the checkbox changes, it toggles the status.
 Label for the input field conveniently allows for clicking **Live Update** text to change the settings.
 
 Control your subscription based on the `liveUpdate` status.
@@ -281,7 +281,7 @@ When `state.liveUpdate` is `true` a new subscription gets created. When `state.l
 
 ## Exercise: fetching latest posts on toggle
 
-When the **Live Update** is off you may loose some posts. Therefore, when a user enables the update, load the latest posts.
+When the **Live Update** is off you may lose some posts. Therefore, when a user enables the update, load the latest posts.
 Modify `ToggleLiveUpdate` to `LoadLatestPosts` when appropriate.
 
 <details>
