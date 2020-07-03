@@ -8,7 +8,7 @@ It doesn't fit the short-lived HTTP request-response model.
 
 In Hyperapp you use **subscriptions** to handle those **long-lived** effects. 
 
-To build intuition about subscriptions, look at even different sources that fit this model:
+To build intuition about subscriptions, look at different sources that fit this model:
 * WebSockets
 * setInterval
 * mouse moves
@@ -73,7 +73,7 @@ You'll fix this behaviour in the next exercise.
 For now, test your WebSocket connection in two different browser windows. See if the messages are propagated correctly.
 
 Diagnosing problems with WebSockets:
-* make sure the HTTP protocol was switched to WebSockets
+* make sure the HTTP protocol switched to WebSockets
 
 ![Figure: Switching protocols](images/switching-protocols.png)
 
@@ -159,8 +159,7 @@ app({
   subscriptions: (state) => [
     EventSourceListen({
       action: SetPost,
-      url: "https://hyperapp-api.herokuapp.com/api/event/post",
-      event: "post",
+      url: "https://hyperapp-api.herokuapp.com/api/event/post"
     }),
   ],
   node: document.getElementById("app"),
@@ -196,18 +195,16 @@ app({
 ```
 Both the short-lived `LoadLatestPosts` action and long-lived `EventSourceListen` subscription are invoked on startup.
 
-If you never need to stop listening to the long-running event source, the subscription is effectively the same as the init action.
-The moment you need to stop listening to the event source, they start to differ.
+If you never need to stop listening to the long-running event source, the subscription is effectively the same as the init action. But, what if you have to stop listening to the subscription?
 
-## Unsubscribing from subscriptions
+## Subscription with Cleanup
 
-Subscriptions are long-lived effects you can unsubscribe from. 
-Return the code to unsubscribe in the subscription definition.
+Return the cleanup function from the subscription definition.
 ```js
 const eventSourceSubscription = (dispatch, data) => {
-   return () => {
-      // unsubscribe here
-   };
+  return () => {
+    // cleanup here
+  };
 };
 ```
 
@@ -224,12 +221,13 @@ const eventSourceSubscription = (dispatch, data) => {
   };
 };
 ```
-The unsubscribe function removes a listener from the `EventSource` and closes the connection. 
+The cleanup function removes a listener from the `EventSource` and closes the connection.
 `addEventListener` and `removeEventListener` need a reference to the same listener instance. Therefore, put the listener in a shared variable.
+But, how do you call the cleanup function? You don't. Hypeapp will call it for you.
 
 ## Controlling subscription status
 
-You will add a capability to enable/disable live updates through the UI, as shown in the following figure:
+It will be easier to understand the idea if we start with the UI first. Add a capability to enable/disable live updates through the checkbox, as shown in the following figure:
 
 ![Figure: Live Update control](images/liveupdate.png)
 
@@ -261,7 +259,7 @@ Add a UI control for live update just below the **Add Post** button.
 This checkbox reflects the `liveUpdate` status. Every time the checkbox changes, it toggles the status.
 Label for the input field conveniently allows for clicking **Live Update** text to change the settings.
 
-Control your subscription based on the `liveUpdate` status.
+You can control your subscription based on the `liveUpdate` status:
 ```js
 app({
   init: [state, LoadLatestPosts],
@@ -277,11 +275,12 @@ app({
   node: document.getElementById("app")
 });
 ```
-When `state.liveUpdate` is `true` a new subscription gets created. When `state.liveUpdate` is `false`  you unsubscribe and close the connection.
+When `state.liveUpdate` is `true` a new subscription gets returned in the subscriptions array. When `state.liveUpdate` is `false`, Hyperapp compares the two arrays and notices that a subscription is removed. It will call its cleanup function for you.
+If you're familiar with `useEffect` in React, then you should notice how much more elegant it is. It's not dependent on the order of calls, you don't need to remember to pass an empty array `[]`, and your dependencies are standard JS logic `state.liveUpdate && EventSourceListen(/* ... */)` instead of `[state.liveUpdate]` that's easy to miss.
 
-## Exercise: fetching latest posts on toggle
+## Exercise: fetching latest posts when resubscribing to the Live Updates
 
-When the **Live Update** is off you may lose some posts. Therefore, when a user enables the update, load the latest posts.
+When the **Live Update** is off you may lose some posts. Therefore, when a user enables the live update, load the latest posts.
 Modify `ToggleLiveUpdate` to `LoadLatestPosts` when appropriate.
 
 <details>
