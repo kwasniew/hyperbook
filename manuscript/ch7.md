@@ -278,7 +278,7 @@ app({
 When `state.liveUpdate` is `true` a new subscription gets returned in the subscriptions array. When `state.liveUpdate` is `false`, Hyperapp compares the two arrays and notices that a subscription is removed. It will call its cleanup function for you.
 If you're familiar with `useEffect` in React, then you should notice how much more elegant it is. It's not dependent on the order of calls, you don't need to remember to pass an empty array `[]`, and your dependencies are standard JS logic `state.liveUpdate && EventSourceListen(/* ... */)` instead of `[state.liveUpdate]` that's easy to miss.
 
-## Exercise: fetching latest posts when resubscribing to the Live Updates
+## Exercise: fetching latest posts on toggle
 
 When the **Live Update** is off you may lose some posts. Therefore, when a user enables the live update, load the latest posts.
 Modify `ToggleLiveUpdate` to `LoadLatestPosts` when appropriate.
