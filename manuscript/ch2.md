@@ -2,7 +2,7 @@
 
 ## Getting started
 
-When learning a new framework I like to understand every single step I take and every single line of code I write.
+When learning a new framework, I like to understand every single step I take and every single line of code I write.
 Therefore, instead of generating boilerplate, you'll be writing everything yourself.
 
 With more Hyperapp experience, you may formalize the setup into your own starter kit.
@@ -11,6 +11,8 @@ However, you may also realize the starter kit is no longer necessary with certai
 
 Create empty **src** directory with **index.html** and **App.js**. This book convention is to 
 uppercase the first letter of the JS file names.
+
+Note: If you prefer an online environment, you can look at [codesandbox.io/s/hyperapp-playground-fwjlo](https://codesandbox.io/s/hyperapp-playground-fwjlo).
 
 **index.html**
 ```html
@@ -32,7 +34,7 @@ uppercase the first letter of the JS file names.
 ```
 You'll be using a prototype friendly [mvp.css](https://andybrewer.github.io/mvp/) stylesheet to get
 out-of-the-box styling for semantic HTML.
-Our HTML uses **App.js** as ES6 module (```type="module"```), therefore you can use ES6 imports without a build tool.
+Our HTML uses **App.js** as ES6 module (```type="module"```). Therefore you can use ES6 imports without a build tool.
 Finally, Hyperapp will render its contents into the  ```<div id="app"></main>```.
 
 
@@ -62,14 +64,14 @@ If you already have Node.js and npm on your machine then you can install it with
 ```
 npm i http-server -G
 ```
-After that run in the root of the project:
+After that, run in the root of the project:
 ```
 http-server src
 ```
 
-By default the `http-server` starts on http://localhost:8080
+By default, the `http-server` starts on http://localhost:8080.
 
-Check if you browser renders the following HTML:
+Check if your browser renders the following HTML:
 
 ![Figure: Getting started HTML](images/getting-started.png)
 
@@ -77,10 +79,10 @@ Check if you browser renders the following HTML:
 
 ![View as a function of state](images/view.jpg)
 
-In the functional approach to UI development, view is a pure function of state.
+In the functional approach to UI development, the view is a pure function of the state.
 Hyperapp ```view``` function takes ```state``` object as an input and returns a data structure describing future DOM tree to build.
 The returned data structure is known as the **Virtual DOM**. The framework can translate it into very efficient low-level DOM updates.
-With Hyperapp you never work directly with the DOM API in your application code.
+With Hyperapp, you never work directly with the DOM API in your application code.
 Instead of making imperative calls such as ```document.createElement```, ```element.insertBefore``` or ```element.removeChild``` you declare
 what the view should look like and let the framework figure out the details. 
 
@@ -123,7 +125,7 @@ How much effort would it take to translate the following snippet into the ```h``
 ```
 Translating between HTML and the ```h``` function calls can get tiresome for nested HTML.
 Even if you automate the process, you still have to mentally switch between JS representation and HTML representation you see in DevTools.
-However, if you write everything from scratch and prefer JS-driven templating, calling ```h``` function directly is a solid option.
+However, if you write everything from scratch and prefer JS-driven templating, directly calling ```h``` function is a solid option.
 
 ### JSX
 
