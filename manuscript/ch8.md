@@ -12,7 +12,7 @@ const SavePost = (post) =>
 ```
 When you test the app `SavePost` should take about 3 seconds before a notification arrives. 
 While waiting for the response, you can send more requests without getting confirmation that the previous ones succeeded. 
-If it were real application users would try to add the same message thinking that something went wrong. Disable the **Add Post** button while the post is saving.
+Confused users may try to add the same message again thinking that something went wrong. Disable the **Add Post** button while the post is saving.
 
 Enhance initial state with the `isSaving` property.
 ```js
