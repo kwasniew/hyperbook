@@ -158,7 +158,7 @@ app({
    node: document.getElementById("app")
 });
 ```
-```htm``` connects to Hyperapp via ```bind``` function. Write your HTML inside ```html``` tagged template literals. Under the hood ```htm```, translates everything to the low-level ```h``` function calls.
+```htm``` connects to Hyperapp via ```bind``` function. Write your HTML inside ```html``` tagged template literals. Under the hood ```htm``` translates everything to the low-level ```h``` function calls.
 
 ```htm``` works with any Virtual DOM framework matching the signature:
 ```js
