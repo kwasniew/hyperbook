@@ -1,10 +1,8 @@
 # Chapter 6: Effects as data
-
-## Understanding "effects as data"
-
-All actions you've seen so far were simple state transitions from one data structure to the other.
-However, in real-world scenarios, your application will probably have to deal with side-effects, e.g. making HTTP calls to some API.
-A typical functional approach to side-effects is to move them to the edges of the system.
+## Understanding side-effects
+All actions you’ve seen so far were simple state transitions from one data structure to the other.
+However, in real-world scenarios, your application will probably have to deal with side-effects, e.g. making HTTP calls to the API.
+A typical functional approach to side-effects is to move them to the edges of the system. But, let’s start from the ground up.
 
 Imagine the following hypothetical code you could write:
 ```js
@@ -12,57 +10,167 @@ const SetPosts = (state, posts) => ({
   ...state,
   posts
 });
-const LoadLatestPosts = (state) => fetch("https://hyperapp-api.herokuapp.com/api/post").then(SetPosts);
+const LoadLatestPosts = (state) =>
+  fetch("https://hyperapp-api.herokuapp.com/api/post")
+    .then(response => response.json())
+    .then(SetPosts);
 ```
 `LoadLatestPosts` uses browser Fetch API to get data from the server.
 When the data arrives, it invokes a simple state transition function to set the posts in the local state.
 Since `fetch` causes side effects (going over the wire with HTTP) it makes your entire program side-effectful.
-It only takes one innocent `fetch` call to make all code impure.
+## Understanding "effects as data"
+It only takes one innocent `fetch` call to make all your code impure. Fetching the data in your code is manageable when the app is small. Unfortunately, it makes it harder to think about the app when you have lots of functions all with their own fetch calls.
 
-Let’s do a thought experiment in code. How can we represent the effect as a data structure?
+Note: If you’re familiar with Redux then it will be similar to dispatching actions from reducers discussion. You don’t want to break the purity of the reducers in Redux, and you don’t want that in Hyperapp. 
+
+You may be used to mocking `fetch` in your tests, but have you ever asked yourself why you have to do that?
+
+Let’s do a thought experiment in code. How can we represent the effect (making a fetch request) as a data structure?
 ```js
 const SetPosts = (state, posts) => ({
   ...state,
   posts
 });
-const LoadLatestPosts = {
+const data = {
+  url: "https://hyperapp-api.herokuapp.com/api/post",
+  action: SetPosts
+};
+// const LoadLatestPosts = ??
+```
+Before we try to figure out how the `LoadLatestPosts` could look like, let’s explain the structure of the data it would need. 
+`data` is an object. It has API `url` pointing to the resource that we want to load (`"https://hyperapp-api.herokuapp.com/api/post"`). After it’s loaded you want to call `SetPosts` action. You can think of `action: SetPosts` as a callback. While different effects need all kinds of data, almost all effects use `action` to call when they're done. 
+
+But how should Hyperapp know how to interpret this object?
+
+![Figure: Hyperapp can't interpret arbitrary data](images/arbitrary-effect.svg)
+
+Hyperapp is less than 500 lines of code. It can’t support all effects out of the box. There's no way it can translate arbitrary JS objects to every single side-effect you can imagine. Because of it, you must pass the side-effect function definition and the effect data as a two-argument array. Instead of using side-effect function definition, let’s use Effect Definition to make it shorter.
+
+```js
+const SetPosts = (state, posts) => ({
+  ...state,
+  posts
+});
+const data = {
+  url: "https://hyperapp-api.herokuapp.com/api/post",
+  action: SetPosts
+};
+const LoadLatestPosts = [effectDefinition, data];
+// We will explain effectDefinition in a moment
+```
+To summarize what we’ve done so far: Side-effects in Hyperapp are made of the effect definition and the effect data:
+```js
+[effectDefinition, data]
+```
+## Write a new effect definition
+
+Let’s move from the abstract `effectDefinition` to actual code to make HTTP GET `fetch` request.  Let’s call it `fetchEffect`
+```js
+const LoadLatestPosts = [fetchEffect, data];
+```
+
+```
+Hyperapp passes two arguments to the effect definition:
+```js
+const fetchEffect = (dispatch, data) => {};
+```
+Hyperapp will invoke your effect and inject a `dispatch` function that the effect definition will call. `data` is the data you pass to the effect. 
+A simple implementation of the fetch effect definition may look like this:
+```js
+const fetchEffect = (dispatch, data) => {
+  return fetch(data.url)
+      .then(response => response.json())
+      .then(json => dispatch(data.action, json));
+};
+```
+As an effect library author, you translate the side-effectful API call (e.g. `fetch`) into a `dispatch` call. You will never call `fetch` directly outside of effect definitions.
+
+Our original post-fetch action definition looked like this:
+```js
+const SetPosts = (state, posts) => ({
+  ...state,
+  posts
+});
+```
+Remember that it’s passed as an action: 
+```js
+const data = {
   url: "https://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
 };
 ```
-`LoadLatesPosts` is an object with API `url` and follow-up `action` to invoke after the fetch completes.
-Ideally, we'd like to pass this object to Hyperapp and let it get the posts from the API on our behalf.
-We don't want to fetch the data ourselves in the userland code, as it makes composition and testing harder.
-This is the essence of moving impure code to the edges of the system. The framework handles the impure part, while your code stays pure and very declarative.
+When the effect calls `dispatch(data.action,  json)` Hyperapp will call your action with the current state and pass the `json` from the API as the `posts` parameter. 
 
-But how should Hyperapp know how to interpret this object?
+The effect definition will **hide** the `fetch` call or any other impure API. You will never invoke the effect definition in the userland code yourself. When you pass the effect definition to the framework, it will call the impure code for you.
 
-![Figure: Hyperapp can't interpret arbitrary data](images/arbitrary-effect.jpg)
+Didn’t we tell you that even a bit of side-effect makes the whole application impure? What’s the difference when you’re calling fetch directly versus Hyperapp calling it for you? 
 
-There's no way it can translate arbitrary JS objects to every single side-effect you can imagine.
-That's why it doesn't even try. Instead, you must pass the side-effect definition and the effect data as a two-argument array.
+![Figure: Hyperapp handling effect definitions from the userland](images/hyperapp-impure.svg)
 
+In essence, it’s moving impure code to the edges of the system. The framework handles the impure part, while your code stays pure and declarative. It’s not possible to get rid of all impure code. Impure code is one that makes changes to the world. We want that. The only perfectly pure code out there is one that does nothing. But, it’s easier to think about pure code, so you want as much of it as possible.
+
+## Writing generic effects
+
+It would be a little too repetitive to create this array every time you want to make a fetch request. Especially because the effect definition that we called `fetchEffect` will always be the same. 
 ```js
-const LoadLatestPosts = [effectDefinition, {
+const LoadLatestPosts = [fetchEffect, {
   url: "https://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
 }];
+const LoadSomethingElseExample = [fetchEffect, { 
+/* data */
+}];
 ```
-
-Side-effects in Hyperapp are made of the effect definition and the effect data:
+To prevent that make a function that will hide the repetition:
 ```js
-[effectDefinition, data]
+const Fetch = data => [fetchEffect, data];
 ```
+Then, pass the actual effect data:
+```js
+const LoadLatestPosts = Fetch({
+  url: "https://hyperapp-api.herokuapp.com/api/post",
+  action: SetPosts
+});
+```
+## Triggering effects on application startup
 
-The effect definition will hide the `fetch` call or some other impure API. You will never invoke the effect definition in the userland code yourself.
-It's something you must pass to the framework so that it can call the impure part for you.
+With fetch effect defined, you must decide when to invoke it. For now, you'll start fetching posts early on application startup.
 
-![Figure: Hyperapp handling effect definitions from the userland](images/effect-definition.jpg)
+Modify `init` to invoke `LoadLatestPosts`. Change:
+```js
+app({
+  init: state,
+  ...  
+});
+```
+to:
+```js
+app({
+  init: [state, LoadLatestPosts],
+  ...  
+});
+```
+`init` has an overloaded signature. In addition to the initial state, you can pass one or more actions to invoke on startup.
 
-## Implementing "effects as data"
+
+With those changes in place, test your application. A list of posts from the server should arrive and replace the hard-coded posts.
+You may observe a content flip as Hyperapp replaces initial state with the server posts.
+
+![Figure: Loading initial posts](images/initial-posts.png)
+
+If everything works fine, replace the initial posts with an empty array:
+```js
+const state = {
+  currentPostText: "",
+  posts: []
+};
+```
+It will remove the initial flash of default data.
+
+## Implementing "effects as data" in practice
 
 In this section, you'll use an open-source library [hyperapp-fx](https://github.com/okwolf/hyperapp-fx) that implements the most common effects.
-In one of the next sections, you'll peek under the hood and build your own effects.
+
 
 In **App.js** add `LoadLatestPosts` effect that invokes `SetPost` action on successful response:
 ```js
@@ -78,10 +186,10 @@ const LoadLatestPosts = Http({
   action: SetPosts
 });
 ```
-`Http` function takes your effect data and builds a two-argument array with `[httpEffectDefinition, effectData]`.
+`Http` function takes your effect data and builds a two-argument array of `[httpEffectDefinition, effectData]`.  It’s a more generic version of our `Fetch` function `const Fetch = data => [fetchEffect, data];`, but with more capabilities. 
 
 Add hyperapp-fx:
-```
+```json
 {
   "dependencies": {
     "htm": "3.0.4",
@@ -91,86 +199,13 @@ Add hyperapp-fx:
 }
 ```
 
-And let Snowpack bundle it for the browser:
+And let Snowpack bundle it for the browser when installing dependencies:
 
 ```npm i```
 
-## Triggering effects on application startup
-
-With HTTP effect defined, you must decide when to invoke it. For now, you'll do it on application startup to start fetching posts early.
-
-Modify `init` to invoke `LoadLatestPosts`:
-```js
-app({
-  init: [state, LoadLatestPosts],
-  ...  
-});
-```
-`init` has overloaded signature. In addition to the initial state, you can pass one or more actions to invoke on startup.
-
-With those changes in place, test your application. A list of posts from the server should arrive and replace the hard-coded posts.
-You may observe a content flip as Hyperapp replaces initial state with the server posts.
-
-![Figure: Loading initial posts](images/initial-posts.png)
-
-If everything works fine, replace the initial posts with an empty array:
-```js
-const state = {
-  currentPostText: "",
-  posts: []
-};
-```
-It will remove the initial flip.
-
-## Writing your own effects
-
-Most of the time, you don't need to write your own effects. However, to better understand the underlying concepts implement `Http` effect yourself.
-
-Comment out this line of code:
-```js
-// import { Http } from "./web_modules/hyperapp-fx.js";
-```
-
-Your implementation of the effect should build an array with the effect definition and the effect data.
-```js
-const Http = data => [httpEffect, data];
-```
-Hyperapp expects two-parameter signature in the effect definition:
-```js
-const httpEffect = (dispatch, data) => {};
-```
-
-A simple implementation of the HTTP effect may look like this:
-```js
-const httpEffect = (dispatch, data) => {
-  return fetch(data.url)
-      .then(response => response.json())
-      .then(json => dispatch(data.action, json));
-};
-```
-As an effect library author, you translate the side-effectful API call (e.g. `fetch`) into a `dispatch` call.  
-Hyperapp will invoke this effect and inject a `dispatch` function. You will never call it directly in the application code.
-
-Our original post-fetch action definition looked like this:
-```js
-const SetPosts = (state, posts) => ({
-  ...state,
-  posts
-});
-```
-`dispatch` call will replace the second parameter with the JSON data from the API.
-The first parameter will be a regular state object that you used before.
-
-Test your own implementation of the `Http` effect.
-If everything works, uncomment the original `Http` effect from the library and delete your implementation.
-
-```js
-import { Http } from "./web_modules/hyperapp-fx.js";
-```
-
-## Understanding effectful actions
-
-`LoadLatestPosts` alias for the `Http` effect is invoked on application startup. What if we wanted to trigger `Http` effects from regular actions?
+## Triggering Effects from Actions
+You’re loading posts from the server, but what about adding new posts?
+`LoadLatestPosts` alias for the `Http` effect is invoked on application startup. 
 
 Create `SavePost` effect:
 ```js
@@ -187,47 +222,86 @@ const SavePost = (post) =>
     action: (state, data) => state,
   });
 ```
-This effect wraps HTTP POST. The `action` to be triggered on successful response is not doing anything yet.
+This effect wraps HTTP POST. The `action` to be triggered on successful response is only a placeholder that doesn’t do anything useful yet. It’s only returning the state that it got as an argument.
 
-To trigger this effect from an action use the following signature as a template:
-```js
-const EffectfulActionExample = oldState => [newState, Effect];
-```
-This is how you create **effectful actions**. The return type is the same as the value of the `init` function.
-So you return both the new state and the effect to invoke.
-
-Hyperapp applies the new state and schedules the effect almost instantly.
-The return action inside the effect will trigger eventually, e.g. when the HTTP response arrives.
-
-If you have more than one effect wrap them in an array:
-```js
-const EffectfulActionExample = oldState => [newState, [Effect1, Effect2]];
-```
-Or pass them comma-separated at the end of the main array:
-```js
-const EffectfulActionExample = oldState => [newState, Effect1, Effect2];
-```
-
-## Exercise: making effectful action
-
-Change the `AddPost` action to trigger the `SavePost` effect.  Do it every time a post is added to the local state.
-Use the network tab to verify if the request is sent:
-
-![Figure: Sending JSON payload to the server](images/sending.png)
-
-<details>
-    <summary id="making_effectful_action">Solution</summary>
+Change the `AddPost` action to trigger the `SavePost` effect.  
 
 ```js
 const AddPost = state => {
   if (state.currentPostText.trim()) {
-    const newPost = { username: "anonymous", body: state.currentPostText };
-    const newState = { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
+    const newPost = { 
+      username: "anonymous",
+      body: state.currentPostText
+      };
+    const newState = { 
+      ...state,
+      currentPostText: "",
+      posts: [newPost, ...state.posts]
+    };
     return [newState, SavePost(newPost)];
   } else {
     return state;
   }
 };
+```
+## More Effects
+
+If you have more than one effect wrap them in an array:
+```js
+const ActionExample = oldState => [newState, [Effect1, Effect2]];
+```
+Or pass them comma-separated at the end of the main array:
+```js
+const ActionExample = oldState => [newState, Effect1, Effect2];
+```
+They do the same thing, so pick a convention that makes the most sense to you. You can add as many effects as you need. Think of it as a batch of effects. 
+
+## Using Effects
+
+The important thing to remember is that whenever you see `state`, you can replace it with `[state, effect*]` array. 
+You can use it in the `app` `init`:
+```js
+app({
+  init: [state, LoadLatestPosts],
+  ...  
+});
+```
+But, the same structure can be returned from an action. 
+```js
+const NewUser = state => {
+  const newPost = {
+    username: "anonymous",
+    body: `new user joined chat`
+  };
+
+  const newState = {
+    ...state,
+    currentPostText: "",
+    posts: [newPost, ...state.posts]
+  };
+  return [newState, SavePost(newPost)];
+};
+```
+
+
+## Exercise:  Trigger `NewUser` action on application startup
+Change:
+```js
+app({
+  init: [state, LoadLatestPosts],
+  ...  
+});
+```
+to trigger the `NewUser` action.
+
+<details>
+    <summary id="making_effectful_action">Solution</summary>
+
+```js
+app({
+  init: [state, LoadLatestPosts, NewUser],
+  ...  
+});
 ```
 
 </details>
