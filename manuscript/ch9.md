@@ -6,10 +6,10 @@
 ```setTimeout``` becomes an effect, ````setInterval```` becomes a subscription. HTTP calls become effects, SSE becomes subscriptions. 
 
 What about things like `console.log` or `Math.random()`? 
-Can wrap them inside effects? Yes, but it's more convenient to use them directly. Let's see that in practice.
+Can you wrap them inside effects? Yes, but it's more convenient to use them directly. While working on the runtime optimization, you will use a function based on `Math.random()`.
 
 Our next requirement is to add unique identifiers to the posts.
-Put the `guid` function based on `Math.random()` into your code:
+Put the `guid` function into your code:
 ```js
 const guid = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
