@@ -6,10 +6,12 @@
 
 Add an input field to change the text:
 ```js
-<h1>Recent Posts</h1>
+<h4>hyperposts</h4>
 <input type="text" autofocus />
+${" "}
 <button onclick=${AddPost}>Add Post</button>
 ```
+We added a whitespace between the input and the button to make the UI nicer.
 
 When you start typing text into the input, your state and view will get out of sync. What you're typing is not
 reflected in the state object.
@@ -59,14 +61,14 @@ As mentioned before, it's all about transferable skills.
 
 The following figure shows the updated conceptual model of Hyperapp actions with the extra event attribute:
 
-![Figure: Action is a pure function of state and event](images/action-with-event.jpg)
+![Figure: Action is a pure function of state and event](images/action-with-event.png)
 
 Try to add a new post with some text. It should still not work. You need to copy the `currentPostText` to the newly added post.
 
 ```js
 const AddPost = (state) => {
-  const newPost = { username: "anonymous", body: state.currentPostText };
-  return { ...state, posts: [newPost, ...state.posts] };
+    const newPost = { username: "anonymous", body: state.currentPostText };
+    return { ...state, posts: [...state.posts, newPost] };
 };
 ```
 
@@ -85,7 +87,7 @@ All event based actions will follow a similar pattern:
 ```
 Action code would be cleaner if it didn't know about the DOM Event API.
 
-Create a **selector function** to extract only a part of the event you care about:
+Create a **custom payload filter** to extract only a part of the event you care about:
 ```js
 const targetValue = event => event.target.value;
 ```
@@ -107,16 +109,18 @@ const UpdatePostText = (state, currentPostText) => ({
     currentPostText
 });
 ```
-Shape the second argument of your action inside the input handler. 
+Shape the second argument of your action using the following snippet: 
 ```js
-<input type="text" oninput=${[UpdatePostText, targetValue]} value=${state.currentPostText} autofocus />
+const withFilter = filter => action => (state, event) => action(state, filter(event));
+const withTargetValue = withFilter(targetValue);
+<input type="text" oninput=${withTargetValue(UpdatePostText)} value=${state.currentPostText} autofocus />
 ```
-Hyperapp will apply the selector from the two-argument array before invoking your action with its result.
-In our case `targetValue` is applied to DOM event before `UpdatePostText` is called.
+`withFilter` is a curried function that can be first configured with a given filter e.g. `targetValue` and then
+applied to a given action e.g. `UpdatePostText`.  It returns a new action that applied filter to the original event.
 
-If you keep using the `[action, selector]` array over and over, consider creating an alias:
+If you keep using `withTargetValue(UpdatePostText)` over and over, consider creating an alias:
 ```js
-const UpdatePostTextAction = [UpdatePostText, targetValue];
+const UpdatePostTextAction = withTargetValue(UpdatePostText);
 ```
 That you can pass directly:
 ```js
@@ -124,8 +128,6 @@ That you can pass directly:
 ```
 
 ## Exercises
-
-
 
 According to [modern research](https://en.wikipedia.org/wiki/Desirable_difficulty), testing your knowledge is essential for learning. 
 If you want to get the most out of this book, please do the exercises. They are not optional.
@@ -145,7 +147,7 @@ When you're done, compare with the solution below.
 ```js
 const AddPost = (state) => {
   const newPost = { username: "anonymous", body: state.currentPostText };
-  return { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
+  return { ...state, currentPostText: "", posts: [...state.posts, newPost] };
 };
 ```
 
@@ -163,7 +165,7 @@ The application should ignore **Add Post** clicks when the text is empty.
 const AddPost = (state) => {
   if(state.currentPostText.trim()) {
       const newPost = { username: "anonymous", body: state.currentPostText };
-      return { ...state, currentPostText: "", posts: [newPost, ...state.posts] };
+      return { ...state, currentPostText: "", posts: [...state.posts, newPost] };
   }  else {
       return state;
   }
