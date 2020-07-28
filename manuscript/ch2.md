@@ -89,9 +89,9 @@ what the view should look like and let the framework figure out the details.
 ## Analyzing view rendering options
 
 View function builds a Virtual DOM data structure. You have at least 3 options to choose from:
-* ```h```
-* ```JSX``` translating to ```h``` at build time
-* ```htm``` translating to ```h``` at runtime or build time
+* `h` - low level Virtual DOM builder
+* `@hyperapp/html` - syntactic sugar on top of the `h` function
+* `hyperlit` - JSX like library translating to `h` at runtime or build time
 
 
 ### h
@@ -99,7 +99,7 @@ View function builds a Virtual DOM data structure. You have at least 3 options t
 Currently, your application uses a built-in **h** function to create Virtual DOM nodes.
 Change your ```view``` function to wrap the text in a ```span``` element:
 ```js
-state => h("h1", {id: "my-header"}, [h("span", {}, state.text)])
+state => h("h1", {id: "my-header"}, [h("span", {}, text(state.text))])
 ```
 Check the generated HTML:
 ```html
@@ -107,7 +107,7 @@ Check the generated HTML:
 ```
 
 What about creating something more complicated?
-How much effort would it take to translate the following snippet into the ```h``` function calls?
+How much effort would it take to translate the following snippet into the `h` function calls?
 ```html
 <div>
    <h1>Recent Posts</h1>
@@ -123,51 +123,28 @@ How much effort would it take to translate the following snippet into the ```h``
    </ul>
 </div>
 ```
-Translating between HTML and the ```h``` function calls can get tiresome for nested HTML.
+Translating between HTML and the `h` function calls can get tiresome for nested HTML.
 Even if you automate the process, you still have to mentally switch between JS representation and HTML representation you see in DevTools.
 However, if you write everything from scratch and prefer JS-driven templating, directly calling ```h``` function is a solid option.
 
-### JSX
+### hyperlit
 
-[JSX](http://facebook.github.io/jsx/) is a language extension that originated in the React circles. It allows to write JS code that looks like HTML:
-```jsx
-view: state => <h1 id="my-header"><span>{state.text}</span></h1>
-```
+[hyperlit](https://github.com/zaceno/hyperlit) is a tiny library with HTML-like syntax and no build tool requirement.
 
-To make JSX work, you need to run a transpiler from JSX to the ```h``` function calls.
-If adding a build step to your development process is not your thing, we have one more option.
-
-Note: Hyperapp is dropping support for ```JSX``` soon.
-
-### htm
-
-[htm](https://github.com/developit/htm) is a tiny library with HTML-like syntax and no build tool requirement.
-
-Change you **App.js** code to use ```htm```:
+Change you **App.js** code to use `hyperlit`:
 ```js
-import {h, app} from "https://unpkg.com/hyperapp?module";
-import htm from 'https://unpkg.com/htm/mini?module';
-
-const html = htm.bind(h);
+import {app} from "https://unpkg.com/hyperapp?module";
+import html from 'https://unpkg.com/hyperlit?module';
 
 const state = {text: "Welcome to Hyperapp!"};
 
 app({
-   init: state,
-   view: state => html`<h1 id="my-header"><span>${state.text}</span></h1>`,
-   node: document.getElementById("app")
+    init: state,
+    view: state => html`<h1 id="my-header"><span>${state.text}</span></h1>`,
+    node: document.getElementById("app")
 });
 ```
-```htm``` connects to Hyperapp via ```bind``` function. Write your HTML inside ```html``` tagged template literals. Under the hood ```htm``` translates everything to the low-level ```h``` function calls.
+Write your HTML inside `html` tagged template literals. Under the hood `hyperlit` translates your HTML to the low-level `h` function calls.
 
-```htm``` works with any Virtual DOM framework matching the signature:
-```js
-function buildVirtualNode(type, props, ...children) {}
-```
-The ```h``` function matches the signature:
-```js
-function h(type, props, ...children) {}
-```
-
-Note: If you want to replace ```htm``` with ```h``` calls in production, you can use ```babel-plugin-htm```.
+Note: If you want to replace `hyperlit` with ```h``` calls in production, you can use `babel-plugin-hyperlit`.
 
