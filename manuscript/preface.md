@@ -5,18 +5,18 @@
 > -- Mark Twain
 
 This book gives you full coverage of Hyperapp - a tiny framework for building rich web interfaces and 
-probably the most capable 434 LOC you will on Github.
+probably the most capable 422 LOC you will on GitHub.
 
 ## How to use it
 
-To benefit the most, read chapters in order. I will explain every single concept with code, images and words. 
+To benefit the most, read chapters in order. We will explain every single concept with code, images and words. 
 Later sections will build upon the previous ones, so don't skip anything.
 The book was designed to be a hands-on tutorial so have your code editor
-open all the time and code along with me. It's gonna be fun!
+open all the time and code along with us. It's gonna be fun!
 
 ## How long does it take
 
-You will need about 4 hours because this book is 7 times longer than Hyperapp [source code](https://github.com/jorgebucaran/hyperapp/blob/master/src/index.js).
+You will need about 4 hours because this book is 7 times longer than Hyperapp [source code](https://github.com/jorgebucaran/hyperapp/blob/master/index.js).
 
 ## Prerequisites
 
