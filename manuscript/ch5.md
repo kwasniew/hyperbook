@@ -116,7 +116,7 @@ const withTargetValue = withFilter(targetValue);
 <input type="text" oninput=${withTargetValue(UpdatePostText)} value=${state.currentPostText} autofocus />
 ```
 `withFilter` is a curried function that can be first configured with a given filter e.g. `targetValue` and then
-applied to a given action e.g. `UpdatePostText`.  It returns a new action that applied filter to the original event.
+applied to a given action e.g. `UpdatePostText`.  It returns a new action that applies the filter to the original event.
 
 If you keep using `withTargetValue(UpdatePostText)` over and over, consider creating an alias:
 ```js
