@@ -48,7 +48,7 @@ Inside the `view` you map over a list of `posts` and render each of them using `
 As a rule of thumb, if your view gets too big, split it into **smaller view fragments**. 
 Pass as much state as needed. For example: `listItem` only needs a single `post` parameter.
 
-At the end of this section, your view should look like this:
+At the end of this chapter, your view will look like this:
 ![Figure: Displaying a list of posts](images/splitting-view.png)
 
 ## Changing state with actions
