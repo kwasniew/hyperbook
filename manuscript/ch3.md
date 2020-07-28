@@ -132,7 +132,7 @@ app({
   init: state,
   view: (state) => html`
 <div>
-    <h1>Recent Posts</h1>
+    <h4>HyperPosts</h4>
     <ul>
       <li>
         <strong>@js_developers</strong>

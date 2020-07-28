@@ -7,10 +7,8 @@ The next code snippet shows how to render a dynamic view with a list of posts.
 
 Change you **App.js** to the following code:
 ```js
-import { h, app } from "./web_modules/hyperapp.js";
-import htm from "./web_modules/htm.js";
-
-const html = htm.bind(h);
+import { app } from "./web_modules/hyperapp.js";
+import html from "./web_modules/hyperlit.js";
 
 const state = {
   posts: [
@@ -32,7 +30,7 @@ const listItem = (post) => html`
 
 const view = (state) => html`
   <div>
-    <h1>Recent Posts</h1>
+    <h4>hyperposts</h1>
     <ul>
       ${state.posts.map(listItem)}
     </ul>
@@ -57,9 +55,9 @@ At the end of this section, your view should look like this:
 
 **Actions** bring interactivity to your application. As users click buttons or type some text, you want to react to those events.
 
-First, add a button just below the `h1` element:
+First, add a button just below the `h4` element:
 ```js
-<h1>Recent Posts</h1>
+<h4>hyperposts</h4>
 <button onclick=${AddPost}>Add Post</button>
 ```
 The `onclick` attribute translates to the DOM API click events. 
@@ -71,19 +69,19 @@ Add the action itself. Put it between the state and view declarations:
 ```js
 const AddPost = (state) => {
   const newPost = { username: "anonymous", body: "fixed text" };
-  return { ...state, posts: [newPost, ...state.posts] };
+  return { ...state, posts: [...state.posts, newPost] };
 };
 ```
 `AddPost` is a pure function mapping previous state to the new state. 
 When you click a button, Hyperapp automatically passes the previous state to your action. 
-`newPost` is created and added to the beginning of the posts list. 
+`newPost` is created and added to the end of the posts list. 
 A common pattern is to destructure the previous state and only update those properties that change. 
 Our current state has no other properties, but the code is future-proofed. 
 To keep your state updates simple, model your state as flat objects. The more nesting you do, the more
 elaborate update strategies you will need (e.g. [lenses](https://randycoulman.com/blog/2016/07/12/thinking-in-ramda-lenses/)). 
 
 The following figure shows the same action in a visual format:
-![Figure: Action is a pure function of state](images/action.jpg)
+![Figure: Action is a pure function of state](images/action.png)
 
 
 Test your app in the browser and click the **Add Post** button several times. New items should be added to the list.
@@ -98,7 +96,7 @@ Hyperapp **data flow** is inspired by the [Elm Architecture](https://guide.elm-l
 * action **A** creates a new state **S**
 * new state **S** causes re-render of the view **V** 
 
-![Figure: Functional data flow](images/data-flow.jpg)
+![Figure: Functional data flow](images/data-flow.png)
 
 As a Hyperapp user, you declare all the views, actions and the initial state. 
 Hyperapp connects the circles and takes care of:
