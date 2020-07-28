@@ -49,6 +49,7 @@ As a rule of thumb, if your view gets too big, split it into **smaller view frag
 Pass as much state as needed. For example: `listItem` only needs a single `post` parameter.
 
 At the end of this section, your view should look like this:
+
 ![Figure: Displaying a list of posts](images/splitting-view.png)
 
 ## Changing state with actions
