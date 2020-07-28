@@ -77,7 +77,7 @@ Check if your browser renders the following HTML:
 
 ## Understanding view function
 
-![View as a function of state](images/view.jpg)
+![View as a function of state](images/view.png)
 
 In the functional approach to UI development, the view is a pure function of the state.
 Hyperapp ```view``` function takes ```state``` object as an input and returns a data structure describing future DOM tree to build.
