@@ -2,8 +2,8 @@
 
 ## Getting started
 
-When learning a new framework, I like to understand every single step I take and every single line of code I write.
-Therefore, instead of generating boilerplate, you'll be writing everything yourself.
+When learning a new framework, we like to understand every single step we take and every single line of code we write.
+Therefore, instead of generating boilerplate, we'll be writing everything form scratch.
 
 With more Hyperapp experience, you may formalize the setup into your own starter kit.
 However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
@@ -22,7 +22,7 @@ Note: If you prefer an online environment, you can look at [codesandbox.io/s/hyp
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1" />
    <title>HyperPosts</title>
-   <link rel="stylesheet" href="https://andybrewer.github.io/mvp/mvp.css">
+   <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
    <script type="module" src="App.js"></script>
 </head>
 <body>
@@ -32,26 +32,26 @@ Note: If you prefer an online environment, you can look at [codesandbox.io/s/hyp
 </body>
 </html>
 ```
-You'll be using a prototype friendly [mvp.css](https://andybrewer.github.io/mvp/) stylesheet to get
+You'll be using a prototype friendly [sakura](https://oxal.org/projects/sakura/) classless CSS framework to get
 out-of-the-box styling for semantic HTML.
-Our HTML uses **App.js** as ES6 module (```type="module"```). Therefore you can use ES6 imports without a build tool.
-Finally, Hyperapp will render its contents into the  ```<div id="app"></main>```.
+Our HTML uses **App.js** as ES6 module (`type="module"`). Therefore you can use ES6 imports without a build tool.
+Finally, Hyperapp will render its contents into the  `<div id="app"></main>`.
 
 
 **App.js**
 ```js
-import {h, app} from "https://unpkg.com/hyperapp?module";
+import {h, text, app} from "https://unpkg.com/hyperapp?module";
 
 const state = {text: "Welcome to Hyperapp!"};
 
 app({
-   init: state,
-   view: state => h("h1", {id: "my-header"}, state.text),
-   node: document.getElementById("app")
+    init: state,
+    view: state => h("h1", {id: "my-header"}, text(state.text)),
+    node: document.getElementById("app")
 });
 ```
 To start experimenting, import Hyperapp as ES6 module directly from CDN (e.g. unpkg.com).
-The exported module provides two functions: `h` and `app`.
+The exported module provides three functions: `h` , `text` and `app`.
 
 The **app** function is your main integration point with the framework.
 We’re passing an object with three attributes:
@@ -59,11 +59,11 @@ We’re passing an object with three attributes:
 * **view** - view function rendering current state
 * **node** - DOM node to mount the application to
 
-Serve your **src** directory with any static HTTP server. I'm using https://www.npmjs.com/package/http-server.
+Serve your **src** directory with any static HTTP server. We're using https://www.npmjs.com/package/http-server.
 If you already have Node.js and npm on your machine then you can install it with:
-```
+`
 npm i http-server -G
-```
+`
 After that, run in the root of the project:
 ```
 http-server src
