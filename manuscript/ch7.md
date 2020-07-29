@@ -270,19 +270,19 @@ app({
     state.liveUpdate &&
       EventSourceListen({
         action: SetPost,
-        url: "https://hyperapp-api.herokuapp.com/api/event/post",
-        event: "post",
+        url: "https://hyperapp-api.herokuapp.com/api/event/post"
       }),
   ],
   node: document.getElementById("app")
 });
 ```
-When `state.liveUpdate` is `true` a new subscription gets returned in the subscriptions array. When `state.liveUpdate` is `false`, Hyperapp compares the two arrays and notices that a subscription is removed. It will call its cleanup function for you.
-If you're familiar with `useEffect` in React, then you should notice how much more elegant it is. It's not dependent on the order of calls, you don't need to remember to pass an empty array `[]`, and your dependencies are standard JS logic `state.liveUpdate && EventSourceListen(/* ... */)` instead of `[state.liveUpdate]` that's easy to miss.
+When `state.liveUpdate` is `true` the subscriptions array initializes a new subscription. 
+When `state.liveUpdate` is `false`, the subscriptions array is empty and our subscription is removed. 
+Hyperapp call the cleanup function when it removes a subscription.
 
 ## Exercise: fetching latest posts on toggle
 
-When the **Live Update** is off you may lose some posts. Therefore, when a user enables the live update, load the latest posts.
+When the **Live Update** is off you may skip some posts. Therefore, when a user enables the live update, load the latest posts.
 Modify `ToggleLiveUpdate` to `LoadLatestPosts` when appropriate.
 
 <details>
