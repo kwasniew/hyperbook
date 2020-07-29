@@ -57,8 +57,8 @@ const listItem = (post) => html`
 ```
 Usually, the best candidate for the `key` value is a stable identifier (e.g. guid).
 Some bad keys:
-- post content because it may not be unique.
-- array index as it's not stable over re-renders.
+* post content because it may not be unique
+* array index as it's not stable over re-renders
 
 Since the `key` attribute is not visible in the generated DOM you can also add `data-key` attribute for debugging purposes:
 ```js
@@ -90,7 +90,7 @@ But, you want it to be fast on older machines and mobile phones as well. Go to y
 
 Record the CPU profile while typing the text. It should show significant time spent on JS execution.
 We recommend profiling in the **Incognito mode** which usually has most browser extensions disabled.
-Those extensions may significantly impact performance results. But, you can't optimize them. You have to see your app in isolation.
+Those extensions may significantly impact performance results. 
 
 ![Figure: Impact of slow CPU on runtime performance](images/slow-cpu-impact.png)
 
@@ -98,7 +98,8 @@ Zoom in on the slowest part, which is the widest yellow box in the flame chart:
 
 ![Figure: Zooming in on performance bottleneck](images/zoomin.png)
 
-Next, look what's it consists of. `render` function seems to be our bottleneck. But the `render` function belongs to Hyperapp so keep looking for the code that you wrote. 
+Next, check the main contributors to performance problems. `render` function seems to be our bottleneck. 
+But the `render` function belongs to Hyperapp so keep looking for the code that you wrote. 
 Just below the `render` function, you should see a `view` function invoking `listItem`  repeatedly. 
 The source of our bottleneck is the `listItem` function invoked multiple times when we type a new post.
 Excessive `listItem` calls result in multiple `patch` function calls. It's Hyperapp patching physical DOM tree to keep
@@ -123,17 +124,17 @@ ${postList({ posts: state.posts })}
 
 Import `Lazy` function from Hyperapp:
 ```js
-import { h, app, Lazy } from "./web_modules/hyperapp.js";
+import { app, memo } from "./web_modules/hyperapp.js";
 ```
-`Lazy` wraps view fragments that need to be optimized.
+`memo` wraps view fragments that need to be optimized.
 
 Decorate `postList` with `Lazy`:
 ```js
-const lazyPostList = ({posts}) => Lazy({view: postList, posts});
+const lazyPostList = ({posts}) => memo(postList, {posts});
 ```
-`Lazy` expects a `view` to optimize (`postList`) and properties (```posts```) that it will pass to the `view`.
-The optimization implemented by `Lazy` is called **memoization**. 
-`Lazy` remembers the input and output of the previous `postList` invocation. 
+`memo` expects a `view` to optimize (`postList`) and properties (`posts`) that it will pass to the `view`.
+The optimization implemented by `memo` is called **memoization**. 
+`memo` remembers the input and output of the previous `postList` invocation. 
 If you call it again with the same input, the `postList` doesn't compute anything, and `lazyPostList` returns the last result.
 
 Replace `postList` with `lazyPostList`:
