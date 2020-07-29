@@ -137,7 +137,7 @@ Those 2 states have 4 possible combinations:
 * `isSaving: true` and `error: ""` (request is pending)
 * `isSaving: true` and `error: "Post cannot be saved."` (**should be impossible**)
 
-The last combination should be impossible. But the way we modelled our state makes it possible. 
+The last combination should be impossible. But the way we modeled our state makes it possible. 
 Of course, you can write some tests to verify the combination never occurs. But you can also model your state to **make the impossible state impossible**.
 
 The request status can be in 1 of 3 valid states:
@@ -189,16 +189,11 @@ const PostSaved = (state) => ({ ...state, requestStatus: idle });
 const PostError = (state) => ({ ...state, requestStatus: error });
 ```
 
-Map request status in the new `errorMessage` view fragment:
+Map request error message in the new `errorMessage` view fragment:
 ```js
-const errorMessage = ({ status, message }) => {
-  if (status === "error") {
-    return html` <div>${message}</div> `;
-  }
-  return "";
-};
+const errorMessage = ({ message }) => html`<div>${message}</div>`;
 ```
-Map request status to the button `disabled` status in a new `addPostButton` view fragment:
+Map request status to the button `disabled` status in the new `addPostButton` view fragment:
 ```js
 const addPostButton = ({ status }) => html`
   <button onclick=${AddPost} disabled=${status === "saving"}>Add Post</button>
@@ -216,7 +211,7 @@ And replace them with your new view fragments:
 ${errorMessage(state.requestStatus)}
 ${addPostButton(state.requestStatus)}
 ```
-A strategy to scale growing view functions is to split them into smaller view fragments and delegate to them.
+A common strategy to scale growing view functions is to split them into smaller view fragments and delegate to them.
 
 ## Exercise: removing error when typing a new post
 
