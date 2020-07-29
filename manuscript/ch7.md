@@ -17,7 +17,7 @@ To build intuition about subscriptions, look at different sources that fit this 
 
 What they have in common is a long-lived nature of the underlying event source. 
 
-Note: I'll refer to short-lived effects as just effects and the long-lived effects as subscriptions.
+Note: we'll refer to short-lived effects as just effects and the long-lived effects as subscriptions.
 
 ## Implementing subscriptions
 
@@ -36,7 +36,7 @@ const SetPost = (state, event) => {
     const post = JSON.parse(event.data);
     return {
       ...state,
-      posts: [post, ...state.posts],
+      posts: [...state.posts, post],
     };
   } catch (e) {
     return state;
@@ -44,7 +44,7 @@ const SetPost = (state, event) => {
 };
 ```
 The event is the underlying `MessageEvent` from the WebSocket API. You parse the `data` property of the event. 
-If the data is a valid JSON post, you add it to the beginning of the post list. In case of a parsing error, you don't change the state of the application.
+If the data is a valid JSON post, you add it to the end of the post list. In case of a parsing error, you don't change the state of the application.
 
 Plug the subscription and the action into the application:
 ```js
@@ -94,7 +94,7 @@ Inside `AddPost` action change this code:
     const newState = {
       ...state,
       currentPostText: "",
-      posts: [newPost, ...state.posts],
+      posts: [...state.posts, newPost]
     };
 ```
 To this:
@@ -112,9 +112,9 @@ To this:
 In this section, you'll write your subscription for [Server-Sent Events](https://www.smashingmagazine.com/2018/02/sse-websockets-data-flow-http2/).
 
 Server-Sent Events (SSE) is a lesser-known, but much simpler HTTP-native alternative to WebSockets. 
-SSE also handles network failures more gracefully than plain WebSockets. It can automatically reconnect on failed connections.
+SSE handles network failures more gracefully than plain WebSockets. It can automatically reconnect on failed connections.
 
-In [Writing your own effects](ch6.md#writing-your-own-effects) section you defined effects as follows:
+In [Writing a new effect definition](ch6.md#writing-a-new-effect-definition) section you defined effects as follows:
 ```js
 const httpEffect = (dispatch, data) => {};
 ```
@@ -141,7 +141,7 @@ const eventSourceSubscription = (dispatch, data) => {
 `data` parameter will hold two configuration options: `url` and `action`. 
 We follow the same convention that was used in the WebSockets implementation. When SSE notification arrives, dispatch an `action` and pass the server `event`.
 
-In [Writing your own effects](ch6.md#writing-your-own-effects) section you used the following effect signature:
+In [Writing a new effect definition](ch6.md#writing-a-new-effect-definition) section you used the following effect signature:
 ```js
 const Http = data => [httpEffect, data];
 ```

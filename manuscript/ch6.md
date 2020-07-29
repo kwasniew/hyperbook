@@ -68,7 +68,7 @@ To summarize what we’ve learned so far. Side-effects in Hyperapp are made of t
 ```js
 [effectDefinition, data]
 ```
-## Write a new effect definition
+## Writing a new effect definition
 
 Let’s move from the abstract `effectDefinition` to the actual code making HTTP GET `fetch` request.  Let’s call it `fetchEffect`
 ```js
@@ -251,7 +251,7 @@ const AddPost = state => {
     const newState = { 
       ...state,
       currentPostText: "",
-      posts: [newPost, ...state.posts]
+      posts: [...state.posts, newPost]
     };
     return [newState, SavePost(newPost)];
   } else {
