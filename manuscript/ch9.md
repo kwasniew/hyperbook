@@ -1,12 +1,12 @@
 # Chapter 9: Runtime optimization
 
-## Breaking from the purity
+## Breaking from purity
 
 "Effects/subscriptions as data" taken to the extreme means no side-effects in the userland code. 
-```setTimeout``` becomes an effect, ````setInterval```` becomes a subscription. HTTP calls become effects, SSE becomes subscriptions. 
+```setTimeout``` becomes an effect, ````setInterval```` becomes a subscription. HTTP calls become effects, SSE become a subscription. 
 
 What about things like `console.log` or `Math.random()`? 
-Can you wrap them inside effects? Yes, but it's more convenient to use them directly. While working on the runtime optimization, you will use a function based on `Math.random()`.
+Can you wrap them inside effects? Yes, but sometimes it's more convenient to use them directly. 
 
 Our next requirement is to add unique identifiers to the posts.
 Put the `guid` function into your code:
@@ -34,15 +34,16 @@ Modify the `AddPost` action to generate `id` for all new posts:
 
 ## Optimizing long lists of items 
 
-Our application keeps adding new posts to the top of the list. 
-When Hyperapp sees the first item in the new list and compares it with the first item in the old list, they differ. 
-Same with the second and third and all the other items. The old items got shifted by one. We know it, but the algorithm for the Virtual DOM diffing doesn't.
+Our application keeps adding new posts to the end of the list. But what would happen if you had to add them 
+to the beginning of the list?
 
-![Figure: Lists without keys require unnecessary Virtual DOM computations](images/nokeys.jpg)
+![Figure: Lists without keys require unnecessary Virtual DOM computations](images/nokeys.png)
 
+When Hyperapp compares previous and next list they differ. 
+The old items got shifted by one. We know it, but the algorithm for the Virtual DOM diffing doesn't.
 To maintain a stable list item identity between the renders, add a **key** attribute.
 
-![Figure: Lists with keys skip unnecessary Virtual DOM computations](images/keys.jpg)
+![Figure: Lists with keys skip unnecessary Virtual DOM computations](images/keys.png)
 
 With the extra hint from the **key** attribute, Hyperapp avoids re-rendering the items that got shifted by one.
 
