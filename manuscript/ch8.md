@@ -86,9 +86,8 @@ Eventually, you will populate this field with an error value.
 Expose the `error` in the UI:
 ```js
 <div>${state.error}</div>
-<button onclick=${AddPost} disabled="${state.isSaving}">Add Post</button>
 ```
-You should put the error just above the **Add Post** button.
+You should put the error just above the **Add Post**  button and the input field.
 
 Add `PostError` action that will be triggered on HTTP errors. 
 ```js
