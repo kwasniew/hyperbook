@@ -231,7 +231,7 @@ It will be easier to understand the idea if we start with the UI first. Add a ca
 
 ![Figure: Live Update control](images/liveupdate.png)
 
-Introduce intial state field called `liveUpdate`:
+Introduce the initial state field called `liveUpdate`:
 ```js
 const state = {
   currentPostText: "",
@@ -248,13 +248,15 @@ const ToggleLiveUpdate = state => ({...state, liveUpdate: !state.liveUpdate});
 
 Add a UI control for live update just below the **Add Post** button.
 ```js
-    <input
-      type="checkbox"
-      id="liveUpdate"
-      onchange=${ToggleLiveUpdate}
-      checked=${state.liveUpdate}
-    />
-    <label for="liveUpdate">Live Update</label>
+    <label for="liveUpdate">
+        <input
+        type="checkbox"
+        id="liveUpdate"
+        onchange=${ToggleLiveUpdate}
+        checked=${state.liveUpdate}
+        />
+      Live Update
+    </label>
 ```
 This checkbox reflects the `liveUpdate` status. Every time the checkbox changes, it toggles the status.
 Label for the input field conveniently allows for clicking **Live Update** text to change the settings.
