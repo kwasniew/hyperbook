@@ -122,13 +122,13 @@ Use it in the `view` function:
 ${postList({ posts: state.posts })}
 ```
 
-Import `Lazy` function from Hyperapp:
+Import `memo` function from Hyperapp:
 ```js
 import { app, memo } from "./web_modules/hyperapp.js";
 ```
 `memo` wraps view fragments that need to be optimized.
 
-Decorate `postList` with `Lazy`:
+Decorate `postList` with `memo`:
 ```js
 const lazyPostList = ({posts}) => memo(postList, {posts});
 ```
@@ -147,8 +147,6 @@ Verify performance profile again.
 ![Figure: Optimized view profile with shorter JS blocking time](images/optimized.png)
 
 Most key presses should generate a performance profile with much shorter JS blocking time.
-
-`Lazy` is the last part of Hyperapp API you need to learn.  There's nothing more. Congratulations!
 
 After this section remove the `limit` query param from the API `url`.
 
