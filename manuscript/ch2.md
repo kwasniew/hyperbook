@@ -146,5 +146,6 @@ app({
 ```
 Write your HTML inside `html` tagged template literals. Under the hood `hyperlit` translates your HTML to the low-level `h` function calls.
 
-Note: If you want to replace `hyperlit` with ```h``` calls in production, you can use `babel-plugin-hyperlit`.
+Note: If you want to replace `hyperlit` with ```h``` calls in production, you can use `babel-plugin-hyperlit`. The plugin will
+eliminate the runtime cost of the HTML parser.
 
