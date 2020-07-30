@@ -77,7 +77,7 @@ Update **package.json** with this `snowpack` setup:
 }
 ```
 Snowpack is our development dependency. It provides `snowpack install` command that will run after ```npm i``` from the ```postinstall``` script. 
-You tell snowpack to put the browser-friendly bundles in `src/web_modules`, because we want to HTTP serve the whole `src` directory. Without `--dest`  it would put everything in the root-level `web_modules`.
+You tell Snowpack to put the browser-friendly bundles in `src/web_modules`, because we want to HTTP serve the whole `src` directory. Without `--dest`  it would put everything in the root-level `web_modules`.
 
 Rewrite your imports to use `web_modules`:
 ```
