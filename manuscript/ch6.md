@@ -68,12 +68,16 @@ To summarize what we’ve learned so far. Side-effects in Hyperapp are made of t
 ```js
 [effectDefinition, data]
 ```
+In this book we'll call effect definitions with a lowercase letter. 
+
 ## Writing a new effect definition
 
 Let’s move from the abstract `effectDefinition` to the actual code making HTTP GET `fetch` request.  Let’s call it `fetchEffect`
 ```js
 const LoadLatestPosts = [fetchEffect, data];
 ```
+Please note that the effect `LoadLatestPosts` starts with an uppercase letter, but
+the effect definition from a lowercase one. This is the convention we follow in this book.
 
 Hyperapp passes two arguments to the effect definition:
 ```js

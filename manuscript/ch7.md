@@ -123,6 +123,7 @@ Start with the same signature for the subscription definition:
 ```js
 const eventSourceSubscription = (dispatch, data) => {};
 ```
+We're using lowercase letter convention for the subscription definitions.
 
 The browser API for SSE is called the `EventSource`:
 ```js
@@ -150,6 +151,7 @@ Following the same convention create your own subscription:
 ```js
 const EventSourceListen = data => [eventSourceSubscription, data];
 ```
+The actual subscription name starts with an uppercase letter.
 
 Plug the subscription into your application:
 ```js

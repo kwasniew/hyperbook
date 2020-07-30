@@ -79,7 +79,8 @@ When you click a button, Hyperapp automatically passes the previous state to you
 A common pattern is to destructure the previous state and only update those properties that change. 
 Our current state has no other properties, but the code is future-proofed. 
 To keep your state updates simple, model your state as flat objects. The more nesting you do, the more
-elaborate update strategies you will need (e.g. [lenses](https://randycoulman.com/blog/2016/07/12/thinking-in-ramda-lenses/)). 
+elaborate update strategies you will need (e.g. [lenses](https://randycoulman.com/blog/2016/07/12/thinking-in-ramda-lenses/)).
+In this book we'll call all actions with an uppercase letter. 
 
 The following figure shows the same action in a visual format:
 ![Figure: Action is a pure function of state](images/action.png)
