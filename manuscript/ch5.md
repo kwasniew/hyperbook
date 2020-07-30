@@ -127,6 +127,20 @@ That you can pass directly:
 <input type="text" oninput=${UpdatePostTextAction} value=${state.currentPostText} autofocus />
 ```
 
+Finally, move the generic code for extracting `event.target.value` to a separate file **lib/DomEvents.js**.
+
+```js
+const targetValue = (event) => event.target.value;
+const withFilter = (filter) => (action) => (state, event) =>
+    action(state, filter(event));
+export const withTargetValue = withFilter(targetValue);
+```
+
+Use it in the **Posts.js**:
+```js
+import {withTargetValue} from "./lib/DomEvents.js";
+```
+
 ## Exercises
 
 According to [modern research](https://en.wikipedia.org/wiki/Desirable_difficulty), testing your knowledge is essential for learning. 
