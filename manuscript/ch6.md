@@ -263,15 +263,10 @@ This action performs simple local state update and simultaneously triggers the e
 
 ## Triggering Multiple Effects
 
-If you have more than one effect wrap them in an array:
-```js
-const ActionExample = oldState => [newState, [Effect1, Effect2]];
-```
-Or pass them comma-separated at the end of the main array:
+If you have more than one effect pass them comma-separated at the end of the main array:
 ```js
 const ActionExample = oldState => [newState, Effect1, Effect2];
 ```
-They do the same thing, so pick the convention that makes the most sense to you. 
 You can add as many effects as you need. Think of it as a batch of effects. 
 
 To summarize this section, whenever you see `state`, you can replace it with `[state, effect*]` array. 
