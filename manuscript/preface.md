@@ -5,7 +5,7 @@
 > -- Mark Twain
 
 This book gives you full coverage of Hyperapp - a tiny framework for building rich web interfaces and 
-probably the most capable 422 LOC you will on GitHub.
+probably the most capable 422 LOC you will find on GitHub.
 
 ## How to use it
 
