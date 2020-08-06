@@ -134,7 +134,7 @@ However, if you write everything from scratch and prefer JS-driven templating, d
 Change you **App.js** code to use `hyperlit`:
 ```js
 import {app} from "https://unpkg.com/hyperapp?module";
-import html from 'https://unpkg.com/hyperlit?module';
+import html from "https://unpkg.com/hyperlit?module";
 
 const state = {text: "Welcome to Hyperapp!"};
 
