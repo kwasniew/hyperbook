@@ -12,8 +12,6 @@ However, you may also realize the starter kit is no longer necessary with certai
 Create empty **src** directory with **index.html** and **App.js**. This book convention is to 
 uppercase the first letter of the JS file names.
 
-Note: If you prefer an online environment, you can look at [codesandbox.io/s/hyperapp-playground-fwjlo](https://codesandbox.io/s/hyperapp-playground-fwjlo).
-
 **index.html**
 ```html
 <!DOCTYPE html>
