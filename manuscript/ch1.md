@@ -18,7 +18,7 @@ Modern frontend development is very complicated:
 
 ## What is your elevator pitch?
 
-![Figure: Hyperapp Elevator Pitch](images/elevator-pitch.svg)
+![Figure: Hyperapp Elevator Pitch](images/elevator-pitch.png)
 
 ```
 For JS developers. 
