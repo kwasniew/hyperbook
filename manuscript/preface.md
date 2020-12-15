@@ -2,7 +2,7 @@
 
 > If I had more time, I would have written a shorter letter.
 >
-> -- Mark Twain
+> -- not Mark Twain
 
 This book gives you full coverage of Hyperapp - a tiny framework for building rich web interfaces and 
 probably the most capable 422 LOC you will find on GitHub.
