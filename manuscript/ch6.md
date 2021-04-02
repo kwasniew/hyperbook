@@ -13,7 +13,7 @@ const SetPosts = (state, posts) => ({
 const LoadLatestPosts = (state) =>
   fetch("https://hyperapp-api.herokuapp.com/api/post")
     .then(response => response.json())
-    .then(SetPosts);
+    .then(data => SetPosts(state, data));
 ```
 `LoadLatestPosts` uses browser Fetch API to get data from the server.
 When the data arrives, it invokes a simple state transition function to set the posts in the local state.
