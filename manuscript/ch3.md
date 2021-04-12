@@ -16,8 +16,8 @@ Create **package.json** in your root directory:
 ```json
 {
   "dependencies": {
-    "hyperapp": "2.0.8",
-    "hyperlit": "0.3.5"
+    "hyperapp": "2.0.14",
+    "hyperlit": "0.3.6"
   }
 }
 ```
@@ -46,51 +46,43 @@ import html from "../node_modules/hyperlit/dist.js";
 Start HTTP server from the root:
 `http-server .`
 
-Open http://localhost:8080/src and test your app.
+Open http://localhost:8080 and test your app.
 
 It certainly works, but you had to inspect the contents of both libraries to provide correct paths. We can automate 
 this process.
 
 ## Integrating Hyperapp with Snowpack 
 
-[Snowpack](https://www.snowpack.dev/) is a tool to translate selected `node_modules` into browser friendly bundles at dependency installation time.
-It puts all dependencies as single file bundles in a predictable location called `web_modules`. 
-It also has experimental support for deep imports so all transitive dependencies are resolved as single browser-friendly files. 
-Deep imports work for libraries using `require` and [Node.js ESM modules](https://nodejs.org/api/esm.html). The latter means your dependency needs
-to use `.js` extension in the import statements.  
-In essence Snowpack makes bundling JS optional at development time.
+[Snowpack](https://www.snowpack.dev/) is a tool making JS bundling optional at development time.
 
 Update **package.json** with this `snowpack` setup:
 ```json
 {
   "scripts": {
-    "snowpack": "snowpack install --dest=src/web_modules",
-    "postinstall": "npm run snowpack"
+    "start": "snowpack dev",
+    "build": "snowpack build"
   },
   "dependencies": {
-    "hyperapp": "2.0.8",
-    "hyperlit": "0.3.5"
+    "hyperapp": "2.0.14",
+    "hyperlit": "0.3.6"
   },
   "devDependencies": {
-    "snowpack": "2.6.4"
+    "snowpack": "3.2.2"
   }
 }
 ```
-Snowpack is our development dependency. It provides `snowpack install` command that will run after ```npm i``` from the ```postinstall``` script. 
-You tell Snowpack to put the browser-friendly bundles in `src/web_modules`, because we want to HTTP serve the whole `src` directory. Without `--dest`  it would put everything in the root-level `web_modules`.
-
-Rewrite your imports to use `web_modules`:
+Snowpack is our development dependency. It provides `snowpack dev` command that will use in development and `snowpack build` command
+that we will use for a production build.
+Rewrite your imports:
 ```
-import {app} from "./web_modules/hyperapp.js";
-import html from "./web_modules/hyperlit.js";
+import {app} from "hyperapp";
+import html from "hyperlit";
 ```
  
-Run the installation command:
-```npm i```
+Run the following command:
+```npm start```
 
-Snowpack will inspect your code and translate required modules from `node_modules` to `web_modules`.
-
-If you use git then add **src/web_modules** to **.gitignore**.
+Snowpack will inspect your code and translate required modules into browser friendly bundles on the fly.
 
 ## Formatting code with prettier 
 
@@ -101,21 +93,22 @@ Add `format` command and `prettier` dev dependency to **package.json**:
 ```json
 {
   "scripts": {
-    "snowpack": "snowpack install --dest=src/web_modules",
-    "postinstall": "npm run snowpack",
-    "format": "prettier --write '**/!(web_modules)/*.js'"
+    "start": "snowpack dev",
+    "build": "snowpack build",
+    "format": "prettier --write 'src/**/*.js'"
   },
   "dependencies": {
-    "hyperapp": "2.0.8",
-    "hyperlit": "0.3.5"
+    "hyperapp": "2.0.14",
+    "hyperlit": "0.3.6"
   },
   "devDependencies": {
-    "prettier": "2.0.5",
-    "snowpack": "2.6.4"
+    "snowpack": "3.2.2",
+    "prettier": "2.2.1"
   }
 }
+
 ```
-`format` command will format your JS files except from the `web_modules` (excluded explicitly in the format script) and `node_modules` (excluded by default).
+`format` command will format your JS files except from the `node_modules` (excluded by default).
 With the `--write` option `prettier` will re-write the formatted files in place.
 
 Install prettier by running:
@@ -123,8 +116,8 @@ Install prettier by running:
 
 To test if `prettier` is working paste this malformed code into **App.js**:
 ```js
-import { app } from "./web_modules/hyperapp.js";
-import html from "./web_modules/hyperlit.js";
+import { app } from "hyperapp";
+import html from "hyperlit";
 
 const state = { text: "Welcome to Hyperapp!" };
 

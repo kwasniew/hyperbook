@@ -11,7 +11,7 @@ const SetPosts = (state, posts) => ({
   posts
 });
 const LoadLatestPosts = (state) =>
-  fetch("https://hyperapp-api.herokuapp.com/api/post")
+  window.fetch("http://hyperapp-api.herokuapp.com/api/post")
     .then(response => response.json())
     .then(data => SetPosts(state, data));
 ```
@@ -34,13 +34,13 @@ const SetPosts = (state, posts) => ({
   posts
 });
 const data = {
-  url: "https://hyperapp-api.herokuapp.com/api/post",
+  url: "http://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
 };
 // const LoadLatestPosts = ??
 ```
 Before we try to figure out how the `LoadLatestPosts` could look like, let’s explain the structure of the data it would need. 
-`data` is an object. It has API `url` pointing to the resource that we want to load (`"https://hyperapp-api.herokuapp.com/api/post"`). 
+`data` is an object. It has API `url` pointing to the resource that we want to load (`"http://hyperapp-api.herokuapp.com/api/post"`). 
 After it’s loaded you want to call `SetPosts` action. You can think of `action: SetPosts` as a callback. 
 While different effects need all kinds of input data, almost all effects use `action` to call when they're done. 
 
@@ -58,7 +58,7 @@ const SetPosts = (state, posts) => ({
   posts
 });
 const data = {
-  url: "https://hyperapp-api.herokuapp.com/api/post",
+  url: "http://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
 };
 const LoadLatestPosts = [effectDefinition, data];
@@ -87,7 +87,7 @@ Hyperapp will invoke your effect and inject a `dispatch` function that the effec
 A simple implementation of the fetch effect definition may look like this:
 ```js
 const fetchEffect = (dispatch, data) => {
-  return fetch(data.url)
+  return window.fetch(data.url)
       .then(response => response.json())
       .then(json => dispatch(data.action, json));
 };
@@ -105,7 +105,7 @@ const SetPosts = (state, posts) => ({
 Remember that it’s passed as an action: 
 ```js
 const data = {
-  url: "https://hyperapp-api.herokuapp.com/api/post",
+  url: "http://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
 };
 ```
@@ -131,7 +131,7 @@ It would be a little too repetitive to create `[effectDefinition, data]` array e
 Especially because the effect definition that we called `fetchEffect` will always be the same. 
 ```js
 const LoadLatestPosts = [fetchEffect, {
-  url: "https://hyperapp-api.herokuapp.com/api/post",
+  url: "http://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
 }];
 const LoadSomethingElseExample = [fetchEffect, { 
@@ -140,12 +140,12 @@ const LoadSomethingElseExample = [fetchEffect, {
 ```
 To prevent that make a function that will hide the repetition:
 ```js
-const Fetch = data => [fetchEffect, data];
+const Http = data => [fetchEffect, data];
 ```
 Then, pass the actual effect data:
 ```js
-const LoadLatestPosts = Fetch({
-  url: "https://hyperapp-api.herokuapp.com/api/post",
+const LoadLatestPosts = Http({
+  url: "http://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
 });
 ```
@@ -192,7 +192,7 @@ In this section, you'll use an open-source library [hyperapp-fx](https://github.
 
 In **App.js** add `LoadLatestPosts` effect that invokes `SetPost` action on successful response:
 ```js
-import { Http } from "./web_modules/hyperapp-fx.js";
+import { Http } from "hyperapp-fx";
 
 const SetPosts = (state, posts) => ({
   ...state,
@@ -200,27 +200,28 @@ const SetPosts = (state, posts) => ({
 });
 
 const LoadLatestPosts = Http({
-  url: "https://hyperapp-api.herokuapp.com/api/post",
+  url: "http://hyperapp-api.herokuapp.com/api/post",
   action: SetPosts
 });
 ```
 `Http` function takes your effect data and builds a two-argument array of `[httpEffectDefinition, effectData]`.  
-It’s a more generic version of our `Fetch` function.
+It’s a more generic version of our own `Http` function.
 
 Add hyperapp-fx:
 ```json
 {
   "dependencies": {
-    "htm": "3.0.4",
-    "hyperapp": "2.0.4",
-    "hyperapp-fx": "2.0.0-beta.1"
+    "hyperapp": "2.0.14",
+    "hyperapp-fx": "2.0.0-beta.2",
+    "hyperlit": "0.3.6"
   }
 }
 ```
 
-And let Snowpack bundle it for the browser when installing dependencies:
+And let Snowpack bundle it for the browser:
 
 ```npm i```
+```npm start```
 
 ## Triggering Effects from Actions
 
@@ -230,7 +231,7 @@ Create the `SavePost` effect:
 ```js
 const SavePost = (post) =>
   Http({
-    url: "https://hyperapp-api.herokuapp.com/api/post",
+    url: "http://hyperapp-api.herokuapp.com/api/post",
     options: {
       method: "post",
       headers: {
@@ -287,3 +288,31 @@ const Action = state => {
   return [newState, Effect1, Effect2];
 };
 ```
+
+### Exercise: implementing own HTTP POST support
+
+Enhance our own `fetchEffect` to handle POST requests. It should accept options similar to hyperapp-fx.
+Once it works, move `fetchEffect` and `Http` into **lib/Http.js** and use it in **App.js**.
+
+<details>
+    <summary id="implementing_own_post">Solution</summary>
+
+**lib/Http.js**
+```js
+const fetchEffect = (dispatch, data) => {
+  return window
+    .fetch(data.url, data.options)
+    .then((response) => response.json())
+    .then((json) => {
+      return dispatch(data.action, json);
+    });
+};
+export const Http = (data) => [fetchEffect, data];
+```
+
+**App.js**
+```js
+import { Http } from "./lib/Http.js";
+```
+
+</details>

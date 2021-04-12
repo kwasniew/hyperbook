@@ -7,8 +7,8 @@ The next code snippet shows how to render a dynamic view with a list of posts.
 
 Change you **App.js** to the following code:
 ```js
-import { app } from "./web_modules/hyperapp.js";
-import html from "./web_modules/hyperlit.js";
+import { app } from "hyperapp";
+import html from "hyperlit";
 
 const state = {
   posts: [
