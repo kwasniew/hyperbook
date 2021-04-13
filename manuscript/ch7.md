@@ -127,7 +127,7 @@ We're using lowercase letter convention for the subscription definitions.
 
 The browser API for SSE is called the `EventSource`:
 ```js
-const es = new EventSource("http://hyperapp-api.herokuapp.com/api/event/post");
+const es = new window.EventSource("http://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
 ```
 `EventSource` is a regular event emitter similar to a clickable button.
@@ -135,7 +135,7 @@ es.addEventListener("message", event => /* handle event with a data field */)
 Wrap the API into your subscription definition:
 ```js
 const eventSourceSubscription = (dispatch, data) => {
-  const es = new EventSource(data.url);
+  const es = new window.EventSource(data.url);
   es.addEventListener("message", (event) => dispatch(data.action, event));
 };
 ```
@@ -213,7 +213,7 @@ const eventSourceSubscription = (dispatch, data) => {
 Fill in this template with your `EventSource` implementation:
 ```js
 const eventSourceSubscription = (dispatch, data) => {
-  const es = new EventSource(data.url);
+  const es = new window.EventSource(data.url);
   const listener = (event) => dispatch(data.action, event);
   es.addEventListener("message", listener);
 

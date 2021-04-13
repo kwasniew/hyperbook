@@ -6,7 +6,7 @@ Switch `SavePost` to a new url with the slow API.
 ```js
 const SavePost = (post) =>
   Http({
-    url: "https://hyperapp-api.herokuapp.com/slow-api/post",
+    url: "http://hyperapp-api.herokuapp.com/slow-api/post",
     ...
   });
 ```
@@ -65,7 +65,7 @@ Switch `SavePost` to a new url with API returning error responses.
 ```js
 const SavePost = (post) =>
   Http({
-    url: "https://hyperapp-api.herokuapp.com/error-api/post",
+    url: "http://hyperapp-api.herokuapp.com/error-api/post",
     ...
   });
 ```
@@ -108,8 +108,23 @@ const SavePost = (post) =>
     error: PostError
   });
 ```
-hyperapp-fx `Http` effect has a special error field for the error handling action.
 `PostError` should enable the **Add Post** button and set the error message.
+
+Add error handling in your `fetchEffect`:
+```js
+const fetchEffect = (dispatch, data) => {
+  return window
+    .fetch(data.url, data.options)
+    .then((response) => (response.ok ? response : Promise.reject(response.json())))
+    .then((response) => response.json())
+    .then((json) => {
+      return dispatch(data.action, json);
+    })
+    .catch((e) => dispatch(data.error, e));
+};
+```
+`window.fetch` API doesn't reject a promise by default. We have to inspect the `response` object and trigger promise rejection
+ourselves. 
 
 Test your application. 
 
@@ -230,4 +245,4 @@ const UpdatePostText = (state, currentPostText) => ({
 
 </details>
 
-Now revert your API `url` in `SavePost` to `"https://hyperapp-api.herokuapp.com/api/post"`
+Now revert your API `url` in `SavePost` to `"http://hyperapp-api.herokuapp.com/api/post"`
