@@ -9,7 +9,7 @@ With more Hyperapp experience, you may formalize the setup into your own starter
 However, you may also realize the starter kit is no longer necessary with certain sources of complexity eliminated.
 
 
-Create empty **src** directory with **index.html** and **App.js**. This book convention is to 
+In your project root directory create **index.html** and **src/App.js**. This book convention is to 
 uppercase the first letter of the JS file names.
 
 **index.html**
@@ -21,7 +21,7 @@ uppercase the first letter of the JS file names.
    <meta name="viewport" content="width=device-width, initial-scale=1" />
    <title>HyperPosts</title>
    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
-   <script type="module" src="App.js"></script>
+   <script type="module" src="src/App.js"></script>
 </head>
 <body>
    <main>
@@ -32,11 +32,11 @@ uppercase the first letter of the JS file names.
 ```
 You'll be using a prototype friendly [sakura](https://oxal.org/projects/sakura/) classless CSS framework to get
 out-of-the-box styling for semantic HTML.
-Our HTML uses **App.js** as ES6 module (`type="module"`). Therefore you can use ES6 imports without a build tool.
+Our HTML uses **src/App.js** as ES6 module (`type="module"`). Therefore you can use ES6 imports without a build tool.
 Finally, Hyperapp will render its contents into the  `<div id="app"></main>`.
 
 
-**App.js**
+**src/App.js**
 ```js
 import {h, text, app} from "https://unpkg.com/hyperapp?module";
 
@@ -64,7 +64,7 @@ npm i http-server -G
 `
 After that, run in the root of the project:
 ```
-http-server src
+http-server .
 ```
 
 By default, the `http-server` starts on http://localhost:8080.

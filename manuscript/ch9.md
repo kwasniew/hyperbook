@@ -75,7 +75,7 @@ Hyperapp internally uses `key`, so the `data-key` is only for you.
 Switch `LoadLatestPosts` to fetch 1000 items when the application starts (notice new `url` value):
 ```js
 const LoadLatestPosts = Http({
-  url: "https://hyperapp-api.herokuapp.com/api/post?limit=1000",
+  url: "http://hyperapp-api.herokuapp.com/api/post?limit=1000",
   action: SetPosts,
 });
 ```
@@ -124,7 +124,7 @@ ${postList({ posts: state.posts })}
 
 Import `memo` function from Hyperapp:
 ```js
-import { app, memo } from "./web_modules/hyperapp.js";
+import { app, memo } from "hyperapp";
 ```
 `memo` wraps view fragments that need to be optimized.
 

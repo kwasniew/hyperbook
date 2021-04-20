@@ -25,7 +25,7 @@ In this section, you will subscribe to the WebSocket stream with post updates.
 
 Import subscription definition:
 ```js
-import { Http, WebSocketListen } from "./web_modules/hyperapp-fx.js";
+import { WebSocketListen } from "hyperapp-fx";
 ```
 hyperapp-fx uses `*Listen` convention to name subscription creating functions.
 
@@ -116,7 +116,7 @@ SSE handles network failures more gracefully than plain WebSockets. It can autom
 
 In [Writing a new effect definition](ch6.md#writing-a-new-effect-definition) section you defined effects as follows:
 ```js
-const httpEffect = (dispatch, data) => {};
+const fetchEffect = (dispatch, data) => {};
 ```
 
 Start with the same signature for the subscription definition:
@@ -127,7 +127,7 @@ We're using lowercase letter convention for the subscription definitions.
 
 The browser API for SSE is called the `EventSource`:
 ```js
-const es = new EventSource("https://hyperapp-api.herokuapp.com/api/event/post");
+const es = new window.EventSource("http://hyperapp-api.herokuapp.com/api/event/post");
 es.addEventListener("message", event => /* handle event with a data field */)
 ```
 `EventSource` is a regular event emitter similar to a clickable button.
@@ -135,7 +135,7 @@ es.addEventListener("message", event => /* handle event with a data field */)
 Wrap the API into your subscription definition:
 ```js
 const eventSourceSubscription = (dispatch, data) => {
-  const es = new EventSource(data.url);
+  const es = new window.EventSource(data.url);
   es.addEventListener("message", (event) => dispatch(data.action, event));
 };
 ```
@@ -144,7 +144,7 @@ We follow the same convention that was used in the WebSockets implementation. Wh
 
 In [Writing a new effect definition](ch6.md#writing-a-new-effect-definition) section you used the following effect signature:
 ```js
-const Http = data => [httpEffect, data];
+const Http = data => [fetchEffect, data];
 ```
 
 Following the same convention create your own subscription:
@@ -161,7 +161,7 @@ app({
   subscriptions: (state) => [
     EventSourceListen({
       action: SetPost,
-      url: "https://hyperapp-api.herokuapp.com/api/event/post"
+      url: "http://hyperapp-api.herokuapp.com/api/event/post"
     }),
   ],
   node: document.getElementById("app"),
@@ -191,7 +191,7 @@ Looking at your subscription signature, it's not much different from any short-l
 You could event plug the subscription into the init:
 ```js
 app({
-    init: [state, [LoadLatestPosts, EventSourceListen({action: SetPost, url: 'https://hyperapp-api.herokuapp.com/api/event/post'})]],
+    init: [state, [LoadLatestPosts, EventSourceListen({action: SetPost, url: 'http://hyperapp-api.herokuapp.com/api/event/post'})]],
     ...
 });
 ```
@@ -213,7 +213,7 @@ const eventSourceSubscription = (dispatch, data) => {
 Fill in this template with your `EventSource` implementation:
 ```js
 const eventSourceSubscription = (dispatch, data) => {
-  const es = new EventSource(data.url);
+  const es = new window.EventSource(data.url);
   const listener = (event) => dispatch(data.action, event);
   es.addEventListener("message", listener);
 
@@ -272,7 +272,7 @@ app({
     state.liveUpdate &&
       EventSourceListen({
         action: SetPost,
-        url: "https://hyperapp-api.herokuapp.com/api/event/post"
+        url: "http://hyperapp-api.herokuapp.com/api/event/post"
       }),
   ],
   node: document.getElementById("app")
